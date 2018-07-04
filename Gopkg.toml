@@ -36,3 +36,7 @@
 [[constraint]]
   branch = "v2"
   name = "gopkg.in/mgo.v2"
+
+[[constraint]]
+  name = "github.com/spf13/viper"
+  version = "1.0.2"
