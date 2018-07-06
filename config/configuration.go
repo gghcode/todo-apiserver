@@ -7,19 +7,19 @@ type Configuration struct {
 	MongoConnStr string
 }
 
-func Load() Configuration {
+func Load() (*Configuration, error) {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	result := &Configuration{}
+	var result *Configuration
 
 	if err := viper.Unmarshal(&result); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return *result
+	return result, nil
 }
