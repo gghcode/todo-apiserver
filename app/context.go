@@ -1,7 +1,16 @@
 package app
 
-import "apas-todo-service/config"
-
 type Context struct {
-	Config *config.Configuration
+	Config *Config
+}
+
+func LoadContext() (*Context, error) {
+	config, err := loadConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	result := &Context{ config }
+
+	return result, nil
 }

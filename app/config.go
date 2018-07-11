@@ -1,13 +1,13 @@
-package config
+package app
 
 import "github.com/spf13/viper"
 
-type Configuration struct {
+type Config struct {
 	Port int
-	MongoConnStr string
+	MonnStr string
 }
 
-func Load() (*Configuration, error) {
+func loadConfig() (*Config, error) {
 	viper.SetConfigName("config")
 	viper.AddConfigPath(".")
 
@@ -15,7 +15,7 @@ func Load() (*Configuration, error) {
 		return nil, err
 	}
 
-	var result *Configuration
+	var result *Config
 
 	if err := viper.Unmarshal(&result); err != nil {
 		return nil, err
