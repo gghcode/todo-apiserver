@@ -4,7 +4,7 @@ import "github.com/spf13/viper"
 
 type Config struct {
 	Port int
-	MonnStr string
+	MongoConnStr string
 }
 
 func loadConfig() (*Config, error) {

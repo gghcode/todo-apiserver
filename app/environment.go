@@ -1,16 +1,16 @@
 package app
 
-type Context struct {
+type Environment struct {
 	Config *Config
 }
 
-func LoadContext() (*Context, error) {
+func LoadEnvironment() (*Environment, error) {
 	config, err := loadConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	result := &Context{ config }
+	result := &Environment{ config }
 
 	return result, nil
 }
