@@ -48,7 +48,10 @@
 
 [[projects]]
   name = "github.com/magiconair/properties"
-  packages = ["."]
+  packages = [
+    ".",
+    "assert"
+  ]
   revision = "c2353362d570a7bfa228149c62842019201cfb71"
   version = "v1.8.0"
 
@@ -69,6 +72,12 @@
   packages = ["."]
   revision = "c01d1270ff3e442a8a57cddc1c92dc1138598194"
   version = "v1.2.0"
+
+[[projects]]
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   name = "github.com/spf13/afero"
@@ -155,6 +164,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "816760be4ad37bede9489f1cac80e86fe43d6a43657480d9a4023019ebba1da0"
+  inputs-digest = "454fb8a3fd0310b7e7de7eb7066d0ed71d142ce83dc6e5e9663e50aa751cf371"
   solver-name = "gps-cdcl"
   solver-version = 1
