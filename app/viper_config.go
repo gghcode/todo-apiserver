@@ -10,11 +10,15 @@ type viperConfigurationBuilder struct {
 }
 
 func NewViperConfigurationBuilder() viperConfigurationBuilder {
-	return viperConfigurationBuilder{ viper: viper.New() }
+	return viperConfigurationBuilder{viper: viper.New()}
 }
 
 func (builder *viperConfigurationBuilder) SetBasePath(path string) {
 	builder.viper.AddConfigPath(path)
+}
+
+func (builder *viperConfigurationBuilder) SetValue(key string, value interface{}) {
+	builder.viper.Set(key, value)
 }
 
 func (builder *viperConfigurationBuilder) AddJsonFile(path string) {
