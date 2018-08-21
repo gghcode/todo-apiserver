@@ -5,5 +5,5 @@ import (
 )
 
 type Controller interface {
-	InitializeRoutes(router *gin.Engine)
+	AddRoutes(router *gin.Engine)
 }
