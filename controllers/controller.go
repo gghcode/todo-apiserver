@@ -5,5 +5,13 @@ import (
 )
 
 type Controller interface {
-	AddRoutes(router *gin.Engine)
+	GetHandlers() []Handler
+}
+
+type HandlerFunc = gin.HandlerFunc
+
+type Handler struct {
+	Method string
+	Path   string
+	Handle HandlerFunc
 }
