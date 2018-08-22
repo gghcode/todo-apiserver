@@ -17,5 +17,7 @@ func main() {
 		logger.Fatalln(errors.Wrap(err, "Configuration build failed."))
 	}
 
-	logger.Infoln(configuration)
+	if err := app.NewServerAndRun(*configuration); err != nil {
+		logger.Fatalln(err)
+	}
 }

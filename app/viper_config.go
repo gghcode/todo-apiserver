@@ -10,7 +10,9 @@ type viperConfigurationBuilder struct {
 }
 
 func NewViperConfigurationBuilder() viperConfigurationBuilder {
-	return viperConfigurationBuilder{viper: viper.New()}
+	return viperConfigurationBuilder{
+		viper: viper.New(),
+	}
 }
 
 func (builder *viperConfigurationBuilder) SetBasePath(path string) {
@@ -36,12 +38,12 @@ func (builder *viperConfigurationBuilder) AddEnvironmentVariables() {
 	//builder.viper.AutomaticEnv()
 }
 
-func (builder *viperConfigurationBuilder) Build() (Configuration, error) {
+func (builder *viperConfigurationBuilder) Build() (*Configuration, error) {
 	result := Configuration{}
 
 	if err := builder.viper.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return &result, nil
 }

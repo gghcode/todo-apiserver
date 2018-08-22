@@ -1,6 +1,8 @@
 package app
 
-type Configuration = map[string]interface{}
+type Configuration struct {
+	ListenPort int `mapstructure:"LISTEN_PORT"`
+}
 
 type ConfigurationBuilder interface {
 	SetBasePath(path string)
@@ -9,5 +11,5 @@ type ConfigurationBuilder interface {
 	AddJsonFile(path string)
 	AddEnvironmentVariables()
 
-	Build() (Configuration, error)
+	Build() (*Configuration, error)
 }
