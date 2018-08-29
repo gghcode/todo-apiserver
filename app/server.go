@@ -27,15 +27,21 @@ func (apiServer *TodoApiServer) Initialize() {
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())
 
-	controllerList := []controllers.Controller{
-		&controllers.TodoController{},
-	}
-
-	for _, controller := range controllerList {
-		addRoutes(engine, controller)
-	}
+	setRoutes(engine, getControllerList())
 
 	apiServer.engine = engine
+}
+
+func getControllerList() []controllers.Controller {
+	return []controllers.Controller{
+		&controllers.TodoController{},
+	}
+}
+
+func setRoutes(router *gin.Engine, controllerList []controllers.Controller) {
+	for _, controller := range controllerList {
+		addRoutes(router, controller)
+	}
 }
 
 func addRoutes(router *gin.Engine, controller controllers.Controller) {
