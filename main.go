@@ -2,11 +2,13 @@ package main
 
 import (
 	"apas-todo-apiserver/app"
-	logger "github.com/Sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
 )
 
 func main() {
+	logger := logrus.New()
+
 	builder := app.NewViperConfigurationBuilder()
 	builder.SetBasePath(".")
 	builder.AddJsonFile("config")
