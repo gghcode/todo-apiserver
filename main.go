@@ -19,7 +19,7 @@ func main() {
 		logger.Fatalln(errors.Wrap(err, "Configuration build failed."))
 	}
 
-	server := app.NewTodoApiServer(*configuration)
+	server := app.NewServer(*configuration)
 	server.Initialize()
 
 	if err := server.Run(); err != nil {

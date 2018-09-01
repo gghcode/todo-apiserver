@@ -13,7 +13,7 @@ type TodoApiServer struct {
 	configuration Configuration
 }
 
-func NewTodoApiServer(configuration Configuration) *TodoApiServer {
+func NewServer(configuration Configuration) *TodoApiServer {
 	logger := logrus.New().WithField("host", "server")
 
 	return &TodoApiServer{
