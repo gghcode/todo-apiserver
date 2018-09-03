@@ -25,20 +25,39 @@ func (controller *TodoController) GetHandlers() []Handler {
 			Handle: controller.getTodos,
 		},
 		Handler{
+			Method: "GET",
+			Path: "api/v1/todos/:id",
+			Handle: controller.getTodo,
+		},
+		Handler{
 			Method: "POST",
 			Path: "api/v1/todos",
-			Handle: controller.addTodos,
+			Handle: controller.addTodo,
+		},
+		Handler{
+			Method: "PUT",
+			Path: "api/v1/todos/:id",
+			Handle: controller.updateTodo,
+		},
+		Handler{
+			Method: "DELETE",
+			Path: "api/v1/todos/:id",
+			Handle: controller.removeTodo,
 		},
 	}
 }
 
 func (controller *TodoController) getTodos(ctx *gin.Context) {
+
+}
+
+func (controller *TodoController) getTodo(ctx *gin.Context) {
 	todo := models.Todo{}
 
 	ctx.JSON(200, todo)
 }
 
-func (controller *TodoController) addTodos(ctx *gin.Context) {
+func (controller *TodoController) addTodo(ctx *gin.Context) {
 	var todo models.Todo
 
 	if err := ctx.Bind(&todo); err != nil {
@@ -47,4 +66,12 @@ func (controller *TodoController) addTodos(ctx *gin.Context) {
 
 
 	ctx.JSON(http.StatusCreated, todo)
+}
+
+func (controller *TodoController) updateTodo(ctx *gin.Context) {
+
+}
+
+func (controller *TodoController) removeTodo(ctx *gin.Context) {
+
 }
