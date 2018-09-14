@@ -5,12 +5,12 @@ import (
 )
 
 type Controller interface {
-	GetHandlers() []Handler
+	GetHandlerInfos() []HandlerInfo
 }
 
 type HandlerFunc = gin.HandlerFunc
 
-type Handler struct {
+type HandlerInfo struct {
 	Method string
 	Path   string
 	Handle HandlerFunc

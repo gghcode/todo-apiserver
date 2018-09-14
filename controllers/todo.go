@@ -17,29 +17,29 @@ func NewTodoController(session *mgo.Session) *TodoController {
 	return &result
 }
 
-func (controller *TodoController) GetHandlers() []Handler {
-	return []Handler {
-		Handler{
+func (controller *TodoController) GetHandlerInfos() []HandlerInfo {
+	return []HandlerInfo{
+		HandlerInfo{
 			Method: "GET",
 			Path: "api/v1/todos",
 			Handle: controller.getTodos,
 		},
-		Handler{
+		HandlerInfo{
 			Method: "GET",
 			Path: "api/v1/todos/:id",
 			Handle: controller.getTodo,
 		},
-		Handler{
+		HandlerInfo{
 			Method: "POST",
 			Path: "api/v1/todos",
 			Handle: controller.addTodo,
 		},
-		Handler{
+		HandlerInfo{
 			Method: "PUT",
 			Path: "api/v1/todos/:id",
 			Handle: controller.updateTodo,
 		},
-		Handler{
+		HandlerInfo{
 			Method: "DELETE",
 			Path: "api/v1/todos/:id",
 			Handle: controller.removeTodo,
