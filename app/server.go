@@ -1,6 +1,7 @@
 package app
 
 import (
+	"apas-todo-apiserver/config"
 	"apas-todo-apiserver/controllers"
 	"fmt"
 	"github.com/Sirupsen/logrus"
@@ -8,11 +9,11 @@ import (
 
 type TodoApiServer struct {
 	engine        ServerEngine
-	configuration Configuration
+	configuration config.Configuration
 	logger        *logrus.Entry
 }
 
-func NewServer(configuration Configuration) *TodoApiServer {
+func NewServer(configuration config.Configuration) *TodoApiServer {
 	logger := logrus.New().WithField("host", "server")
 
 	return &TodoApiServer{
