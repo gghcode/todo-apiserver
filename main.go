@@ -3,7 +3,7 @@ package main
 import (
 	"apas-todo-apiserver/app"
 	"apas-todo-apiserver/config"
-
+	"apas-todo-apiserver/todo"
 	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
 )
@@ -21,7 +21,11 @@ func main() {
 		logger.Fatalln(errors.Wrap(err, "Configuration build failed."))
 	}
 
-	server := app.NewServer(configuration)
+	controllers := []app.ApiController{
+		todo.NewController(configuration),
+	}
+
+	server := app.NewServer(configuration, controllers)
 	server.Initialize()
 
 	if err := server.Run(); err != nil {

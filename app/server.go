@@ -2,7 +2,6 @@ package app
 
 import (
 	"apas-todo-apiserver/config"
-	"apas-todo-apiserver/controllers"
 	"fmt"
 	"github.com/Sirupsen/logrus"
 )
@@ -10,14 +9,16 @@ import (
 type TodoApiServer struct {
 	engine        ServerEngine
 	configuration config.Configuration
+	controllers   []ApiController
 	logger        *logrus.Entry
 }
 
-func NewServer(configuration config.Configuration) *TodoApiServer {
+func NewServer(configuration config.Configuration, controllers []ApiController) *TodoApiServer {
 	logger := logrus.New().WithField("host", "server")
 
 	return &TodoApiServer{
 		configuration: configuration,
+		controllers:   controllers,
 		logger:        logger,
 	}
 }
@@ -25,33 +26,16 @@ func NewServer(configuration config.Configuration) *TodoApiServer {
 func (apiServer *TodoApiServer) Initialize() {
 	engine := NewGinEngine()
 
-	setRoutes(engine, getControllerList())
+	RegisterControllers(engine, apiServer.controllers)
 
 	apiServer.engine = engine
 }
 
-func getControllerList() []controllers.Controller {
-	return []controllers.Controller{
-		&controllers.TodoController{},
-	}
-}
-
-func setRoutes(router ServerEngine, controllerList []controllers.Controller) {
-	for _, controller := range controllerList {
-		addRoutes(router, controller)
-	}
-}
-
-func addRoutes(router ServerEngine, controller controllers.Controller) {
-	handlers := controller.GetHandlerInfos()
-
-	for _, handler := range handlers {
-		router.Handle(handler)
-	}
-}
-
 func (apiServer *TodoApiServer) Run() error {
-	return apiServer.engine.Run(getAddrString(apiServer.configuration.ListenPort))
+	listenPort := apiServer.configuration.ListenPort
+	listenAddr := getAddrString(listenPort)
+
+	return apiServer.engine.Run(listenAddr)
 }
 
 func getAddrString(port int) string {
