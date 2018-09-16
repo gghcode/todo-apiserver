@@ -1,4 +1,4 @@
-package models
+package todo
 
 import (
 	"gopkg.in/mgo.v2/bson"
