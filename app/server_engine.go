@@ -1,12 +1,11 @@
 package app
 
 import (
-	"apas-todo-apiserver/controllers"
 	"github.com/gin-gonic/gin"
 )
 
 type ServerEngine interface {
-	Handle(handlerInfo controllers.HandlerInfo)
+	RegisterRoute(route RouteInfo)
 	Run(addr string) error
 }
 
@@ -14,8 +13,8 @@ type GinEngine struct {
 	gin *gin.Engine
 }
 
-func (engine *GinEngine) Handle(info controllers.HandlerInfo) {
-	engine.gin.Handle(info.Method, info.Path, info.Handle)
+func (engine *GinEngine) RegisterRoute(route RouteInfo) {
+	engine.gin.Handle(route.Method, route.Path, route.Handle)
 }
 
 func (engine *GinEngine) Run(addr string) error {
@@ -29,4 +28,3 @@ func NewGinEngine() *GinEngine {
 
 	return &result
 }
-
