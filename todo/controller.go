@@ -3,17 +3,20 @@ package todo
 import (
 	"apas-todo-apiserver/app"
 	"apas-todo-apiserver/config"
+	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type Controller struct {
 	repository *Repository
+	logger *logrus.Entry
 }
 
 func NewController(configuration config.Configuration) *Controller {
 	controller := Controller{
 		repository: NewRepository(configuration),
+		logger: logrus.New().WithField("caller", "todo.Controller"),
 	}
 
 	return &controller
@@ -33,7 +36,11 @@ func (controller *Controller) todo(ctx *gin.Context) {
 
 	todo, err := controller.repository.Todo(todoId)
 	if err != nil {
-		ctx.AbortWithError(400, err)
+
+		controller.logger.Warn(err)
+		ctx.JSON(500, err)
+		//ctx.AbortWithError(500, err)
+		return
 	}
 
 	ctx.JSON(200, todo)
@@ -44,11 +51,13 @@ func (controller *Controller) addTodo(ctx *gin.Context) {
 
 	if err := ctx.Bind(&todo); err != nil {
 		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
 	}
 
 	todo, err := controller.repository.AddTodo(todo)
 	if err != nil {
 		ctx.AbortWithError(400, err)
+		return
 	}
 
 	ctx.JSON(http.StatusCreated, todo)
@@ -64,6 +73,7 @@ func (controller *Controller) removeTodo(ctx *gin.Context) {
 	err := controller.repository.RemoveTodo(todoId)
 	if err != nil {
 		ctx.AbortWithError(400, err)
+		return
 	}
 
 	ctx.Status(http.StatusNoContent)
