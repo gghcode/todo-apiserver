@@ -1,9 +1,17 @@
 image: golang:1.10.3
 
+cache:
+  paths:
+  - /apt-cache
+  - /go/src/github.com
+  - /go/src/golang.org
+  - /go/src/google.golang.org
+  - /go/src/gopkg.in
+
 variables:
-  BIN_NAME: projectname
+  BIN_NAME: apas-todo-apiserver
   ARTIFACTS_DIR: artifacts
-  GO_PROJECT: gitlab.com/username/projectname
+  GO_PROJECT: gitlab.com/gyuhwan/apas-todo-apiserver
 
 stages:
 - build
