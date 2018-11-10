@@ -1,15 +1,33 @@
+# Replace "projectname" and "username"
+image: golang:1.10.3
+
+variables:
+  BIN_NAME: apas-todo-apiserver
+  ARTIFACTS_DIR: artifacts
+  GO_PROJECT: gitlab.com/username/apas-todo-apiserver
+
 stages:
 - build
+- test
 
-build:
+before_script:
+- mkdir -p ${GOPATH}/src/${GO_PROJECT}
+- mkdir -p ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}
+- go get -u github.com/golang/dep/cmd/dep
+- cp -r ${CI_PROJECT_DIR}/* ${GOPATH}/src/${GO_PROJECT}/
+- cd ${GOPATH}/src/${GO_PROJECT}
+
+build-projectname:
   stage: build
-  image: golang:1.10.3
-  before_script:
-    - cd $GOPATH/src
-    - mkdir -p gitlab.com/$CI_PROJECT_NAMESPACE
-    - cd gitlab.com/$CI_PROJECT_NAMESPACE
-    - ln -s $CI_PROJECT_DIR
-    - cd $CI_PROJECT_NAME
   script:
-  - go build -o todo-api
-  - ./todo-api
+  - dep ensure
+  - go build -o ${CI_PROJECT_DIR}/${ARTIFACTS_DIR}/${BIN_NAME}
+  artifacts:
+    paths:
+    - ${ARTIFACTS_DIR}
+
+test-projectname:
+  stage: test
+  script:
+  - dep ensure
+  - go test -v -cover ./...
