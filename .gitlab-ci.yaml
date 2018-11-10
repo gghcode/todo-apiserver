@@ -1,10 +1,9 @@
-# Replace "projectname" and "username"
 image: golang:1.10.3
 
 variables:
-  BIN_NAME: apas-todo-apiserver
+  BIN_NAME: projectname
   ARTIFACTS_DIR: artifacts
-  GO_PROJECT: gitlab.com/username/apas-todo-apiserver
+  GO_PROJECT: gitlab.com/username/projectname
 
 stages:
 - build
