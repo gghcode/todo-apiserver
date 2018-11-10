@@ -3,6 +3,8 @@ package todo
 import (
 	"apas-todo-apiserver/config"
 	"github.com/globalsign/mgo"
+	"github.com/globalsign/mgo/bson"
+	"time"
 )
 
 type Repository struct {
@@ -43,6 +45,9 @@ func (repository *Repository) Todo(id string) (Todo, error) {
 func (repository *Repository) AddTodo(todo Todo) (Todo, error) {
 	sessionCopy := repository.session.Copy()
 	defer sessionCopy.Close()
+
+	todo.Id = bson.NewObjectId()
+	todo.CreatedTime = time.Now()
 
 	collection := sessionCopy.DB(repository.dbName).C(repository.collectionName)
 	if err := collection.Insert(todo); err != nil {
