@@ -1,9 +1,9 @@
 package todo
 
 import (
-	"apas-todo-apiserver/config"
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 	"time"
 )
 

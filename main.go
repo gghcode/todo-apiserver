@@ -1,11 +1,11 @@
 package main
 
 import (
-	"apas-todo-apiserver/app"
-	"apas-todo-apiserver/config"
-	"apas-todo-apiserver/todo"
 	"github.com/Sirupsen/logrus"
 	"github.com/pkg/errors"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/todo"
 )
 
 func main() {

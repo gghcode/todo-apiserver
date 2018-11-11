@@ -1,9 +1,9 @@
 package app
 
 import (
-	"apas-todo-apiserver/config"
 	"fmt"
 	"github.com/Sirupsen/logrus"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
 type TodoApiServer struct {

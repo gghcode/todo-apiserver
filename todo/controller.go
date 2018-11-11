@@ -1,10 +1,10 @@
 package todo
 
 import (
-	"apas-todo-apiserver/app"
-	"apas-todo-apiserver/config"
 	"github.com/Sirupsen/logrus"
 	"github.com/gin-gonic/gin"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 	"net/http"
 )
 
