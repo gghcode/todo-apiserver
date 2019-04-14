@@ -7,15 +7,15 @@ import (
 
 // Server is api-server instance. it contains gin.Engine, middlewares, configuration.
 type Server struct {
-	core          *gin.Engine
-	configuration config.Configuration
+	core *gin.Engine
+	conf config.Configuration
 }
 
 // New return new server instance.
 func New(conf config.Configuration) *Server {
 	server := Server{
-		core:          gin.New(),
-		configuration: conf,
+		core: gin.New(),
+		conf: conf,
 	}
 
 	return &server
@@ -23,6 +23,6 @@ func New(conf config.Configuration) *Server {
 
 // Run start listen.
 func (server Server) Run() error {
-	addr := server.configuration.Addr
+	addr := server.conf.Addr
 	return server.core.Run(addr)
 }
