@@ -31,6 +31,9 @@ test:
 
 push-docker-image:
   stage: staging
+  image: docker:18.09.5-git
+  services:
+    - docker:dind
   before_script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
   script: 
