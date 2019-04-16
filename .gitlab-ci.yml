@@ -21,7 +21,7 @@ build-docker-image:
   script:
     - docker build -t registry.gitlab.com/gyuhwan/apas-todo-apiserver .
 
-test:
+run-unittests:
   stage: test
   before_script:
     - apk add --no-cache ca-certificates git
