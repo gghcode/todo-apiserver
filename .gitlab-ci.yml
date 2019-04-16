@@ -11,9 +11,9 @@ before_script:
 build:
   stage: build
   script:
-    - go build
+    - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 test:
   stage: test
   script:
-    - go test ./...
+    - CGO_ENABLED=0 go test ./...
