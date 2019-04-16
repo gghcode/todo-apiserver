@@ -1,28 +1,19 @@
+image: golang:1.11-alpine
+
 stages:
-  - init
   - test
   - build
 
-mod:
-  stage: init
-  image: golang:1.11-alpine 
-  before_script:
+before_script:
     - apk add --no-cache ca-certificates git
-  script:
     - go mod download
-
-test:
-  stage: test
-  image: golang:1.11-alpine 
-  dependencies:
-    - mod
-  script:
-    - go test ./...
 
 build:
   stage: build
-  image: golang:1.11-alpine
-  dependencies:
-    - mod
   script:
     - go build
+
+test:
+  stage: test
+  script:
+    - go test ./...
