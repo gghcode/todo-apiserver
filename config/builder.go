@@ -9,7 +9,7 @@ import (
 
 // Builder build configuration wtih some options.
 type Builder struct {
-	process [](func(*viper.Viper) error)
+	pipelines [](func(*viper.Viper) error)
 }
 
 // NewBuilder return new builder instance.
@@ -19,7 +19,7 @@ func NewBuilder() *Builder {
 
 // AddConfigFile read config file from filepath.
 func (builder *Builder) AddConfigFile(filepath string) *Builder {
-	builder.process = append(builder.process, func(v *viper.Viper) error {
+	builder.pipelines = append(builder.pipelines, func(v *viper.Viper) error {
 		v.SetConfigFile(filepath)
 		return v.MergeInConfig()
 	})
@@ -29,7 +29,7 @@ func (builder *Builder) AddConfigFile(filepath string) *Builder {
 
 // BindEnvs bind environment variables.
 func (builder *Builder) BindEnvs(prefix string) *Builder {
-	builder.process = append(builder.process, func(v *viper.Viper) error {
+	builder.pipelines = append(builder.pipelines, func(v *viper.Viper) error {
 		v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 		v.SetEnvPrefix(prefix)
 
@@ -61,13 +61,13 @@ func bindEnvsToViper(viper *viper.Viper, iface interface{}, parts ...string) {
 	}
 }
 
-// Build return built new configuration instance.
+// Build return new configuration instance.
 func (builder *Builder) Build() (Configuration, error) {
 	result := Configuration{}
 	v := viper.New()
 
-	for _, ps := range builder.process {
-		if err := ps(v); err != nil {
+	for _, pipeline := range builder.pipelines {
+		if err := pipeline(v); err != nil {
 			return result, err
 		}
 	}
