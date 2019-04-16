@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"reflect"
 	"strings"
 
@@ -18,10 +19,18 @@ func NewBuilder() *Builder {
 }
 
 // AddConfigFile read config file from filepath.
-func (builder *Builder) AddConfigFile(filepath string) *Builder {
+func (builder *Builder) AddConfigFile(filepath string, optional bool) *Builder {
 	builder.pipelines = append(builder.pipelines, func(v *viper.Viper) error {
 		v.SetConfigFile(filepath)
-		return v.MergeInConfig()
+
+		err := v.MergeInConfig()
+		if err != nil {
+			if _, ok := err.(*os.PathError); ok && !optional {
+				return err
+			}
+		}
+
+		return nil
 	})
 
 	return builder

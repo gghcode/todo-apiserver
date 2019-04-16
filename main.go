@@ -11,7 +11,7 @@ const (
 
 func main() {
 	conf, err := config.NewBuilder().
-		AddConfigFile("config.yaml").
+		AddConfigFile("config.yaml", true).
 		BindEnvs(envPrefix).
 		Build()
 
