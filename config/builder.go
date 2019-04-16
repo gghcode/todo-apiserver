@@ -1,6 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"reflect"
+	"strings"
+
+	"github.com/spf13/viper"
+)
 
 // Builder build configuration wtih some options.
 type Builder struct {
@@ -22,12 +27,34 @@ func (builder *Builder) AddConfigFile(filepath string) *Builder {
 	return builder
 }
 
-// UseEnv use environment variables.
-func (builder *Builder) UseEnv(prefix string) *Builder {
+// BindEnvs bind environment variables.
+func (builder *Builder) BindEnvs(prefix string) *Builder {
+	builder.viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	builder.viper.SetEnvPrefix(prefix)
-	builder.viper.AutomaticEnv()
+
+	bindEnvsToViper(builder.viper, Configuration{})
 
 	return builder
+}
+
+func bindEnvsToViper(viper *viper.Viper, iface interface{}, parts ...string) {
+	ifv := reflect.ValueOf(iface)
+	ift := reflect.TypeOf(iface)
+	for i := 0; i < ift.NumField(); i++ {
+		v := ifv.Field(i)
+		t := ift.Field(i)
+		tv, ok := t.Tag.Lookup("mapstructure")
+		if !ok {
+			continue
+		}
+
+		switch v.Kind() {
+		case reflect.Struct:
+			bindEnvsToViper(viper, v.Interface(), append(parts, tv)...)
+		default:
+			viper.BindEnv(strings.Join(append(parts, tv), "."))
+		}
+	}
 }
 
 // Build return built new configuration instance.
