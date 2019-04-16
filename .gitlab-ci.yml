@@ -15,7 +15,7 @@ test:
   stage: test
   image: golang:1.11-alpine 
   dependencies:
-    - init
+    - mod
   script:
     - go test ./...
 
@@ -23,6 +23,6 @@ build:
   stage: build
   image: golang:1.11-alpine
   dependencies:
-    - init
+    - mod
   script:
     - go build
