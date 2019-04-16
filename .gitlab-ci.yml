@@ -1,19 +1,35 @@
 image: golang:1.11-alpine
 
 stages:
-  - test
   - build
+  - test
+  - staging
 
 before_script:
     - apk add --no-cache ca-certificates git
     - go mod download
 
-build:
+build-binary:
   stage: build
   script:
     - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+
+build-docker-image:
+  stage: build
+  image: docker:18.09.5-git
+  script:
+    - docker build -t registry.gitlab.com/gyuhwan/apas-todo-apiserver .
 
 test:
   stage: test
   script:
     - CGO_ENABLED=0 go test ./...
+
+push-docker-image:
+  stage: staging
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+  script: 
+    - docker push registry.gitlab.com/gyuhwan/apas-todo-apiserver
+  only:
+    - master
