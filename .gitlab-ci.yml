@@ -20,7 +20,7 @@ test:
     - go test ./...
 
 build:
-  state: build
+  stage: build
   image: golang:1.11-alpine
   dependencies:
     - init
