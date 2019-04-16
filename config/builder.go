@@ -62,20 +62,19 @@ func bindEnvsToViper(viper *viper.Viper, iface interface{}, parts ...string) {
 }
 
 // Build return built new configuration instance.
-func (builder *Builder) Build() (*Configuration, error) {
+func (builder *Builder) Build() (Configuration, error) {
+	result := Configuration{}
 	v := viper.New()
 
 	for _, ps := range builder.process {
 		if err := ps(v); err != nil {
-			return nil, err
+			return result, err
 		}
 	}
 
-	var result Configuration
-
 	if err := v.Unmarshal(&result); err != nil {
-		return nil, err
+		return result, err
 	}
 
-	return &result, nil
+	return result, nil
 }
