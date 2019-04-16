@@ -5,12 +5,10 @@ stages:
   - test
   - staging
 
-before_script:
-    - apk add --no-cache ca-certificates git
-
 build-binary:
   stage: build
   before_script:
+    - apk add --no-cache ca-certificates git
     - go mod download
   script:
     - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
@@ -18,12 +16,15 @@ build-binary:
 build-docker-image:
   stage: build
   image: docker:18.09.5-git
+  services:
+    - docker:dind
   script:
     - docker build -t registry.gitlab.com/gyuhwan/apas-todo-apiserver .
 
 test:
   stage: test
   before_script:
+    - apk add --no-cache ca-certificates git
     - go mod download
   script:
     - CGO_ENABLED=0 go test ./...
