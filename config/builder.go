@@ -9,30 +9,34 @@ import (
 
 // Builder build configuration wtih some options.
 type Builder struct {
-	viper *viper.Viper
+	process [](func(*viper.Viper) error)
 }
 
 // NewBuilder return new builder instance.
 func NewBuilder() *Builder {
-	return &Builder{
-		viper: viper.New(),
-	}
+	return &Builder{}
 }
 
 // AddConfigFile read config file from filepath.
 func (builder *Builder) AddConfigFile(filepath string) *Builder {
-	builder.viper.SetConfigFile(filepath)
-	builder.viper.MergeInConfig()
+	builder.process = append(builder.process, func(v *viper.Viper) error {
+		v.SetConfigFile(filepath)
+		return v.MergeInConfig()
+	})
 
 	return builder
 }
 
 // BindEnvs bind environment variables.
 func (builder *Builder) BindEnvs(prefix string) *Builder {
-	builder.viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	builder.viper.SetEnvPrefix(prefix)
+	builder.process = append(builder.process, func(v *viper.Viper) error {
+		v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+		v.SetEnvPrefix(prefix)
 
-	bindEnvsToViper(builder.viper, Configuration{})
+		bindEnvsToViper(v, Configuration{})
+
+		return nil
+	})
 
 	return builder
 }
@@ -59,9 +63,17 @@ func bindEnvsToViper(viper *viper.Viper, iface interface{}, parts ...string) {
 
 // Build return built new configuration instance.
 func (builder *Builder) Build() (*Configuration, error) {
+	v := viper.New()
+
+	for _, ps := range builder.process {
+		if err := ps(v); err != nil {
+			return nil, err
+		}
+	}
+
 	var result Configuration
 
-	if err := builder.viper.Unmarshal(&result); err != nil {
+	if err := v.Unmarshal(&result); err != nil {
 		return nil, err
 	}
 
