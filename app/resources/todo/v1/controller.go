@@ -6,7 +6,7 @@ import "github.com/gin-gonic/gin"
 type controller struct {
 }
 
-func NewController *controller {
+func NewController() *controller {
 	return &controller{
 		
 	}

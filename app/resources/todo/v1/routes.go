@@ -9,7 +9,7 @@ func Routes(c *controller) []http.RouteInfo {
 		http.RouteInfo{
 			Method: "GET",
 			Path: "/",
-			Handler: getHandler,
+			Handler: c.getHandler,
 		},
 	}
 }

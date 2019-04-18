@@ -2,7 +2,7 @@ package todo
 
 import (
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/http"
-	v1 "gitlab.com/gyuhwan/apas-todo-apiserver/app/resource/todo/v1"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/resources/todo/v1"
 )
 
 // NewV1Resource returns v1 routes of user.

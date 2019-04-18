@@ -4,8 +4,8 @@ import (
 	"path"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/resource/todo"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/http"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/resources/todo"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
@@ -22,13 +22,13 @@ func New(conf config.Configuration) *Server {
 		conf: conf,
 	}
 
-	registerRouter(server.core, "/api/v1/todo", todo.NewV1Router())
+	registerRouter(server.core, "/api/v1/todo", todo.NewV1Resource())
 
 	return &server
 }
 
-func registerRouter(core *gin.Engine, basePath string, router api.Router) {
-	for _, route := range router.Routes() {
+func registerRouter(core *gin.Engine, basePath string, routes []http.RouteInfo) {
+	for _, route := range routes {
 		core.Handle(route.Method, path.Join(basePath, route.Path), route.Handler)
 	}
 }
