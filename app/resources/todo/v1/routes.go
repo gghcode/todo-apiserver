@@ -7,8 +7,8 @@ import (
 func Routes(c *controller) []http.RouteInfo {
 	return []http.RouteInfo{
 		http.RouteInfo{
-			Method: "GET",
-			Path: "/",
+			Method:  "GET",
+			Path:    "/",
 			Handler: c.getHandler,
 		},
 	}

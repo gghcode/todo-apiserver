@@ -7,9 +7,7 @@ type controller struct {
 }
 
 func NewController() *controller {
-	return &controller{
-		
-	}
+	return &controller{}
 }
 
 func (controller controller) getHandler(ctx *gin.Context) {
