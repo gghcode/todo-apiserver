@@ -19,7 +19,11 @@ build-docker-image:
   services:
     - docker:dind
   script:
-    - docker build -t registry.gitlab.com/gyuhwan/apas-todo-apiserver .
+    - docker build -t $CI_REGISTRY_IMAGE .
+  	- docker save -o image/app.tar $CI_REGISTRY_IMAGE
+  artifacts:
+    paths:
+      - image
 
 run-unittests:
   stage: test
@@ -37,6 +41,7 @@ push-docker-image:
   before_script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
   script: 
+    - docker load -i image/app.tar
     - docker push registry.gitlab.com/gyuhwan/apas-todo-apiserver
   only:
     - master
