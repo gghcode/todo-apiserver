@@ -1,34 +1,26 @@
 package main
 
 import (
-	"apas-todo-apiserver/app"
-	"apas-todo-apiserver/config"
-	"apas-todo-apiserver/todo"
-	"github.com/Sirupsen/logrus"
-	"github.com/pkg/errors"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
+)
+
+const (
+	envPrefix = "REST"
 )
 
 func main() {
-	logger := logrus.New()
+	conf, err := config.NewBuilder().
+		AddConfigFile("config.yaml", true).
+		BindEnvs(envPrefix).
+		Build()
 
-	builder := config.NewViperBuilder()
-	builder.SetBasePath(".")
-	builder.AddJsonFile("config")
-	builder.AddEnvironmentVariables()
-
-	configuration, err := builder.Build()
 	if err != nil {
-		logger.Fatalln(errors.Wrap(err, "Configuration build failed."))
+		panic(err)
 	}
 
-	controllers := []app.ApiController{
-		todo.NewController(configuration),
-	}
-
-	server := app.NewServer(configuration, controllers)
-	server.Initialize()
-
+	server := app.New(conf)
 	if err := server.Run(); err != nil {
-		logger.Fatalln(err)
+		panic(err)
 	}
 }

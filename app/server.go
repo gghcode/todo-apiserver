@@ -1,43 +1,40 @@
 package app
 
 import (
-	"apas-todo-apiserver/config"
-	"fmt"
-	"github.com/Sirupsen/logrus"
+	"path"
+
+	"github.com/gin-gonic/gin"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/http"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/resources/todo"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
-type TodoApiServer struct {
-	engine        ServerEngine
-	configuration config.Configuration
-	controllers   []ApiController
-	logger        *logrus.Entry
+// Server is api-server instance. it contains gin.Engine, middlewares, configuration.
+type Server struct {
+	core *gin.Engine
+	conf config.Configuration
 }
 
-func NewServer(configuration config.Configuration, controllers []ApiController) *TodoApiServer {
-	logger := logrus.New().WithField("host", "server")
+// New return new server instance.
+func New(conf config.Configuration) *Server {
+	server := Server{
+		core: gin.New(),
+		conf: conf,
+	}
 
-	return &TodoApiServer{
-		configuration: configuration,
-		controllers:   controllers,
-		logger:        logger,
+	registerRouter(server.core, "/api/v1/todo", todo.NewV1Resource())
+
+	return &server
+}
+
+func registerRouter(core *gin.Engine, basePath string, routes []http.RouteInfo) {
+	for _, route := range routes {
+		core.Handle(route.Method, path.Join(basePath, route.Path), route.Handler)
 	}
 }
 
-func (apiServer *TodoApiServer) Initialize() {
-	engine := NewGinEngine()
-
-	RegisterControllers(engine, apiServer.controllers)
-
-	apiServer.engine = engine
-}
-
-func (apiServer *TodoApiServer) Run() error {
-	listenPort := apiServer.configuration.ListenPort
-	listenAddr := getAddrString(listenPort)
-
-	return apiServer.engine.Run(listenAddr)
-}
-
-func getAddrString(port int) string {
-	return fmt.Sprintf(":%d", port)
+// Run start listen.
+func (server Server) Run() error {
+	addr := server.conf.Addr
+	return server.core.Run(addr)
 }

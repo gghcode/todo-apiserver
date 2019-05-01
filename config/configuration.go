@@ -1,8 +1,6 @@
 package config
 
+// Configuration is config type.
 type Configuration struct {
-	ListenPort int `mapstructure:"LISTEN_PORT"`
-
-	MongoDbName           string `mapstructure:"MONGO_DB_NAME"`
-	MongoConnectionString string `mapstructure:"MONGO_CONN_STR"`
+	Addr string `mapstructure:"addr" yaml:"addr"`
 }
