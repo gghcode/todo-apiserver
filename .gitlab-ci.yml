@@ -19,11 +19,12 @@ build-docker-image:
   services:
     - docker:dind
   script:
+    - mkdir image
     - docker build -t $CI_REGISTRY_IMAGE .
     - docker save -o image/app.tar $CI_REGISTRY_IMAGE
   artifacts:
     paths:
-      - image
+      - image/
 
 run-unittests:
   stage: test
