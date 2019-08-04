@@ -1,4 +1,4 @@
-image: golang:1.11-alpine
+image: golang:1.12.4-alpine
 
 stages:
   - build
@@ -41,7 +41,7 @@ push-docker-image:
     - docker:dind
   before_script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-  script: 
+  script:
     - docker load -i image/app.tar
     - docker push registry.gitlab.com/gyuhwan/apas-todo-apiserver
   only:
