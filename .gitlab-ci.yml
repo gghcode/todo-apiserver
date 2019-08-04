@@ -29,7 +29,7 @@ build-docker-image:
 run-unittests:
   stage: test
   before_script:
-    - apk add --no-cache ca-certificates git
+    - apk add --no-cache ca-certificates git make
     # - go mod download
   script:
     - make unit_ci
