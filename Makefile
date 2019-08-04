@@ -1,6 +1,12 @@
 dependency:
 	@go get -v ./...
 
+build:
+	@go build
+
+run:
+	@go run .
+
 unit: dependency
 	@go test -race -v -short ./...
 

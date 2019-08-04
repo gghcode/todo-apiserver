@@ -14,6 +14,7 @@ config.yaml
 *.dll
 *.so
 *.dylib
+apas-todo-apiserver
 
 # Test binary, built with `go test -c`
 *.test
