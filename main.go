@@ -1,7 +1,6 @@
 package main
 
 import (
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
@@ -10,17 +9,12 @@ const (
 )
 
 func main() {
-	conf, err := config.NewBuilder().
+	_, err := config.NewBuilder().
 		AddConfigFile("config.yaml", true).
 		BindEnvs(envPrefix).
 		Build()
 
 	if err != nil {
-		panic(err)
-	}
-
-	server := app.New(conf)
-	if err := server.Run(); err != nil {
 		panic(err)
 	}
 }
