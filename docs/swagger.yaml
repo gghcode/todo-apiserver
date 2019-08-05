@@ -1,0 +1,20 @@
+basePath: /api
+host: '{{.Host}}'
+info:
+  contact: {}
+  description: This is a apas todo api server.
+  license: {}
+  title: APAS TODO API
+  version: "1.0"
+paths:
+  /healthy:
+    get:
+      description: Get server healthy
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      tags:
+      - App API
+swagger: "2.0"
