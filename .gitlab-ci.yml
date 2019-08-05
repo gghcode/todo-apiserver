@@ -1,12 +1,11 @@
 image: golang:1.12.4-alpine
 
 stages:
-  - build
-  - test
+  - build-and-test
   - staging
 
 build-binary:
-  stage: build
+  stage: build-and-test
   before_script:
     - apk add --no-cache ca-certificates git
     - go mod download
@@ -14,7 +13,7 @@ build-binary:
     - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
 build-docker-image:
-  stage: build
+  stage: build-and-test
   image: docker:18.09.5-git
   services:
     - docker:dind
@@ -27,10 +26,8 @@ build-docker-image:
       - image/
 
 run-unittests:
-  stage: test
-  before_script:
-    - apk add --no-cache ca-certificates git make build-base
-    # - go mod download
+  stage: build-and-test
+  image: circleci/golang:1.12
   script:
     - make unit_ci
 

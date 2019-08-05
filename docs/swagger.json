@@ -1,0 +1,30 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a apas todo api server.",
+        "title": "APAS TODO API",
+        "contact": {},
+        "license": {},
+        "version": "1.0"
+    },
+    "host": "{{.Host}}",
+    "basePath": "/api",
+    "paths": {
+        "/healthy": {
+            "get": {
+                "description": "Get server healthy",
+                "tags": [
+                    "App API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

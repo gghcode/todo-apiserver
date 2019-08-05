@@ -1,8 +1,13 @@
 dependency:
 	@go get -v ./...
+	@go get -u github.com/swaggo/swag/cmd/swag
+	@go get -u github.com/oxequa/realize
 
 build:
 	@go build
+
+live:
+	@realize start --run --fmt --no-config
 
 run:
 	@go run .
