@@ -12,8 +12,8 @@ live:
 run:
 	@go run .
 
-unit: dependency
+unit:
 	@go test -race -v -short ./...
 
-unit_ci: dependency
+unit_ci:
 	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -short ./...

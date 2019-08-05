@@ -1,4 +1,36 @@
 basePath: /api
+definitions:
+  common.APIError:
+    properties:
+      message:
+        type: string
+    type: object
+  common.ErrorResponse:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/common.APIError'
+        type: array
+    type: object
+  user.CreateUserRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  user.UserResponse:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: integer
+      user_name:
+        type: string
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
@@ -17,4 +49,32 @@ paths:
             type: string
       tags:
       - App API
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: user payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/user.CreateUserRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+            type: object
+        "400":
+          description: Invalid user payload
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+      tags:
+      - User API
 swagger: "2.0"

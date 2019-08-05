@@ -1,12 +1,13 @@
-package common_test
+package user_test
 
 import (
+	"io"
 	"net/http"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
 )
 
@@ -14,28 +15,36 @@ type ControllerUnit struct {
 	suite.Suite
 
 	router     *gin.Engine
-	controller *common.Controller
+	controller *user.Controller
 }
 
-func TestCommonControllerUnit(t *testing.T) {
+func TestUserControllerUnit(t *testing.T) {
 	suite.Run(t, new(ControllerUnit))
 }
 
 func (suite *ControllerUnit) SetupTest() {
 	suite.router = gin.New()
 
-	suite.controller = common.NewController()
+	suite.controller = user.NewController()
 	suite.controller.RegisterRoutes(suite.router)
 }
 
-func (suite *ControllerUnit) TestHealthy() {
+func (suite *ControllerUnit) TestCreateUser() {
 	testCases := []struct {
 		description    string
+		reqPayload     io.Reader
 		expectedStatus int
 	}{
 		{
-			description:    "ShouldBeOK",
-			expectedStatus: http.StatusOK,
+			description: "ShouldCreateUser",
+			reqPayload: testutil.ReqBodyFromInterface(suite.T(), struct {
+			}{}),
+			expectedStatus: http.StatusCreated,
+		},
+		{
+			description:    "ShouldBeBadRequestWhenNotContainPayload",
+			reqPayload:     nil,
+			expectedStatus: http.StatusBadRequest,
 		},
 	}
 
@@ -44,9 +53,9 @@ func (suite *ControllerUnit) TestHealthy() {
 			actualRes := testutil.Response(
 				suite.T(),
 				suite.router,
-				"GET",
-				"healthy",
-				nil,
+				"POST",
+				"/users",
+				tc.reqPayload,
 			)
 
 			suite.Equal(tc.expectedStatus, actualRes.StatusCode)
