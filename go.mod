@@ -13,15 +13,18 @@ require (
 	github.com/go-openapi/spec v0.19.2 // indirect
 	github.com/go-openapi/swag v0.19.4 // indirect
 	github.com/go-siris/siris v7.4.0+incompatible // indirect
+	github.com/jinzhu/gorm v1.9.10
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/labstack/echo v3.3.10+incompatible // indirect
 	github.com/labstack/gommon v0.2.9 // indirect
+	github.com/lib/pq v1.1.1
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mattn/go-shellwords v1.0.5 // indirect
 	github.com/ogier/pflag v0.0.1 // indirect
 	github.com/oxequa/interact v0.0.0-20171114182912-f8fb5795b5d7 // indirect
 	github.com/oxequa/realize v2.0.2+incompatible // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.4.2 // indirect
 	github.com/spf13/viper v1.3.2

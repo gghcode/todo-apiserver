@@ -11,6 +11,6 @@ type CreateUserRequest struct {
 // UserResponse is user response model.
 type UserResponse struct {
 	ID        int64     `json:"id"`
-	UserName  string    `json:"user_name"`
+	UserName  string    `json:"username"`
 	CreatedAt time.Time `json:"create_at"`
 }

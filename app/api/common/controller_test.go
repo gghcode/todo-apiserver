@@ -22,6 +22,8 @@ func TestCommonControllerUnit(t *testing.T) {
 }
 
 func (suite *ControllerUnit) SetupTest() {
+	gin.SetMode(gin.TestMode)
+
 	suite.router = gin.New()
 
 	suite.controller = common.NewController()

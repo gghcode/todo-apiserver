@@ -1,6 +1,11 @@
 package user
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
+)
 
 // Controller godoc
 type Controller struct {
@@ -27,5 +32,11 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Tags User API
 // @Router /users [post]
 func (controller *Controller) CreateUser(ctx *gin.Context) {
+	var reqPayload CreateUserRequest
+	if err := ctx.ShouldBindJSON(&reqPayload); err != nil {
+		ctx.JSON(http.StatusBadRequest, common.NewErrResp(err))
+		return
+	}
 
+	ctx.JSON(http.StatusCreated, UserResponse{})
 }

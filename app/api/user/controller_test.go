@@ -23,6 +23,8 @@ func TestUserControllerUnit(t *testing.T) {
 }
 
 func (suite *ControllerUnit) SetupTest() {
+	gin.SetMode(gin.TestMode)
+
 	suite.router = gin.New()
 
 	suite.controller = user.NewController()
@@ -37,13 +39,45 @@ func (suite *ControllerUnit) TestCreateUser() {
 	}{
 		{
 			description: "ShouldCreateUser",
-			reqPayload: testutil.ReqBodyFromInterface(suite.T(), struct {
-			}{}),
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				user.CreateUserRequest{
+					UserName: "testuser",
+					Password: "password",
+				},
+			),
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			description:    "ShouldBeBadRequestWhenNotContainPayload",
 			reqPayload:     nil,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			description: "ShouldBeBadRequestWhenEmptyUserName",
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				user.CreateUserRequest{Password: "password"},
+			),
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			description: "ShouldBeBadRequestWhenEmptyPassword",
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				user.CreateUserRequest{UserName: "testuser"},
+			),
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			description: "ShouldBeBadRequestWhenInvalidPassword",
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				user.CreateUserRequest{
+					UserName: "testuser",
+					Password: "1234",
+				},
+			),
 			expectedStatus: http.StatusBadRequest,
 		},
 	}
