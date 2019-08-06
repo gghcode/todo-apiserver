@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
@@ -9,11 +10,14 @@ import (
 
 // Controller godoc
 type Controller struct {
+	userRepository Repository
 }
 
 // NewController godoc
-func NewController() *Controller {
-	return &Controller{}
+func NewController(userRepository Repository) *Controller {
+	return &Controller{
+		userRepository: userRepository,
+	}
 }
 
 // RegisterRoutes godocs
@@ -38,5 +42,19 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, UserResponse{})
+	createdUser, err := controller.userRepository.CreateUser(User{
+		UserName:     reqPayload.UserName,
+		PasswordHash: []byte(reqPayload.Password),
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, UserResponse{
+		ID:        createdUser.ID,
+		UserName:  createdUser.UserName,
+		CreatedAt: time.Unix(createdUser.CreatedAt, 0),
+	})
 }
