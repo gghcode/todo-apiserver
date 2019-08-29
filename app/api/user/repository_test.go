@@ -41,8 +41,8 @@ func (suite *RepositoryIntegration) SetupTest() {
 	suite.repo = user.NewRepository(suite.postgresConn)
 
 	suite.testUsers = []user.User{
-		user.User{UserName: "fakeUser1", PasswordHash: []byte("password")},
-		user.User{UserName: "fakeUser2", PasswordHash: []byte("password")},
+		{UserName: "fakeUser1", PasswordHash: []byte("password")},
+		{UserName: "fakeUser2", PasswordHash: []byte("password")},
 	}
 
 	for i := range suite.testUsers {
