@@ -28,7 +28,7 @@ definitions:
         type: string
       id:
         type: integer
-      user_name:
+      username:
         type: string
     type: object
 host: '{{.Host}}'
@@ -72,6 +72,63 @@ paths:
             type: object
         "400":
           description: Invalid user payload
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+        "409":
+          description: Already exists user
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+      tags:
+      - User API
+  /users/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch user by user id
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+      tags:
+      - User API
+  /users/{username}:
+    get:
+      consumes:
+      - application/json
+      description: Fetch user by username
+      parameters:
+      - description: User Name
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+            type: object
+        "404":
+          description: User Not Found
           schema:
             $ref: '#/definitions/common.ErrorResponse'
             type: object

@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
 )
@@ -159,6 +160,125 @@ func (suite *ControllerUnit) TestCreateUser() {
 				actualJSON := testutil.JSONStringFromResBody(suite.T(), actualRes.Body)
 				suite.Equal(tc.expectedJSON, actualJSON)
 			}
+		})
+	}
+}
+
+// func (suite *ControllerUnit) TestUserByID() {
+// 	stubUser := user.User{ID: 1, UserName: "test_user"}
+
+// 	testCases := []struct {
+// 		description    string
+// 		argUserID      int64
+// 		stubUser       user.User
+// 		stubErr        error
+// 		expectedStatus int
+// 		expectedJSON   string
+// 	}{
+// 		{
+// 			description:    "ShouldFetchUser",
+// 			argUserID:      1,
+// 			stubUser:       stubUser,
+// 			stubErr:        nil,
+// 			expectedStatus: http.StatusOK,
+// 			expectedJSON: testutil.JSONStringFromInterface(
+// 				suite.T(),
+// 				stubUser.Response(),
+// 			),
+// 		},
+// 		{
+// 			description:    "ShouldBeUserNotFound",
+// 			argUserID:      -1,
+// 			stubUser:       user.EmptyUser,
+// 			stubErr:        user.ErrUserNotFound,
+// 			expectedStatus: http.StatusNotFound,
+// 			expectedJSON: testutil.JSONStringFromInterface(
+// 				suite.T(),
+// 				common.NewErrResp(user.ErrUserNotFound),
+// 			),
+// 		},
+// 	}
+
+// 	for _, tc := range testCases {
+// 		suite.Run(tc.description, func() {
+// 			suite.userRepository.
+// 				On("UserByID", tc.argUserID).
+// 				Return(tc.stubUser, tc.stubErr)
+
+// 			actual := testutil.Response(
+// 				suite.T(),
+// 				suite.router,
+// 				"GET",
+// 				fmt.Sprintf("/users/%d", tc.argUserID),
+// 				nil,
+// 			)
+
+// 			suite.Equal(tc.expectedStatus, actual.StatusCode)
+
+// 			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+
+// 			suite.Equal(tc.expectedJSON, actualJSON)
+// 		})
+// 	}
+// }
+
+func (suite *ControllerUnit) TestUserByName() {
+	testUser := user.User{
+		ID:       10,
+		UserName: "testUser",
+	}
+
+	testCases := []struct {
+		description    string
+		argUserName    string
+		stubUser       user.User
+		stubErr        error
+		expectedStatus int
+		expectedJSON   string
+	}{
+		{
+			description:    "ShouldFetchuser",
+			argUserName:    testUser.UserName,
+			stubUser:       testUser,
+			stubErr:        nil,
+			expectedStatus: http.StatusOK,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				testUser.Response(),
+			),
+		},
+		{
+			description:    "ShouldBeUserNotExists",
+			argUserName:    "NOT_EXISTS_USER",
+			stubUser:       user.EmptyUser,
+			stubErr:        user.ErrUserNotFound,
+			expectedStatus: http.StatusNotFound,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				common.NewErrResp(user.ErrUserNotFound),
+			),
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			suite.userRepository.
+				On("UserByUserName", tc.argUserName).
+				Return(tc.stubUser, tc.stubErr)
+
+			actual := testutil.Response(
+				suite.T(),
+				suite.router,
+				"GET",
+				"/users/"+tc.argUserName,
+				nil,
+			)
+
+			suite.Equal(tc.expectedStatus, actual.StatusCode)
+
+			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+
+			suite.Equal(tc.expectedJSON, actualJSON)
 		})
 	}
 }

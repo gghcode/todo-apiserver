@@ -1,5 +1,7 @@
 package user
 
+import "time"
+
 // EmptyUser is empty user model
 var EmptyUser = User{}
 
@@ -9,4 +11,13 @@ type User struct {
 	UserName     string `gorm:"unique;not null;"`
 	PasswordHash []byte `gorm:"not null;"`
 	CreatedAt    int64  `gorm:"not null;"`
+}
+
+// Response godoc
+func (user User) Response() UserResponse {
+	return UserResponse{
+		ID:        user.ID,
+		UserName:  user.UserName,
+		CreatedAt: time.Unix(user.CreatedAt, 0),
+	}
 }
