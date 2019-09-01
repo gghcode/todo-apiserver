@@ -50,6 +50,8 @@ run-unittests:
     policy: pull
   script:
     - make unit_ci
+  after_script:
+    - bash <(curl -s https://codecov.io/bash)
 
 run-integration-test:
   stage: test
@@ -65,6 +67,8 @@ run-integration-test:
   script:
     - sudo apt install docker-compose
     - make integration_ci
+  after_script:
+    - bash <(curl -s https://codecov.io/bash)
 # push-docker-image:
 #   stage: staging
 #   image: docker:18.09.5-git
