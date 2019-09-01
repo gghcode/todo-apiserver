@@ -1,5 +1,17 @@
 basePath: /api
 definitions:
+  api.ErrorMetaData:
+    properties:
+      message:
+        type: string
+    type: object
+  api.ErrorResponse:
+    properties:
+      errors:
+        items:
+          $ref: '#/definitions/api.ErrorMetaData'
+        type: array
+    type: object
   common.APIError:
     properties:
       message:
@@ -11,6 +23,31 @@ definitions:
         items:
           $ref: '#/definitions/common.APIError'
         type: array
+    type: object
+  todo.AddTodoRequest:
+    properties:
+      contents:
+        type: string
+      title:
+        type: string
+    required:
+    - contents
+    - title
+    type: object
+  todo.TodoResponse:
+    properties:
+      assignor_id:
+        type: integer
+      contents:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
     type: object
   user.CreateUserRequest:
     properties:
@@ -49,6 +86,60 @@ paths:
             type: string
       tags:
       - App API
+  /todos:
+    get:
+      consumes:
+      - application/json
+      description: Fetch todos by user id
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            items:
+              $ref: '#/definitions/todo.TodoResponse'
+            type: array
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+            type: object
+      tags:
+      - Todo API
+    post:
+      consumes:
+      - application/json
+      description: Add new todo
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/todo.AddTodoRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            $ref: '#/definitions/todo.TodoResponse'
+            type: object
+        "400":
+          description: Invalid payload
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+            type: object
+      tags:
+      - Todo API
   /users:
     post:
       consumes:
