@@ -1,2 +1,10 @@
-Addr: :3000
+Addr: :8080
 BasePath: api
+
+Postgres:
+  Driver: postgres
+  Host: localhost
+  Port: 5432
+  User: postgres
+  Name: postgres
+  Password: postgres

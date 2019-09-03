@@ -51,24 +51,4 @@ func (controller *Controller) issueToken(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, token)
-	// accessToken, err := controller.service.GenerateAccessToken(loginUser.ID)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
-	// 	return
-	// }
-
-	// refreshToken, err := controller.service.IssueRefreshToken(loginUser.ID)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
-	// 	return
-	// }
-
-	// res := TokenResponse{
-	// 	Type:         "Bearer",
-	// 	AccessToken:  accessToken,
-	// 	RefreshToken: refreshToken,
-	// 	ExpiresIn:    controller.conf.AccessExpiresInSec,
-	// }
-
-	// ctx.JSON(http.StatusOK, res)
 }

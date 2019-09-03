@@ -1,7 +1,9 @@
 package auth_test
 
 import (
+	"strconv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/auth"
@@ -13,7 +15,9 @@ import (
 type ServiceUnit struct {
 	suite.Suite
 
-	cfg          config.Configuration
+	cfg      config.Configuration
+	jwtParam auth.JWTParam
+
 	fakeUserRepo fake.UserRepository
 	fakePassport fake.Passport
 	service      auth.Service
@@ -24,7 +28,19 @@ func TestAuthServiceUnit(t *testing.T) {
 }
 
 func (suite *ServiceUnit) SetupTest() {
-	suite.cfg = config.Configuration{}
+	suite.cfg = config.Configuration{
+		Jwt: config.JwtConfig{
+			SecretKey:           "testkey",
+			AccessExpiresInSec:  3600,
+			RefreshExpiresInSec: 7200,
+		},
+	}
+
+	suite.jwtParam = auth.JWTParam{
+		SecretKeyBytes:      []byte(suite.cfg.Jwt.SecretKey),
+		AccessExpiresInSec:  time.Duration(suite.cfg.Jwt.AccessExpiresInSec),
+		RefreshExpiresInSec: time.Duration(suite.cfg.Jwt.RefreshExpiresInSec),
+	}
 
 	suite.fakeUserRepo = fake.UserRepository{}
 	suite.fakePassport = fake.Passport{}
@@ -32,11 +48,62 @@ func (suite *ServiceUnit) SetupTest() {
 		suite.cfg,
 		&suite.fakePassport,
 		&suite.fakeUserRepo,
+		fakeCreateAccessToken,
+		fakeCreateRefreshToken,
 	)
+}
+
+func stubCreateAccessToken(p auth.JWTParam, userID int64) string {
+	token, _ := fakeCreateAccessToken(p, userID)
+	return token
+}
+
+func fakeCreateAccessToken(jwtParam auth.JWTParam, userID int64) (string, error) {
+	return "access_token", nil
+}
+
+func stubCreateRefreshToken(p auth.JWTParam, userID int64) string {
+	token, _ := fakeCreateRefreshToken(p, userID)
+	return token
+}
+
+func fakeCreateRefreshToken(jwtParam auth.JWTParam, userID int64) (string, error) {
+	return "refresh_token", nil
+}
+
+func (suite *ServiceUnit) TestCreateAccessToken() {
+	testCases := []struct {
+		description string
+		argJwtParam auth.JWTParam
+		argUserID   int64
+	}{
+		{
+			description: "ShouldBeEqualSubject",
+			argUserID:   100,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			token, err := auth.CreateAccessToken(tc.argJwtParam, tc.argUserID)
+
+			suite.NoError(err)
+
+			claims, err := auth.ExtractTokenClaims(tc.argJwtParam, token)
+
+			suite.NoError(err)
+
+			expected := strconv.FormatInt(tc.argUserID, 10)
+			actual := claims["sub"]
+
+			suite.Equal(expected, actual)
+		})
+	}
 }
 
 func (suite *ServiceUnit) TestIssueToken() {
 	fakeUser := user.User{
+		ID:           100,
 		UserName:     "testuser",
 		PasswordHash: []byte("testtest"),
 	}
@@ -55,7 +122,12 @@ func (suite *ServiceUnit) TestIssueToken() {
 			stubUser:    fakeUser,
 			stubErr:     nil,
 			stubValid:   true,
-			expected:    auth.TokenResponse{},
+			expected: auth.TokenResponse{
+				Type:         "Bearer",
+				AccessToken:  stubCreateAccessToken(suite.jwtParam, fakeUser.ID),
+				RefreshToken: stubCreateRefreshToken(suite.jwtParam, fakeUser.ID),
+				ExpiresIn:    suite.cfg.Jwt.AccessExpiresInSec,
+			},
 			expectedErr: nil,
 		},
 		{

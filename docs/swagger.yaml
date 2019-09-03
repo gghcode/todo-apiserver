@@ -12,6 +12,27 @@ definitions:
           $ref: '#/definitions/api.ErrorMetaData'
         type: array
     type: object
+  auth.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  auth.TokenResponse:
+    properties:
+      access_token:
+        type: string
+      expires_in:
+        type: integer
+      refresh_token:
+        type: string
+      type:
+        type: string
+    type: object
   common.APIError:
     properties:
       message:
@@ -76,6 +97,39 @@ info:
   title: APAS TODO API
   version: "1.0"
 paths:
+  /auth/token:
+    post:
+      consumes:
+      - application/json
+      description: Issue new token
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/auth.LoginRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/auth.TokenResponse'
+            type: object
+        "400":
+          description: Invalid payload
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+        "401":
+          description: Invalid credential
+          schema:
+            $ref: '#/definitions/common.ErrorResponse'
+            type: object
+      tags:
+      - Auth API
   /healthy:
     get:
       description: Get server healthy
