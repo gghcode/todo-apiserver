@@ -12,48 +12,15 @@ import (
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil/fake"
 )
-
-type fakeUserRepository struct {
-	mock.Mock
-}
-
-func (repo *fakeUserRepository) CreateUser(usr user.User) (user.User, error) {
-	args := repo.Called(usr)
-	return args.Get(0).(user.User), args.Error(1)
-}
-
-func (repo *fakeUserRepository) AllUsers() ([]user.User, error) {
-	args := repo.Called()
-	return args.Get(0).([]user.User), args.Error(1)
-}
-
-func (repo *fakeUserRepository) UserByID(userID int64) (user.User, error) {
-	args := repo.Called(userID)
-	return args.Get(0).(user.User), args.Error(1)
-}
-
-func (repo *fakeUserRepository) UserByUserName(username string) (user.User, error) {
-	args := repo.Called(username)
-	return args.Get(0).(user.User), args.Error(1)
-}
-
-func (repo *fakeUserRepository) UpdateUserByID(usr user.User) (user.User, error) {
-	args := repo.Called(usr)
-	return args.Get(0).(user.User), args.Error(1)
-}
-
-func (repo *fakeUserRepository) RemoveUserByID(userID int64) (user.User, error) {
-	args := repo.Called(userID)
-	return args.Get(0).(user.User), args.Error(1)
-}
 
 type ControllerUnit struct {
 	suite.Suite
 
 	router         *gin.Engine
 	controller     *user.Controller
-	userRepository *fakeUserRepository
+	userRepository *fake.UserRepository
 }
 
 func TestUserControllerUnit(t *testing.T) {
@@ -64,7 +31,7 @@ func (suite *ControllerUnit) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
 	suite.router = gin.New()
-	suite.userRepository = &fakeUserRepository{}
+	suite.userRepository = &fake.UserRepository{}
 
 	suite.controller = user.NewController(suite.userRepository)
 	suite.controller.RegisterRoutes(suite.router)

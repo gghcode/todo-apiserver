@@ -40,3 +40,9 @@ docker_up: docker_down
 
 docker_down:
 	@docker-compose --log-level ERROR -p integration -f docker-compose.integration.yml down -v
+
+postgres:
+	@docker run -d --name apas_postgres -p 5432:5432 postgres:11.3-alpine
+ 
+redis:
+	@docker run -d --name apas_redis -p 6379:6379 redis:5.0.5-alpine

@@ -6,6 +6,7 @@ type Configuration struct {
 	BasePath string `mapstructure:"basePath"`
 
 	Postgres PostgresConfig `mapstructure:"postgres"`
+	Jwt      JwtConfig      `mapstructure:"jwt"`
 }
 
 // PostgresConfig is postgres config
@@ -16,4 +17,11 @@ type PostgresConfig struct {
 	User     string `mapstructure:"user"`
 	Name     string `mapstructure:"name"`
 	Password string `mapstructure:"password"`
+}
+
+// JwtConfig is jwt config
+type JwtConfig struct {
+	SecretKey           string `mapstructure:"secret_key"`
+	AccessExpiresInSec  int64  `mapstructure:"access_expires_sec"`
+	RefreshExpiresInSec int64  `mapstructure:"refresh_expires_sec"`
 }
