@@ -1,10 +1,13 @@
-Addr: :8080
-BasePath: api
+addr: :8080
+basePath: api
 
-Postgres:
-  Driver: postgres
-  Host: localhost
-  Port: 5432
-  User: postgres
-  Name: postgres
-  Password: postgres
+postgres:
+  driver: postgres
+  host: localhost
+  port: 5432
+  user: postgres
+  name: postgres
+  password: postgres
+
+jwt:
+  access_expires_sec: 3600
