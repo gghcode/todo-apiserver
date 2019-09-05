@@ -37,7 +37,7 @@ func (repo *repository) AllTodosByUserID(userID int64) ([]Todo, error) {
 	var result []Todo
 
 	err := repo.pgConn.DB().
-		Where("user_id = ?", userID).
+		Where("assignor_id = ?", userID).
 		Find(&result).
 		Error
 
