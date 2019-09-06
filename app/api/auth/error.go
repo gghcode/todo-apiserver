@@ -11,9 +11,10 @@ var (
 	// ErrInvalidCredential godoc
 	ErrInvalidCredential = api.NewHandledError(
 		http.StatusUnauthorized,
-		errors.New("Invalid user credential..."),
+		errors.New("Invalid user credential"),
 	)
 
+	// ErrNotContainToken godoc
 	ErrNotContainToken = api.NewHandledError(
 		http.StatusUnauthorized,
 		errors.New("Not contain token"),
@@ -22,7 +23,7 @@ var (
 	// ErrInvalidToken godoc
 	ErrInvalidToken = api.NewHandledError(
 		http.StatusUnauthorized,
-		errors.New("Invalid token..."),
+		errors.New("Invalid token"),
 	)
 
 	// ErrInvalidTokenType godoc
@@ -34,6 +35,12 @@ var (
 	// ErrTokenExpired godoc
 	ErrTokenExpired = api.NewHandledError(
 		http.StatusUnauthorized,
-		errors.New("Token is expired..."),
+		errors.New("Token is expired"),
+	)
+
+	// ErrNotStoredToken godoc
+	ErrNotStoredToken = api.NewHandledError(
+		http.StatusUnauthorized,
+		errors.New("Token is not stored"),
 	)
 )
