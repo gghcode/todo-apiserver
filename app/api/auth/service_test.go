@@ -18,7 +18,7 @@ type ServiceUnit struct {
 	suite.Suite
 
 	cfg      config.Configuration
-	jwtParam auth.JWTParam
+	jwtParam auth.JwtParam
 
 	fakeUserRepo fake.UserRepository
 	fakePassport fake.Passport
@@ -38,7 +38,7 @@ func (suite *ServiceUnit) SetupTest() {
 		},
 	}
 
-	suite.jwtParam = auth.JWTParam{
+	suite.jwtParam = auth.JwtParam{
 		SecretKeyBytes:      []byte(suite.cfg.Jwt.SecretKey),
 		AccessExpiresInSec:  time.Duration(suite.cfg.Jwt.AccessExpiresInSec),
 		RefreshExpiresInSec: time.Duration(suite.cfg.Jwt.RefreshExpiresInSec),
@@ -55,28 +55,28 @@ func (suite *ServiceUnit) SetupTest() {
 	)
 }
 
-func stubCreateAccessToken(p auth.JWTParam, userID int64) string {
+func stubCreateAccessToken(p auth.JwtParam, userID int64) string {
 	token, _ := fakeCreateAccessToken(p, userID)
 	return token
 }
 
-func fakeCreateAccessToken(jwtParam auth.JWTParam, userID int64) (string, error) {
+func fakeCreateAccessToken(jwtParam auth.JwtParam, userID int64) (string, error) {
 	return "access_token", nil
 }
 
-func stubCreateRefreshToken(p auth.JWTParam, userID int64) string {
+func stubCreateRefreshToken(p auth.JwtParam, userID int64) string {
 	token, _ := fakeCreateRefreshToken(p, userID)
 	return token
 }
 
-func fakeCreateRefreshToken(jwtParam auth.JWTParam, userID int64) (string, error) {
+func fakeCreateRefreshToken(jwtParam auth.JwtParam, userID int64) (string, error) {
 	return "refresh_token", nil
 }
 
 func (suite *ServiceUnit) TestCreateAccessToken() {
 	testCases := []struct {
 		description string
-		argJwtParam auth.JWTParam
+		argJwtParam auth.JwtParam
 		argUserID   int64
 	}{
 		{

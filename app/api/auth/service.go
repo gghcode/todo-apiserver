@@ -19,8 +19,8 @@ type TokenResponse struct {
 	ExpiresIn    int64  `json:"expires_in"`
 }
 
-// JWTParam godoc
-type JWTParam struct {
+// JwtParam godoc
+type JwtParam struct {
 	SecretKeyBytes      []byte
 	AccessExpiresInSec  time.Duration
 	RefreshExpiresInSec time.Duration
@@ -30,10 +30,10 @@ type JWTParam struct {
 var EmptyTokenResponse = TokenResponse{}
 
 // CreateAccessTokenHandler godoc
-type CreateAccessTokenHandler func(param JWTParam, userID int64) (string, error)
+type CreateAccessTokenHandler func(param JwtParam, userID int64) (string, error)
 
 // CreateRefreshTokenHandler godoc
-type CreateRefreshTokenHandler func(param JWTParam, userID int64) (string, error)
+type CreateRefreshTokenHandler func(param JwtParam, userID int64) (string, error)
 
 // Service godoc
 type Service interface {
@@ -50,7 +50,7 @@ func NewService(
 
 	return &authService{
 		cfg: conf,
-		jwtParam: JWTParam{
+		jwtParam: JwtParam{
 			SecretKeyBytes:      []byte(conf.Jwt.SecretKey),
 			AccessExpiresInSec:  time.Duration(conf.Jwt.AccessExpiresInSec),
 			RefreshExpiresInSec: time.Duration(conf.Jwt.RefreshExpiresInSec),
@@ -64,7 +64,7 @@ func NewService(
 
 type authService struct {
 	cfg      config.Configuration
-	jwtParam JWTParam
+	jwtParam JwtParam
 
 	secretKeyBytes      []byte
 	accessExpiresInSec  time.Duration
@@ -120,7 +120,7 @@ func (service *authService) authenticate(req LoginRequest, userID *int64) error 
 }
 
 // CreateAccessToken godoc
-func CreateAccessToken(jwtParam JWTParam, userID int64) (string, error) {
+func CreateAccessToken(jwtParam JwtParam, userID int64) (string, error) {
 	claims := &jwt.StandardClaims{
 		Subject:   strconv.FormatInt(userID, 10),
 		ExpiresAt: time.Now().Add(jwtParam.AccessExpiresInSec * time.Second).Unix(),
@@ -137,7 +137,7 @@ func CreateAccessToken(jwtParam JWTParam, userID int64) (string, error) {
 }
 
 // CreateRefreshToken godoc
-func CreateRefreshToken(jwtParam JWTParam, userID int64) (string, error) {
+func CreateRefreshToken(jwtParam JwtParam, userID int64) (string, error) {
 	return "fasdf", nil
 }
 
@@ -159,7 +159,7 @@ func VerifyAccessToken(secret string, accessToken string) (jwt.MapClaims, error)
 		return nil, ErrInvalidTokenType
 	}
 
-	param := JWTParam{
+	param := JwtParam{
 		SecretKeyBytes: []byte(secret),
 	}
 
@@ -167,7 +167,7 @@ func VerifyAccessToken(secret string, accessToken string) (jwt.MapClaims, error)
 }
 
 // ExtractTokenClaims godoc
-func ExtractTokenClaims(jwtParam JWTParam, token string) (jwt.MapClaims, error) {
+func ExtractTokenClaims(jwtParam JwtParam, token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 
 	_, err := jwt.ParseWithClaims(
