@@ -2,6 +2,7 @@ package auth
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -140,6 +141,31 @@ func CreateRefreshToken(jwtParam JWTParam, userID int64) (string, error) {
 	return "fasdf", nil
 }
 
+// VerifyAccessToken godoc
+func VerifyAccessToken(secret string, accessToken string) (jwt.MapClaims, error) {
+	if accessToken == "" {
+		return nil, ErrNotContainToken
+	}
+
+	tokenInfo := strings.Split(accessToken, " ")
+	if len(tokenInfo) != 2 {
+		return nil, ErrInvalidToken
+	}
+
+	tokenType := tokenInfo[0]
+	tokenString := tokenInfo[1]
+
+	if tokenType != "Bearer" {
+		return nil, ErrInvalidTokenType
+	}
+
+	param := JWTParam{
+		SecretKeyBytes: []byte(secret),
+	}
+
+	return ExtractTokenClaims(param, tokenString)
+}
+
 // ExtractTokenClaims godoc
 func ExtractTokenClaims(jwtParam JWTParam, token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
@@ -155,10 +181,10 @@ func ExtractTokenClaims(jwtParam JWTParam, token string) (jwt.MapClaims, error) 
 	if err != nil {
 		validationErr, ok := err.(*jwt.ValidationError)
 		if ok && validationErr.Errors == jwt.ValidationErrorExpired {
-			return nil, err
+			return nil, ErrTokenExpired
 		}
 
-		return nil, err
+		return nil, ErrInvalidToken
 	}
 
 	return claims, nil

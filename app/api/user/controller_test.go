@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil/fake"
 )
@@ -33,7 +34,7 @@ func (suite *ControllerUnit) SetupTest() {
 	suite.router = gin.New()
 	suite.userRepository = &fake.UserRepository{}
 
-	suite.controller = user.NewController(suite.userRepository)
+	suite.controller = user.NewController(suite.userRepository, infra.NewPassport(0))
 	suite.controller.RegisterRoutes(suite.router)
 }
 

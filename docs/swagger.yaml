@@ -192,6 +192,8 @@ paths:
           schema:
             $ref: '#/definitions/api.ErrorResponse'
             type: object
+      security:
+      - ApiKeyAuth: []
       tags:
       - Todo API
   /users:
@@ -279,4 +281,9 @@ paths:
             type: object
       tags:
       - User API
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

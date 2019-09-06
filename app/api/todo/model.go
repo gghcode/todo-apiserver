@@ -22,16 +22,11 @@ type Todo struct {
 // BeforeSave godoc
 func (todo *Todo) BeforeSave() (err error) {
 	todo.ID = uuid.NewV4()
-	// time.RFC1123
-	// todo.CreatedAt, _ = time.Parse(time.RFC1123, time.Now().Format(time.RFC1123))
-	// todo.UpdatedAt, _ = time.Parse(time.RFC1123, time.Now().Format(time.RFC1123))
-
 	return
 }
 
 // BeforeUpdate godoc
 func (todo *Todo) BeforeUpdate() (err error) {
 	todo.UpdatedAt = time.Now()
-
 	return
 }
