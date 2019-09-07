@@ -20,12 +20,14 @@ func NewContainer(cfg config.Configuration) (*inject.Container, error) {
 		}),
 
 		inject.Provide(db.NewPostgresConn),
+		inject.Provide(db.NewRedisConn),
 		inject.Provide(func() infra.Passport {
 			return infra.NewPassport(12)
 		}),
 
 		inject.Provide(user.NewRepository),
 		inject.Provide(todo.NewRepository),
+		inject.Provide(auth.NewRepository),
 
 		inject.Provide(auth.NewService),
 		inject.Provide(func() auth.CreateAccessTokenHandler {

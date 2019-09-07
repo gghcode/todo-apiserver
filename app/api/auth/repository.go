@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/go-redis/redis"
@@ -14,7 +14,7 @@ const prefixRefreshToken = "refresh_token"
 type Repository interface {
 	SaveRefreshToken(userID int64, token string, expireIn time.Duration) error
 
-	RefreshToken(userID int64) (string, error)
+	UserIDByRefreshToken(refreshToken string) (int64, error)
 }
 
 type repository struct {
@@ -30,27 +30,29 @@ func NewRepository(redisConn db.RedisConn) Repository {
 
 func (repo *repository) SaveRefreshToken(userID int64, token string, expireIn time.Duration) error {
 	err := repo.redisConn.Client().Set(
-		redisRefreshTokenKey(userID),
-		token,
+		redisRefreshTokenKey(token),
+		userID,
 		expireIn*time.Second,
 	).Err()
 
 	return err
 }
 
-func (repo *repository) RefreshToken(userID int64) (string, error) {
-	token, err := repo.redisConn.
+func (repo *repository) UserIDByRefreshToken(refreshToken string) (int64, error) {
+	userIDStr, err := repo.redisConn.
 		Client().
-		Get(redisRefreshTokenKey(userID)).
+		Get(redisRefreshTokenKey(refreshToken)).
 		Result()
 
 	if err == redis.Nil {
-		return "", ErrNotStoredToken
+		return 0, ErrNotStoredToken
 	}
 
-	return token, err
+	userID, err := strconv.ParseInt(userIDStr, 10, 64)
+
+	return userID, err
 }
 
-func redisRefreshTokenKey(userID int64) string {
-	return fmt.Sprintf("%s_%d", prefixRefreshToken, userID)
+func redisRefreshTokenKey(token string) string {
+	return prefixRefreshToken + "-" + token
 }

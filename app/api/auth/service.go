@@ -33,17 +33,19 @@ var EmptyTokenResponse = TokenResponse{}
 type CreateAccessTokenHandler func(param JwtParam, userID int64) (string, error)
 
 // CreateRefreshTokenHandler godoc
-type CreateRefreshTokenHandler func(param JwtParam, userID int64) (string, error)
+type CreateRefreshTokenHandler func(tokenRepo Repository, param JwtParam, userID int64) (string, error)
 
 // Service godoc
 type Service interface {
 	IssueToken(req LoginRequest) (TokenResponse, error)
+	RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error)
 }
 
 // NewService return new auth authService instance.
 func NewService(
 	conf config.Configuration,
 	passport infra.Passport,
+	tokenRepo Repository,
 	userRepo user.Repository,
 	createAccessTokenHandler CreateAccessTokenHandler,
 	createRefreshTokenHandler CreateRefreshTokenHandler) Service {
@@ -56,6 +58,7 @@ func NewService(
 			RefreshExpiresInSec: time.Duration(conf.Jwt.RefreshExpiresInSec),
 		},
 		userRepo:                  userRepo,
+		tokenRepo:                 tokenRepo,
 		passport:                  passport,
 		createAccessTokenHandler:  createAccessTokenHandler,
 		createRefreshTokenHandler: createRefreshTokenHandler,
@@ -70,8 +73,9 @@ type authService struct {
 	accessExpiresInSec  time.Duration
 	refreshExpiresInSec time.Duration
 
-	userRepo user.Repository
-	passport infra.Passport
+	tokenRepo Repository
+	userRepo  user.Repository
+	passport  infra.Passport
 
 	createAccessTokenHandler  CreateAccessTokenHandler
 	createRefreshTokenHandler CreateRefreshTokenHandler
@@ -89,7 +93,7 @@ func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) 
 		return EmptyTokenResponse, err
 	}
 
-	refreshToken, err := service.createRefreshTokenHandler(service.jwtParam, userID)
+	refreshToken, err := service.createRefreshTokenHandler(service.tokenRepo, service.jwtParam, userID)
 	if err != nil {
 		return EmptyTokenResponse, err
 	}
@@ -99,6 +103,24 @@ func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) 
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresIn:    service.cfg.Jwt.AccessExpiresInSec,
+	}, nil
+}
+
+func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error) {
+	userID, err := service.tokenRepo.UserIDByRefreshToken(req.Token)
+	if err != nil {
+		return EmptyTokenResponse, err
+	}
+
+	accessToken, err := service.createAccessTokenHandler(service.jwtParam, userID)
+	if err != nil {
+		return EmptyTokenResponse, err
+	}
+
+	return TokenResponse{
+		Type:        "Bearer",
+		AccessToken: accessToken,
+		ExpiresIn:   service.cfg.Jwt.AccessExpiresInSec,
 	}, nil
 }
 
@@ -121,8 +143,28 @@ func (service *authService) authenticate(req LoginRequest, userID *int64) error 
 
 // CreateAccessToken godoc
 func CreateAccessToken(jwtParam JwtParam, userID int64) (string, error) {
+	return createJwtToken(jwtParam, "access", userID)
+}
+
+// CreateRefreshToken godoc
+func CreateRefreshToken(tokenRepo Repository, jwtParam JwtParam, userID int64) (string, error) {
+	token, err := createJwtToken(jwtParam, "refresh", userID)
+	if err != nil {
+		return "", err
+	}
+
+	tokenRepo.SaveRefreshToken(
+		userID,
+		token,
+		jwtParam.RefreshExpiresInSec,
+	)
+
+	return token, nil
+}
+
+func createJwtToken(jwtParam JwtParam, tokenType string, sub int64) (string, error) {
 	claims := &jwt.StandardClaims{
-		Subject:   strconv.FormatInt(userID, 10),
+		Subject:   strconv.FormatInt(sub, 10),
 		ExpiresAt: time.Now().Add(jwtParam.AccessExpiresInSec * time.Second).Unix(),
 		IssuedAt:  time.Now().Unix(),
 	}
@@ -134,11 +176,6 @@ func CreateAccessToken(jwtParam JwtParam, userID int64) (string, error) {
 	}
 
 	return tokenString, nil
-}
-
-// CreateRefreshToken godoc
-func CreateRefreshToken(jwtParam JwtParam, userID int64) (string, error) {
-	return "fasdf", nil
 }
 
 // VerifyAccessToken godoc

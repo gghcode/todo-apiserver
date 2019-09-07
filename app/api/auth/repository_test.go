@@ -65,7 +65,7 @@ func (suite *RepositoryIntegration) TestSaveRefreshToken() {
 	}
 }
 
-func (suite *RepositoryIntegration) TestRefreshToken() {
+func (suite *RepositoryIntegration) TestUserIDByRefreshToken() {
 	fakeUserID := int64(100)
 	fakeTokenString := "debug token"
 
@@ -76,28 +76,28 @@ func (suite *RepositoryIntegration) TestRefreshToken() {
 	)
 
 	testCases := []struct {
-		description string
-		argUserID   int64
-		expected    string
-		expectedErr error
+		description     string
+		argRefreshToken string
+		expected        int64
+		expectedErr     error
 	}{
 		{
-			description: "ShouldFetchRefreshToken",
-			argUserID:   fakeUserID,
-			expected:    fakeTokenString,
-			expectedErr: nil,
+			description:     "ShouldFetchRefreshToken",
+			argRefreshToken: fakeTokenString,
+			expected:        fakeUserID,
+			expectedErr:     nil,
 		},
 		{
-			description: "ShouldReturnErrNotStoredToken",
-			argUserID:   -1,
-			expected:    "",
-			expectedErr: auth.ErrNotStoredToken,
+			description:     "ShouldReturnErrNotStoredToken",
+			argRefreshToken: "",
+			expected:        0,
+			expectedErr:     auth.ErrNotStoredToken,
 		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
-			actual, actualErr := suite.tokenRepo.RefreshToken(tc.argUserID)
+			actual, actualErr := suite.tokenRepo.UserIDByRefreshToken(tc.argRefreshToken)
 
 			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)
