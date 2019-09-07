@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
 )
 
@@ -41,11 +41,13 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Tags User API
 // @Router /users [post]
 func (controller *Controller) CreateUser(ctx *gin.Context) {
-	var reqPayload CreateUserRequest
-	if err := ctx.ShouldBindJSON(&reqPayload); err != nil {
-		ctx.JSON(http.StatusBadRequest, common.NewErrResp(err))
+	createUserRequestValidator := CreateUserRequestValidator{}
+	if err := createUserRequestValidator.Bind(ctx); err != nil {
+		api.WriteErrorResponse(ctx, err)
 		return
 	}
+
+	reqPayload := createUserRequestValidator.Model
 
 	passwordHash, _ := controller.passport.HashPassword(reqPayload.Password)
 	createdUser, err := controller.userRepository.CreateUser(User{
@@ -54,7 +56,7 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 	})
 
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
+		api.WriteErrorResponse(ctx, err)
 		return
 	}
 
@@ -78,11 +80,8 @@ func (controller *Controller) UserByID(ctx *gin.Context) {
 	}
 
 	user, err := controller.userRepository.UserByID(userID)
-	if err == ErrUserNotFound {
-		ctx.JSON(http.StatusNotFound, common.NewErrResp(err))
-		return
-	} else if err != nil {
-		ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
+	if err != nil {
+		api.WriteErrorResponse(ctx, err)
 		return
 	}
 
@@ -102,11 +101,8 @@ func (controller *Controller) UserByName(ctx *gin.Context) {
 	username := ctx.Param("username")
 
 	user, err := controller.userRepository.UserByUserName(username)
-	if err == ErrUserNotFound {
-		ctx.JSON(http.StatusNotFound, common.NewErrResp(err))
-		return
-	} else if err != nil {
-		ctx.JSON(http.StatusInternalServerError, common.NewErrResp(err))
+	if err != nil {
+		api.WriteErrorResponse(ctx, err)
 		return
 	}
 
