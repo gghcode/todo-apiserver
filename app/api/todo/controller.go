@@ -7,6 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/val"
 )
 
 // Controller godoc
@@ -26,7 +28,11 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	routes := router.Group("/todos")
 	{
 		routes.GET("", controller.AllTodosByUserID)
-		routes.POST("", controller.AddTodo)
+	}
+
+	authorized := routes.Use(middleware.JwtAuthRequired())
+	{
+		authorized.POST("", controller.AddTodo)
 	}
 }
 
@@ -34,6 +40,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Description Add new todo
 // @Accept json
 // @Produce json
+// @Security ApiKeyAuth
 // @Param payload body todo.AddTodoRequest true "payload"
 // @Success 201 {object} todo.TodoResponse "ok"
 // @Failure 400 {object} api.ErrorResponse "Invalid payload"
@@ -49,7 +56,7 @@ func (controller *Controller) AddTodo(ctx *gin.Context) {
 	todoEntity := Todo{
 		Title:      todoValidator.Model.Title,
 		Contents:   todoValidator.Model.Contents,
-		AssignorID: 10,
+		AssignorID: ctx.GetInt64(val.UserID),
 	}
 
 	todo, err := controller.todoRepo.AddTodo(todoEntity)

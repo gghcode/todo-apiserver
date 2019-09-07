@@ -5,6 +5,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/service"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 	_ "gitlab.com/gyuhwan/apas-todo-apiserver/docs"
@@ -17,6 +18,9 @@ const (
 // @title APAS TODO API
 // @version 1.0
 // @description This is a apas todo api server.
+// @securitydefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
 // @BasePath /api
 func main() {
 	cfg, err := config.NewBuilder().
@@ -35,6 +39,7 @@ func main() {
 	}
 
 	router := gin.New()
+	router.Use(middleware.AddJwtAuthHandler(cfg.Jwt))
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiRouter := router.Group(cfg.BasePath)

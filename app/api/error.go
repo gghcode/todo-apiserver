@@ -62,3 +62,14 @@ func WriteErrorResponse(ctx *gin.Context, err error) {
 
 	ctx.JSON(handledErr.Status, NewErrRes(handledErr.Errors...))
 }
+
+// AbortErrorResponse godoc
+func AbortErrorResponse(ctx *gin.Context, err error) {
+	handledErr, ok := err.(HandledError)
+	if !ok {
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, NewErrRes(err))
+		return
+	}
+
+	ctx.AbortWithStatusJSON(handledErr.Status, NewErrRes(handledErr.Errors...))
+}

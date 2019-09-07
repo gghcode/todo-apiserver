@@ -14,6 +14,7 @@ import (
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/todo"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil/fake"
 )
 
 type fakeTodoRepository struct {
@@ -33,9 +34,10 @@ func (repo *fakeTodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, err
 type ControllerUnit struct {
 	suite.Suite
 
-	router     *gin.Engine
-	controller *todo.Controller
-	todoRepo   *fakeTodoRepository
+	router        *gin.Engine
+	userIDFactory *fake.MockUserID
+	controller    *todo.Controller
+	todoRepo      *fakeTodoRepository
 }
 
 func TestTodoControllerUnit(t *testing.T) {
@@ -45,7 +47,10 @@ func TestTodoControllerUnit(t *testing.T) {
 func (suite *ControllerUnit) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
+	suite.userIDFactory = &fake.MockUserID{}
 	suite.router = gin.New()
+	suite.router.Use(fake.AddJwtAuthHandler(suite.userIDFactory))
+
 	suite.todoRepo = &fakeTodoRepository{}
 
 	suite.controller = todo.NewController(suite.todoRepo)
@@ -65,6 +70,7 @@ func (suite *ControllerUnit) TestAddTodo() {
 		reqPayload     io.Reader
 		stubTodo       todo.Todo
 		stubErr        error
+		stubUserID     int64
 		expectedStatus int
 		expectedJSON   string
 	}{
@@ -79,6 +85,7 @@ func (suite *ControllerUnit) TestAddTodo() {
 			),
 			stubTodo:       fakeTodo,
 			stubErr:        nil,
+			stubUserID:     fakeTodo.AssignorID,
 			expectedStatus: http.StatusCreated,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
@@ -117,6 +124,10 @@ func (suite *ControllerUnit) TestAddTodo() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
+			suite.userIDFactory.
+				On("UserID").
+				Return(tc.stubUserID)
+
 			suite.todoRepo.
 				On("AddTodo", mock.Anything).
 				Once().

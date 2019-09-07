@@ -14,10 +14,9 @@ func init() {
 
 // Validate godoc
 func Validate(model interface{}) error {
-	err := validate.Struct(model)
-	if err == nil {
-		return nil
+	if err := validate.Struct(model); err != nil {
+		return NewHandledError(http.StatusBadRequest, err)
 	}
 
-	return NewHandledError(http.StatusBadRequest, err)
+	return nil
 }

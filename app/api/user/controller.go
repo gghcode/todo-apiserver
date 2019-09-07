@@ -6,17 +6,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
 )
 
 // Controller godoc
 type Controller struct {
 	userRepository Repository
+	passport       infra.Passport
 }
 
 // NewController godoc
-func NewController(userRepository Repository) *Controller {
+func NewController(userRepository Repository, passport infra.Passport) *Controller {
 	return &Controller{
 		userRepository: userRepository,
+		passport:       passport,
 	}
 }
 
@@ -44,9 +47,10 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 		return
 	}
 
+	passwordHash, _ := controller.passport.HashPassword(reqPayload.Password)
 	createdUser, err := controller.userRepository.CreateUser(User{
 		UserName:     reqPayload.UserName,
-		PasswordHash: []byte(reqPayload.Password),
+		PasswordHash: passwordHash,
 	})
 
 	if err != nil {
