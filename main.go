@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/service"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 	_ "gitlab.com/gyuhwan/apas-todo-apiserver/docs"
 )
@@ -28,7 +28,7 @@ func main() {
 		BindEnvs(envPrefix).
 		Build()
 
-	container, err := service.NewContainer(cfg)
+	container, err := app.NewContainer(cfg)
 	if err != nil {
 		panic(err)
 	}

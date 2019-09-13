@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
+	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
 	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
@@ -223,7 +223,7 @@ func (suite *ControllerUnit) TestUserByName() {
 			expectedStatus: http.StatusNotFound,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				common.NewErrResp(user.ErrUserNotFound),
+				api.NewErrRes(user.ErrUserNotFound),
 			),
 		},
 	}

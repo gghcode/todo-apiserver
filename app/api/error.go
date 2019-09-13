@@ -35,8 +35,8 @@ type HandledError struct {
 }
 
 // NewHandledError godoc
-func NewHandledError(code int, err ...error) HandledError {
-	return HandledError{
+func NewHandledError(code int, err ...error) *HandledError {
+	return &HandledError{
 		Status: code,
 		Errors: err,
 	}
@@ -54,7 +54,7 @@ func (err HandledError) Error() string {
 
 // WriteErrorResponse godoc
 func WriteErrorResponse(ctx *gin.Context, err error) {
-	handledErr, ok := err.(HandledError)
+	handledErr, ok := err.(*HandledError)
 	if !ok {
 		ctx.JSON(http.StatusInternalServerError, NewErrRes(err))
 		return

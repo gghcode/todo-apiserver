@@ -9,18 +9,20 @@ import (
 
 var (
 	// ErrAlreadyExistUser godoc
-	ErrAlreadyExistUser = errors.New("Already exists user")
+	ErrAlreadyExistUser = api.NewHandledError(
+		http.StatusConflict,
+		errors.New("Already exists user"),
+	)
 
 	// ErrUserNotFound godoc
-	ErrUserNotFound = errors.New("User was not found")
+	ErrUserNotFound = api.NewHandledError(
+		http.StatusNotFound,
+		errors.New("User was not found"),
+	)
 
 	// ErrInvalidUserID godoc
 	ErrInvalidUserID = api.NewHandledError(
 		http.StatusBadRequest,
 		errors.New("Invalid UserID"),
 	)
-	// .APIHandledError{
-	// 	StatusCode: http.StatusBadRequest,
-	// 	Message:    "Invalid UserID",
-	// }
 )

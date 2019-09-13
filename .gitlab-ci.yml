@@ -29,19 +29,6 @@ build-binary:
   script:
     - CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-# build-docker-image:
-#   stage: build-and-test
-#   image: docker:18.09.5-git
-#   services:
-#     - docker:dind
-#   script:
-#     - mkdir image
-#     - docker build -t $CI_REGISTRY_IMAGE .
-#     - docker save -o image/app.tar $CI_REGISTRY_IMAGE
-#   artifacts:
-#     paths:
-#       - image/
-
 run-unittests:
   stage: test
   image: circleci/golang:1.12
@@ -69,15 +56,16 @@ run-integration-test:
     - make integration_ci
   after_script:
     - bash <(curl -s https://codecov.io/bash)
-# push-docker-image:
-#   stage: staging
-#   image: docker:18.09.5-git
-#   services:
-#     - docker:dind
-#   before_script:
-#     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-#   script:
-#     - docker load -i image/app.tar
-#     - docker push registry.gitlab.com/gyuhwan/apas-todo-apiserver
-#   only:
-#     - master
+
+push-docker-image:
+  stage: staging
+  image: docker:18.09.5-git
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE .
+    - docker push registry.gitlab.com/gyuhwan/apas-todo-apiserver
+  only:
+    - master
