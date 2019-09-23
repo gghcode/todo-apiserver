@@ -33,8 +33,8 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Produce json
 // @Param payload body auth.AccessTokenByRefreshRequest true "payload"
 // @Success 200 {object} auth.TokenResponse "ok"
-// @Failure 400 {object} common.ErrorResponse "Invalid payload"
-// @Failure 401 {object} common.ErrorResponse "Invalid credential"
+// @Failure 400 {object} api.ErrorResponse "Invalid payload"
+// @Failure 401 {object} api.ErrorResponse "Invalid credential"
 // @Tags Auth API
 // @Router /auth/refresh [post]
 func (controller *Controller) refreshToken(ctx *gin.Context) {
@@ -58,8 +58,8 @@ func (controller *Controller) refreshToken(ctx *gin.Context) {
 // @Produce json
 // @Param payload body auth.LoginRequest true "payload"
 // @Success 200 {object} auth.TokenResponse "ok"
-// @Failure 400 {object} common.ErrorResponse "Invalid payload"
-// @Failure 401 {object} common.ErrorResponse "Invalid credential"
+// @Failure 400 {object} api.ErrorResponse "Invalid payload"
+// @Failure 401 {object} api.ErrorResponse "Invalid credential"
 // @Tags Auth API
 // @Router /auth/token [post]
 func (controller *Controller) issueToken(ctx *gin.Context) {
