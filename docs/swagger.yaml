@@ -40,18 +40,6 @@ definitions:
       type:
         type: string
     type: object
-  common.APIError:
-    properties:
-      message:
-        type: string
-    type: object
-  common.ErrorResponse:
-    properties:
-      errors:
-        items:
-          $ref: '#/definitions/common.APIError'
-        type: array
-    type: object
   todo.AddTodoRequest:
     properties:
       contents:
@@ -128,12 +116,12 @@ paths:
         "400":
           description: Invalid payload
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
         "401":
           description: Invalid credential
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
       tags:
       - Auth API
@@ -161,12 +149,12 @@ paths:
         "400":
           description: Invalid payload
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
         "401":
           description: Invalid credential
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
       tags:
       - Auth API
@@ -237,6 +225,31 @@ paths:
       tags:
       - Todo API
   /users:
+    get:
+      consumes:
+      - application/json
+      description: Fetch user by user id
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+            type: object
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+            type: object
+      tags:
+      - User API
     post:
       consumes:
       - application/json
@@ -260,38 +273,12 @@ paths:
         "400":
           description: Invalid user payload
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
         "409":
           description: Already exists user
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
-            type: object
-      tags:
-      - User API
-  /users/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Fetch user by user id
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/user.UserResponse'
-            type: object
-        "404":
-          description: User Not Found
-          schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
       tags:
       - User API
@@ -317,7 +304,7 @@ paths:
         "404":
           description: User Not Found
           schema:
-            $ref: '#/definitions/common.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponse'
             type: object
       tags:
       - User API

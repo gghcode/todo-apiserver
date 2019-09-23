@@ -26,7 +26,7 @@ func NewController(userRepository Repository, passport infra.Passport) *Controll
 // RegisterRoutes godocs
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.POST("/users", controller.CreateUser)
-	// router.GET("/users/:id", controller.UserByID)
+	router.GET("/users", controller.UserByID)
 	router.GET("/users/:username", controller.UserByName)
 }
 
@@ -36,8 +36,8 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Produce json
 // @Param payload body user.CreateUserRequest true "user payload"
 // @Success 201 {object} user.UserResponse "ok"
-// @Failure 400 {object} common.ErrorResponse "Invalid user payload"
-// @Failure 409 {object} common.ErrorResponse "Already exists user"
+// @Failure 400 {object} api.ErrorResponse "Invalid user payload"
+// @Failure 409 {object} api.ErrorResponse "Already exists user"
 // @Tags User API
 // @Router /users [post]
 func (controller *Controller) CreateUser(ctx *gin.Context) {
@@ -67,15 +67,15 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 // @Description Fetch user by user id
 // @Accept json
 // @Produce json
-// @Param id path string true "User ID"
+// @Param user_id query string true "User ID"
 // @Success 200 {object} user.UserResponse "ok"
-// @Failure 404 {object} common.ErrorResponse "User Not Found"
+// @Failure 404 {object} api.ErrorResponse "User Not Found"
 // @Tags User API
-// @Router /users/{id} [get]
+// @Router /users [get]
 func (controller *Controller) UserByID(ctx *gin.Context) {
-	userID, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
+	userID, err := strconv.ParseInt(ctx.Query("user_id"), 10, 64)
 	if err != nil {
-		// ctx.JSON(http.StatusBadRequest, common.NewErrResp(common.))
+		api.WriteErrorResponse(ctx, ErrInvalidUserID)
 		return
 	}
 
@@ -94,7 +94,7 @@ func (controller *Controller) UserByID(ctx *gin.Context) {
 // @Produce json
 // @Param username path string true "User Name"
 // @Success 200 {object} user.UserResponse "ok"
-// @Failure 404 {object} common.ErrorResponse "User Not Found"
+// @Failure 404 {object} api.ErrorResponse "User Not Found"
 // @Tags User API
 // @Router /users/{username} [get]
 func (controller *Controller) UserByName(ctx *gin.Context) {

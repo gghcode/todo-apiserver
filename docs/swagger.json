@@ -46,14 +46,14 @@
                         "description": "Invalid payload",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -95,14 +95,14 @@
                         "description": "Invalid payload",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -211,6 +211,43 @@
             }
         },
         "/users": {
+            "get": {
+                "description": "Fetch user by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User API"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/user.UserResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create new user",
                 "consumes": [
@@ -246,53 +283,14 @@
                         "description": "Invalid user payload",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Already exists user",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/{id}": {
-            "get": {
-                "description": "Fetch user by user id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User API"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/user.UserResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "User Not Found",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -331,7 +329,7 @@
                         "description": "User Not Found",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/common.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
                 }
@@ -398,25 +396,6 @@
                 },
                 "type": {
                     "type": "string"
-                }
-            }
-        },
-        "common.APIError": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "common.ErrorResponse": {
-            "type": "object",
-            "properties": {
-                "errors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/common.APIError"
-                    }
                 }
             }
         },
