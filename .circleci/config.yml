@@ -55,7 +55,7 @@ workflows:
   build-test:
     jobs:
       - "Dependencies"
-      - "Build"
+      - "Build":
           requires:
             - "Dependencies"
       - "Unit Test":
