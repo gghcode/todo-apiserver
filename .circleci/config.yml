@@ -1,8 +1,11 @@
 version: 2.1
 jobs:
+  # "Dependencies":
+  #   docker:
+  #     - image:
   "Build":
     docker:
-      - image: circleci/golang:1.12
+      - image: golang:1.12.4-alpine
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
