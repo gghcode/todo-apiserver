@@ -11,14 +11,8 @@ dependency:
 	@go get -u github.com/swaggo/swag/cmd/swag
 	@go get -u github.com/oxequa/realize
 
-build:
-	@go build
-
 live:
 	@realize start --run --fmt --no-config
-
-run:
-	@go run .
 
 unit:
 	@go test -race -v -short ./...
@@ -30,9 +24,8 @@ integration: docker_up
 	@go test -race -v -run Integration ./... || $(MAKE) docker_down
 	@$(MAKE) docker_down
 
-integration_ci: export TEST_POSTGRES_HOST=docker
 integration_ci: docker_up
-	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || $(MAKE) docker_down
+	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down || exit 1)
 	@$(MAKE) docker_down
 
 docker_up: docker_down

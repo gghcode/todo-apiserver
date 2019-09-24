@@ -27,19 +27,58 @@ jobs:
 
       - restore_cache:
           keys:
-            - go-mod-v1-test-{{ checksum "go.sum" }}
+            - go-mod-v1-{{ checksum "go.sum" }}
 
       - run: make unit_ci
-
-      - save_cache:
-          key: go-mod-v1-test-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
 
       - run:
           name: Upload codecov
           command: |
             bash <(curl -s https://codecov.io/bash) -F unittests || 
+            echo 'Codecov failed to upload'
+
+  "Integration Test":
+    docker:
+      - image: circleci/golang:1.12
+    environment:
+      DOCKER_DRIVER: overlay2
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - restore_cache:
+          name: Restore Docker Compose
+          keys:
+            - docker-compose
+
+      # - run:
+      #   name: Install Docker Compose
+      #   command: |
+      #     curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+      #     chmod +x ~/docker-compose
+      #     sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - run:
+          name: Install Docker Compose
+          command: sudo apt install docker-compose
+
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+
+      - run: make integration_ci
+
+      - save_cache:
+          key: docker-compose
+          paths:
+            - "/usr/local/bin/docker-compose"
+
+      - run:
+          name: Upload codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -F integration ||
             echo 'Codecov failed to upload'
 
   "Build Docker Image":
@@ -65,9 +104,9 @@ workflows:
       - "Unit Test":
           requires:
             - "Build"
-      - "Build Docker Image":
+      - "Integration Test":
           requires:
             - "Build"
-      # - run-integration:
+      # - "Build Docker Image":
       #     requires:
       #       - "Build"
