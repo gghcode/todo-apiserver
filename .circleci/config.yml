@@ -1,0 +1,52 @@
+version: 2.1
+jobs:
+  "Build":
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: ~/apas-todo-apiserver
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+
+      - run: go build
+
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+  "Unit Test":
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: ~/apas-todo-apiserver
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+
+      - run: make unit_ci
+
+      - run:
+          name: Upload codecov
+          command: |
+            bash <(curl -s https://codecov.io/bash) -F unittests || 
+            echo 'Codecov failed to upload'
+
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - "Build"
+      - "Unit Test":
+          requires:
+            - "Build"
+      # - run-integration:
+      #     requires:
+      #       - "Build"
+      # - build-docker-image:
+      #     requires:
+      #       - "Build"
