@@ -11,7 +11,6 @@ jobs:
           keys:
             - go-mod-v1-{{ checksum "go.sum" }}
 
-      - run: go mod download
       - run: go build
 
       - save_cache:
@@ -21,7 +20,7 @@ jobs:
 
   "Unit Test":
     docker:
-      - image: circleci/golang:1.12
+      - image: golang:1.12.8
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
