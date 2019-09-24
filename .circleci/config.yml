@@ -27,9 +27,14 @@ jobs:
 
       - restore_cache:
           keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+            - go-mod-v1-test-{{ checksum "go.sum" }}
 
       - run: make unit_ci
+
+      - save_cache:
+          key: go-mod-v1-test-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
 
       - run:
           name: Upload codecov
