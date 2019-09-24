@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
-  "Dependencies":
+  "Build":
     docker:
-      - image: circleci/golang:1.12
+      - image: golang:1.12.8
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
@@ -12,24 +12,12 @@ jobs:
             - go-mod-v1-{{ checksum "go.sum" }}
 
       - run: go mod download
+      - run: go build
 
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-
-  "Build":
-    docker:
-      - image: circleci/golang:1.12
-    working_directory: ~/apas-todo-apiserver
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
-
-      - run: go build
 
   "Unit Test":
     docker:
@@ -54,10 +42,7 @@ workflows:
   version: 2
   build-test:
     jobs:
-      - "Dependencies"
-      - "Build":
-          requires:
-            - "Dependencies"
+      - "Build"
       - "Unit Test":
           requires:
             - "Build"
