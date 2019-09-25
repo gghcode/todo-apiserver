@@ -5,6 +5,7 @@ TEST_POSTGRES_PORT=5431
 TEST_POSTGRES_USER=postgres
 TEST_POSTGRES_NAME=postgres
 TEST_POSTGRES_PASSWORD=postgres
+TEST_REDIS_ADDR=127.0.0.1:6378
 
 dependency:
 	@go get -v ./...
@@ -25,8 +26,7 @@ integration: docker_up
 	@$(MAKE) docker_down
 
 integration_ci: docker_up
-	echo $$(echo $$DOCKER_HOST | cut -c 7- | cut -d: -f1) 
-	@TEST_POSTGRES_HOST=$$(echo $$DOCKER_HOST | cut -c 7- | cut -d: -f1) go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down && exit 1)
+	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down && exit 1)
 	@$(MAKE) docker_down
 
 docker_up: docker_down

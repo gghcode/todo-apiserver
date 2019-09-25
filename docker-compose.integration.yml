@@ -4,6 +4,8 @@ services:
     image: redis:5.0.5-alpine
     ports:
       - 6378:6379
+    networks:
+      - internal
   postgres:
     image: postgres:11.3-alpine
     environment:
@@ -12,3 +14,9 @@ services:
       - POSTGRES_DB=${TEST_POSTGRES_NAME}
     ports:
       - ${TEST_POSTGRES_PORT}:5432
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
