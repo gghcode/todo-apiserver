@@ -21,6 +21,9 @@ jobs:
       - *restore_go_modules
 
       - run: go build
+      - run:
+          name: Grant Go Modules
+          command: chmod -R 777 /go/pkg/mod
 
       - save_cache:
           key: go-mod-v1-{{ checksum "go.sum" }}
@@ -45,25 +48,37 @@ jobs:
             echo 'Codecov failed to upload'
 
   "Integration Test":
-    docker:
-      - image: circleci/golang:1.12
+    # docker:
+    #   - image: circleci/golang:1.12
+    machine:
+      image: ubuntu-1604:201903-01
+      docker_layer_caching: true
     environment:
-      DOCKER_DRIVER: overlay2
+      GOPATH: /go
     steps:
       - checkout
 
-      - setup_remote_docker:
-          docker_layer_caching: true
-
-      - run: ifconfig
       - run:
-          name: Install Docker Compose
+          name: Install Go Runtime 1.12.5
           command: |
-            curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-            chmod +x ~/docker-compose
-            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+            curl -L https://storage.googleapis.com/golang/go1.12.5.linux-amd64.tar.gz > ~/go.tar.gz
+            sudo tar -C ~ -xvf ~/go.tar.gz 1> /dev/null
+            sudo rm -rf /usr/local/go
+            sudo mv ~/go /usr/local 
+            sudo mkdir -p $GOPATH
+            sudo chmod -R 777 $GOPATH
 
-      - *restore_go_modules
+      # - run:
+      #     name: Install Docker Compose
+      #     command: |
+      #       curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+      #       chmod +x ~/docker-compose
+      #       sudo mv ~/docker-compose /usr/local/bin/docker-compose
+
+      - restore_cache:
+          name: "Restore Go Modules"
+          keys:
+            - go-mod-v2-{{ checksum "go.sum" }}
 
       - run: make integration_ci
 
@@ -72,6 +87,11 @@ jobs:
           command: |
             bash <(curl -s https://codecov.io/bash) -F integration ||
             echo 'Codecov failed to upload'
+
+      - save_cache:
+          key: go-mod-v2-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
 
   "Build Docker Image":
     machine:
