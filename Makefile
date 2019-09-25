@@ -25,7 +25,8 @@ integration: docker_up
 	@$(MAKE) docker_down
 
 integration_ci: docker_up
-	@TEST_POSTGRES_HOST=$$(ifconfig eth0 | grep "inet addr" | cut -d ':' -f 2 | cut -d ' ' -f 1) go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down && exit 1)
+	echo $$(echo $$DOCKER_HOST | cut -c 7- | cut -d: -f1) 
+	@TEST_POSTGRES_HOST=$$(echo $$DOCKER_HOST | cut -c 7- | cut -d: -f1) go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down && exit 1)
 	@$(MAKE) docker_down
 
 docker_up: docker_down
