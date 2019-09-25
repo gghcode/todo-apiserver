@@ -1,4 +1,15 @@
 version: 2.1
+aliases:
+  - &restore_go_modules
+    restore_cache:
+      name: "Restore Go Modules"
+      keys:
+        - go-mod-v1-{{ checksum "go.sum" }}
+
+  - &all_test
+    - "Unit Test"
+    - "Integration Test"
+
 jobs:
   "Build":
     docker:
@@ -7,9 +18,7 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+      - *restore_go_modules
 
       - run: go build
 
@@ -25,9 +34,7 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+      - *restore_go_modules
 
       - run: make unit_ci
 
@@ -48,6 +55,7 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
 
+      - run: ifconfig
       - run:
           name: Install Docker Compose
           command: |
@@ -55,9 +63,7 @@ jobs:
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
-      - restore_cache:
-          keys:
-            - go-mod-v1-{{ checksum "go.sum" }}
+      - *restore_go_modules
 
       - run: make integration_ci
 
@@ -94,5 +100,4 @@ workflows:
           requires:
             - "Build"
       # - "Build Docker Image":
-      #     requires:
-      #       - "Build"
+      #     requires: *all_test
