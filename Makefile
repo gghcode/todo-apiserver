@@ -25,14 +25,14 @@ integration: docker_up
 	@$(MAKE) docker_down
 
 integration_ci: docker_up
-	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down || exit 1)
+	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -run Integration ./... || ($(MAKE) docker_down && exit 1)
 	@$(MAKE) docker_down
 
 docker_up: docker_down
-	@-docker-compose --log-level ERROR -p integration -f docker-compose.integration.yml up -d
+	@-docker-compose -p integration -f docker-compose.integration.yml up -d
 
 docker_down:
-	@docker-compose --log-level ERROR -p integration -f docker-compose.integration.yml down -v
+	@docker-compose -p integration -f docker-compose.integration.yml down -v
 
 postgres:
 	@docker run -d --name apas_postgres -p 5432:5432 postgres:11.3-alpine
