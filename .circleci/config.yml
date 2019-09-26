@@ -48,8 +48,6 @@ jobs:
             echo 'Codecov failed to upload'
 
   "Integration Test":
-    # docker:
-    #   - image: circleci/golang:1.12
     machine:
       image: ubuntu-1604:201903-01
       docker_layer_caching: true
@@ -67,13 +65,6 @@ jobs:
             sudo mv ~/go /usr/local 
             sudo mkdir -p $GOPATH
             sudo chmod -R 777 $GOPATH
-
-      # - run:
-      #     name: Install Docker Compose
-      #     command: |
-      #       curl -L https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-      #       chmod +x ~/docker-compose
-      #       sudo mv ~/docker-compose /usr/local/bin/docker-compose
 
       - restore_cache:
           name: "Restore Go Modules"
@@ -93,20 +84,24 @@ jobs:
           paths:
             - "/go/pkg/mod"
 
-  "Build Docker Image":
+  "Push Docker Image":
     machine:
       docker_layer_caching: true
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
 
-      - run: docker build -t apas-todo-apiserver .
-      - run: mkdir -p /tmp/images
-      - run: docker save -o /tmp/images/app.tar apas-todo-apiserver
+      - run:
+          name: Login Github Registry
+          command: docker login docker.pkg.github.com --username gghcode -p $GITHUB_TOKEN
 
-      - store_artifacts:
-          path: /tmp/images
-          destination: app.tar
+      - run:
+          name: Build Docker Image
+          command: docker build -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
+
+      - run:
+          name: Push Docker Image
+          command: docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app
 
 workflows:
   version: 2
@@ -119,5 +114,8 @@ workflows:
       - "Integration Test":
           requires:
             - "Build"
-      # - "Build Docker Image":
-      #     requires: *all_test
+      - "Push Docker Image":
+          requires: *all_test
+          filters:
+            branches:
+              only: master
