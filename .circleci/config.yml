@@ -93,19 +93,21 @@ jobs:
     steps:
       - checkout
 
+      - run: echo "export VERSION=alpha-b$CIRCLE_BUILD_NUM" >> $BASH_ENV
+
       - run:
           name: Login Github Registry
           command: docker login docker.pkg.github.com --username gghcode -p $GITHUB_TOKEN
 
       - run:
           name: Build Docker Image
-          command: docker build \
-            --build-arg BUILD_APP_VERSION=$VERSION \
-            --tag docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
+          command: docker build
+            --build-arg BUILD_APP_VERSION=$VERSION
+            --tag docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$VERSION .
 
       - run:
           name: Push Docker Image
-          command: docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app
+          command: docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$VERSION
 
 workflows:
   version: 2
