@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/app/infra"
+	"github.com/gghcode/apas-todo-apiserver/config"
 )
 
 // TokenResponse godoc

@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/val"
 )
 
 // Controller godoc

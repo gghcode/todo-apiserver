@@ -3,8 +3,8 @@ package infra_test
 import (
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/infra"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
 )
 
 type PassportUnit struct {

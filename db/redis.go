@@ -1,8 +1,8 @@
 package db
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/go-redis/redis"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
 // RedisConn godoc

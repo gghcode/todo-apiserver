@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
+	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/auth"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
 )
 
 type RepositoryIntegration struct {

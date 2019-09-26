@@ -3,8 +3,8 @@ package auth
 import (
 	"net/http"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
 )
 
 // AccessTokenByRefreshRequest godoc

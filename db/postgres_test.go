@@ -3,8 +3,8 @@ package db_test
 import (
 	"testing"
 
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
 )
 
 func TestPostgresConnIntegration(t *testing.T) {

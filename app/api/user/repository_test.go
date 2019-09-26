@@ -3,11 +3,11 @@ package user_test
 import (
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
 )
 
 type RepositoryIntegration struct {

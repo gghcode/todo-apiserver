@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api"
 )
 
 var (

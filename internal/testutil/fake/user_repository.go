@@ -1,8 +1,8 @@
 package fake
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/stretchr/testify/mock"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
 )
 
 // UserRepository godoc

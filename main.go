@@ -1,14 +1,14 @@
 package main
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/app"
+	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/config"
+	_ "github.com/gghcode/apas-todo-apiserver/docs"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
-	_ "gitlab.com/gyuhwan/apas-todo-apiserver/docs"
 )
 
 const (
