@@ -1,19 +1,37 @@
 package common
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gghcode/apas-todo-apiserver/app/loader"
+	"github.com/gin-gonic/gin"
+)
 
 // Controller godoc
 type Controller struct {
+	appVersion string
 }
 
 // NewController godoc
-func NewController() *Controller {
-	return &Controller{}
+func NewController(appVersionLoader loader.VersionLoader) *Controller {
+	return &Controller{
+		appVersion: appVersionLoader.GetVersion(),
+	}
 }
 
 // RegisterRoutes godocs
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.GET("/healthy", controller.Healthy)
+	router.GET("/version", controller.Version)
+}
+
+// Version godoc
+// @Description Get server version
+// @Success 200 {string} string OK
+// @Tags App API
+// @Router /version [get]
+func (controller *Controller) Version(ctx *gin.Context) {
+	ctx.String(http.StatusOK, controller.appVersion)
 }
 
 // Healthy godoc

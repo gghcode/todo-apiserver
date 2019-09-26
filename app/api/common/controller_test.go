@@ -5,8 +5,10 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api/common"
+	"github.com/gghcode/apas-todo-apiserver/app/loader"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/afero"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -26,8 +28,42 @@ func (suite *ControllerUnit) SetupTest() {
 
 	suite.router = gin.New()
 
-	suite.controller = common.NewController()
+	versionLoader := loader.NewVersionLoader(afero.NewOsFs())
+
+	suite.controller = common.NewController(versionLoader)
 	suite.controller.RegisterRoutes(suite.router)
+}
+
+func (suite *ControllerUnit) TestVersion() {
+	testCases := []struct {
+		description      string
+		expectedStatus   int
+		expectedResponse string
+	}{
+		{
+			description:      "ShouldBeDevVersion",
+			expectedStatus:   http.StatusOK,
+			expectedResponse: "dev version",
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			actualRes := testutil.Response(
+				suite.T(),
+				suite.router,
+				"GET",
+				"version",
+				nil,
+			)
+
+			suite.Equal(tc.expectedStatus, actualRes.StatusCode)
+
+			actual := testutil.JSONStringFromResBody(suite.T(), actualRes.Body)
+
+			suite.Equal(tc.expectedResponse, actual)
+		})
+	}
 }
 
 func (suite *ControllerUnit) TestHealthy() {
