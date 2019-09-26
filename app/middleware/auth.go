@@ -3,12 +3,12 @@ package middleware
 import (
 	"strconv"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/app/val"
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/auth"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/val"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 )
 
 // JwtAuthHandlerToken godoc

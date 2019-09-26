@@ -1,10 +1,10 @@
 package fake
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/middleware"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/val"
 )
 
 // UserIDFactory godoc

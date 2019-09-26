@@ -3,9 +3,9 @@ package user
 import (
 	"time"
 
+	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/jinzhu/gorm"
 	pg "github.com/lib/pq"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
 )
 
 // Repository godoc

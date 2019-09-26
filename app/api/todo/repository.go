@@ -1,6 +1,6 @@
 package todo
 
-import "gitlab.com/gyuhwan/apas-todo-apiserver/db"
+import "github.com/gghcode/apas-todo-apiserver/db"
 
 // Repository godoc
 type Repository interface {

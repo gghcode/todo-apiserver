@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api/common"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/common"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
 )
 
 type ControllerUnit struct {

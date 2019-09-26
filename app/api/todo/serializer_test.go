@@ -3,9 +3,9 @@ package todo_test
 import (
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/assert"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/todo"
 )
 
 func TestTodoSerializer(t *testing.T) {

@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/app/infra"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/user"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/infra"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil/fake"
 )
 
 type ControllerUnit struct {

@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/app/api/auth"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/internal/testutil/fake"
 )
 
 type ControllerUnit struct {

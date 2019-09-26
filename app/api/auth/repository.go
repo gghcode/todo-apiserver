@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/go-redis/redis"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
 )
 
 const prefixRefreshToken = "refresh_token"

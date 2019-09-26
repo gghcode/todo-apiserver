@@ -3,9 +3,9 @@ package db_test
 import (
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/stretchr/testify/suite"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/db"
 )
 
 type RedisIntegration struct {

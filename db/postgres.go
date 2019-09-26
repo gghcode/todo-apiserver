@@ -1,9 +1,9 @@
 package db
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
-	"gitlab.com/gyuhwan/apas-todo-apiserver/config"
 
 	_ "github.com/lib/pq"
 )
