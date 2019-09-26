@@ -6,6 +6,7 @@ goorm.manifest
 
 ### App ###
 # config.yaml
+VERSION
 
 ### Go ###
 # Binaries for programs and plugins

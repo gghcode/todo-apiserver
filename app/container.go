@@ -8,8 +8,10 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/app/infra"
+	"github.com/gghcode/apas-todo-apiserver/app/loader"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/spf13/afero"
 )
 
 // NewContainer godoc
@@ -24,6 +26,11 @@ func NewContainer(cfg config.Configuration) (*inject.Container, error) {
 		inject.Provide(func() infra.Passport {
 			return infra.NewPassport(12)
 		}),
+		inject.Provide(func() afero.Fs {
+			return afero.NewOsFs()
+		}),
+
+		inject.Provide(loader.NewVersionLoader),
 
 		inject.Provide(user.NewRepository),
 		inject.Provide(todo.NewRepository),
