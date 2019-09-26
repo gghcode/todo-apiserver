@@ -87,6 +87,8 @@ jobs:
   "Push Docker Image":
     machine:
       docker_layer_caching: true
+    environment:
+      VERSION: "alpha b$CIRCLE_BUILD_NUM"
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
@@ -97,7 +99,9 @@ jobs:
 
       - run:
           name: Build Docker Image
-          command: docker build -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
+          command: docker build \
+            --build-arg BUILD_APP_VERSION=$VERSION \
+            --tag docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
 
       - run:
           name: Push Docker Image

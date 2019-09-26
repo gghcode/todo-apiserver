@@ -1,0 +1,42 @@
+version: "2.0"
+services:
+  app:
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - REST_ADDR=0.0.0.0:8080
+      - REST_BASEPATH=api
+      - REST_REDIS_ADDR=redis:6379
+      - REST_POSTGRES_DRIVER=postgres
+      - REST_POSTGRES_HOST=postgres
+      - REST_POSTGRES_PORT=5432
+      - REST_POSTGRES_NAME=postgres
+      - REST_POSTGRES_USER=postgres
+      - REST_POSTGRES_PASSWORD=postgres
+      - REST_POSTGRES_DB=postgres
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - internal
+  redis:
+    image: redis:5.0.5-alpine
+    ports:
+      - 6379:6379
+    networks:
+      - internal
+  postgres:
+    image: postgres:11.3-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
