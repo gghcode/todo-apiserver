@@ -2,6 +2,8 @@ package loader
 
 import (
 	"bufio"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/afero"
 )
@@ -25,7 +27,9 @@ func NewVersionLoader(fs afero.Fs) VersionLoader {
 const defaultAppVersion = "dev version"
 
 func (loader *versionLoader) GetVersion() string {
-	file, err := loader.fs.Open("VERSION")
+	versionFilePath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+
+	file, err := loader.fs.Open(filepath.Join(versionFilePath, "VERSION"))
 	if err != nil {
 		return defaultAppVersion
 	}

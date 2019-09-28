@@ -1,21 +1,19 @@
 FROM golang:1.12.4-alpine AS builder
 
-ARG BUILD_APP_VERSION="dev version"
-ENV GO111MODULE=on
+ARG BUILD_APP_VERSION="dev version on docker"
 
 RUN apk add --no-cache git
 
 WORKDIR /app
 
-COPY go.mod .
-COPY go.sum .
+COPY go.mod go.sum ./
 
-RUN echo "$BUILD_APP_VERSION" >> VERSION
 RUN go mod download
 
 COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+RUN echo "$BUILD_APP_VERSION" > VERSION
 
 FROM scratch
 

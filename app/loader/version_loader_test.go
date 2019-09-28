@@ -1,6 +1,8 @@
 package loader_test
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/app/loader"
@@ -22,9 +24,10 @@ func TestGetVersionWhenNotExistsVersionFile(t *testing.T) {
 
 func TestGetVersionWhenExistsVersionFile(t *testing.T) {
 	expectedVersion := "test version"
+	currentPath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
 
 	memFs := afero.NewMemMapFs()
-	afero.WriteFile(memFs, "VERSION", []byte(expectedVersion), 0644)
+	afero.WriteFile(memFs, filepath.Join(currentPath, "VERSION"), []byte(expectedVersion), 0644)
 
 	versionLoader := loader.NewVersionLoader(memFs)
 	assert.NotNil(t, versionLoader)
