@@ -90,7 +90,9 @@ jobs:
     steps:
       - checkout
 
-      - run: echo "export VERSION=alpha-b$CIRCLE_BUILD_NUM" >> $BASH_ENV
+      - run:
+          name: Export Build Version
+          command: echo "export VERSION=alpha-b$CIRCLE_BUILD_NUM" >> $BASH_ENV
 
       - run:
           name: Login Github Registry
@@ -106,6 +108,28 @@ jobs:
           name: Push Docker Image
           command: docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$VERSION
 
+  "Deploy to Azure":
+    executor: azure-cli/azure-docker
+    environment:
+      APP_NAME: apas-todo-api
+      RESOURCE_GROUP: rg_apas
+    steps:
+      - run:
+          name: Export Build Version
+          command: echo "export VERSION=alpha-b$CIRCLE_PREVIOUS_BUILD_NUM" >> $BASH_ENV
+
+      - azure-cli/login-with-service-principal
+
+      - run:
+          name: Deploy App Service
+          command: az webapp config container set
+            --name $APP_NAME
+            --resource-group $RESOURCE_GROUP
+            --docker-custom-image-name docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$VERSION
+
+orbs:
+  azure-cli: circleci/azure-cli@1.0.0
+
 workflows:
   version: 2
   build-test:
@@ -119,6 +143,9 @@ workflows:
             - "Build"
       - "Push Docker Image":
           requires: *all_test
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
+      - "Deploy to Azure":
+          requires:
+            - "Push Docker Image"
