@@ -119,6 +119,6 @@ workflows:
             - "Build"
       - "Push Docker Image":
           requires: *all_test
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
