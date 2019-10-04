@@ -25,15 +25,10 @@ func NewController(todoRepo Repository) *Controller {
 
 // RegisterRoutes godoc
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
-	routes := router.Group("/todos")
-	{
-		routes.GET("", controller.AllTodosByUserID)
-	}
+	router.GET("api/todos", controller.AllTodosByUserID)
 
-	authorized := routes.Use(middleware.JwtAuthRequired())
-	{
-		authorized.POST("", controller.AddTodo)
-	}
+	authorized := router.Use(middleware.JwtAuthRequired())
+	authorized.POST("api/todos", controller.AddTodo)
 }
 
 // AddTodo godoc
@@ -45,7 +40,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Success 201 {object} todo.TodoResponse "ok"
 // @Failure 400 {object} api.ErrorResponse "Invalid payload"
 // @Tags Todo API
-// @Router /todos [post]
+// @Router /api/todos [post]
 func (controller *Controller) AddTodo(ctx *gin.Context) {
 	todoValidator := NewAddTodoValidator()
 	if err := todoValidator.Bind(ctx); err != nil {
@@ -78,7 +73,7 @@ func (controller *Controller) AddTodo(ctx *gin.Context) {
 // @Success 200 {array} todo.TodoResponse "ok"
 // @Failure 404 {object} api.ErrorResponse "User Not Found"
 // @Tags Todo API
-// @Router /todos [get]
+// @Router /api/todos [get]
 func (controller *Controller) AllTodosByUserID(ctx *gin.Context) {
 	userIDStr, exists := ctx.GetQuery("user_id")
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)

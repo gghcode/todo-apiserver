@@ -118,7 +118,7 @@ func (suite *ControllerUnit) TestCreateUser() {
 				suite.T(),
 				suite.router,
 				"POST",
-				"/users",
+				"api/users",
 				tc.reqPayload,
 			)
 
@@ -238,7 +238,7 @@ func (suite *ControllerUnit) TestUserByName() {
 				suite.T(),
 				suite.router,
 				"GET",
-				"/users/"+tc.argUserName,
+				"api/users/"+tc.argUserName,
 				nil,
 			)
 

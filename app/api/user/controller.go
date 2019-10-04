@@ -25,9 +25,9 @@ func NewController(userRepository Repository, passport infra.Passport) *Controll
 
 // RegisterRoutes godocs
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
-	router.POST("/users", controller.CreateUser)
-	router.GET("/users", controller.UserByID)
-	router.GET("/users/:username", controller.UserByName)
+	router.POST("api/users", controller.CreateUser)
+	router.GET("api/users", controller.UserByID)
+	router.GET("api/users/:username", controller.UserByName)
 }
 
 // CreateUser godoc
@@ -39,7 +39,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Failure 400 {object} api.ErrorResponse "Invalid user payload"
 // @Failure 409 {object} api.ErrorResponse "Already exists user"
 // @Tags User API
-// @Router /users [post]
+// @Router /api/users [post]
 func (controller *Controller) CreateUser(ctx *gin.Context) {
 	createUserRequestValidator := CreateUserRequestValidator{}
 	if err := createUserRequestValidator.Bind(ctx); err != nil {
@@ -71,7 +71,7 @@ func (controller *Controller) CreateUser(ctx *gin.Context) {
 // @Success 200 {object} user.UserResponse "ok"
 // @Failure 404 {object} api.ErrorResponse "User Not Found"
 // @Tags User API
-// @Router /users [get]
+// @Router /api/users [get]
 func (controller *Controller) UserByID(ctx *gin.Context) {
 	userID, err := strconv.ParseInt(ctx.Query("user_id"), 10, 64)
 	if err != nil {
@@ -96,7 +96,7 @@ func (controller *Controller) UserByID(ctx *gin.Context) {
 // @Success 200 {object} user.UserResponse "ok"
 // @Failure 404 {object} api.ErrorResponse "User Not Found"
 // @Tags User API
-// @Router /users/{username} [get]
+// @Router /api/users/{username} [get]
 func (controller *Controller) UserByName(ctx *gin.Context) {
 	username := ctx.Param("username")
 

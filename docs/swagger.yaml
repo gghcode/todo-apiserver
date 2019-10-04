@@ -1,4 +1,4 @@
-basePath: /api
+basePath: '{{.BasePath}}'
 definitions:
   api.ErrorMetaData:
     properties:
@@ -92,7 +92,7 @@ info:
   title: APAS TODO API
   version: "1.0"
 paths:
-  /auth/refresh:
+  /api/auth/refresh:
     post:
       consumes:
       - application/json
@@ -125,7 +125,7 @@ paths:
             type: object
       tags:
       - Auth API
-  /auth/token:
+  /api/auth/token:
     post:
       consumes:
       - application/json
@@ -158,7 +158,7 @@ paths:
             type: object
       tags:
       - Auth API
-  /healthy:
+  /api/healthy:
     get:
       description: Get server healthy
       responses:
@@ -168,7 +168,7 @@ paths:
             type: string
       tags:
       - App API
-  /todos:
+  /api/todos:
     get:
       consumes:
       - application/json
@@ -224,7 +224,7 @@ paths:
       - ApiKeyAuth: []
       tags:
       - Todo API
-  /users:
+  /api/users:
     get:
       consumes:
       - application/json
@@ -282,7 +282,7 @@ paths:
             type: object
       tags:
       - User API
-  /users/{username}:
+  /api/users/{username}:
     get:
       consumes:
       - application/json
@@ -308,6 +308,16 @@ paths:
             type: object
       tags:
       - User API
+  /api/version:
+    get:
+      description: Get server version
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      tags:
+      - App API
 securityDefinitions:
   ApiKeyAuth:
     in: header

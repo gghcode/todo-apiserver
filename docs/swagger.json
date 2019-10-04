@@ -8,9 +8,9 @@
         "version": "1.0"
     },
     "host": "{{.Host}}",
-    "basePath": "/api",
+    "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/refresh": {
+        "/api/auth/refresh": {
             "post": {
                 "description": "Get new access token by refreshtoken",
                 "consumes": [
@@ -59,7 +59,7 @@
                 }
             }
         },
-        "/auth/token": {
+        "/api/auth/token": {
             "post": {
                 "description": "Issue new token",
                 "consumes": [
@@ -108,7 +108,7 @@
                 }
             }
         },
-        "/healthy": {
+        "/api/healthy": {
             "get": {
                 "description": "Get server healthy",
                 "tags": [
@@ -124,7 +124,7 @@
                 }
             }
         },
-        "/todos": {
+        "/api/todos": {
             "get": {
                 "description": "Fetch todos by user id",
                 "consumes": [
@@ -210,7 +210,7 @@
                 }
             }
         },
-        "/users": {
+        "/api/users": {
             "get": {
                 "description": "Fetch user by user id",
                 "consumes": [
@@ -296,7 +296,7 @@
                 }
             }
         },
-        "/users/{username}": {
+        "/api/users/{username}": {
             "get": {
                 "description": "Fetch user by username",
                 "consumes": [
@@ -330,6 +330,22 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/version": {
+            "get": {
+                "description": "Get server version",
+                "tags": [
+                    "App API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

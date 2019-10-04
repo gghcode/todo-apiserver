@@ -53,7 +53,7 @@ func (suite *ControllerUnit) TestVersion() {
 				suite.T(),
 				suite.router,
 				"GET",
-				"version",
+				"api/version",
 				nil,
 			)
 
@@ -83,7 +83,7 @@ func (suite *ControllerUnit) TestHealthy() {
 				suite.T(),
 				suite.router,
 				"GET",
-				"healthy",
+				"api/healthy",
 				nil,
 			)
 
