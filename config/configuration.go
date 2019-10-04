@@ -5,9 +5,16 @@ type Configuration struct {
 	Addr     string `mapstructure:"addr"`
 	BasePath string `mapstructure:"basePath"`
 
+	Cors     CorsConfig     `mapstructure:"cors"`
 	Postgres PostgresConfig `mapstructure:"postgres"`
 	Redis    RedisConfig    `mapstructure:"redis"`
 	Jwt      JwtConfig      `mapstructure:"jwt"`
+}
+
+// CorsConfig godoc
+type CorsConfig struct {
+	AllowOrigins []string `mapstructure:"allow_origins"`
+	AllowMethods []string `mapstructure:"allow_methods"`
 }
 
 // PostgresConfig is postgres config
