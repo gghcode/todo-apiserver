@@ -21,7 +21,6 @@ const (
 // @securitydefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
-// @BasePath /api
 func main() {
 	cfg, err := config.NewBuilder().
 		AddConfigFile("config.yaml", true).
@@ -43,9 +42,8 @@ func main() {
 	router.Use(middleware.AddJwtAuthHandler(cfg.Jwt))
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	apiRouter := router.Group(cfg.BasePath)
 	for _, controller := range controllers {
-		controller.RegisterRoutes(apiRouter)
+		controller.RegisterRoutes(router)
 	}
 
 	if err := router.Run(cfg.Addr); err != nil {

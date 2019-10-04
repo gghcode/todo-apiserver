@@ -137,7 +137,7 @@ func (suite *ControllerUnit) TestAddTodo() {
 				suite.T(),
 				suite.router,
 				"POST",
-				"/todos",
+				"api/todos",
 				tc.reqPayload,
 			)
 
@@ -211,7 +211,7 @@ func (suite *ControllerUnit) TestAllTodos() {
 				suite.T(),
 				suite.router,
 				"GET",
-				"/todos?user_id="+tc.argUserID,
+				"api/todos?user_id="+tc.argUserID,
 				nil,
 			)
 

@@ -77,7 +77,7 @@ func (suite *ControllerUnit) TestRefreshToken() {
 				suite.T(),
 				suite.router,
 				"POST",
-				auth.APIPath+"/refresh",
+				"api/auth/refresh",
 				tc.reqPayload,
 			)
 
@@ -155,7 +155,7 @@ func (suite *ControllerUnit) TestIssueToken() {
 				suite.T(),
 				suite.router,
 				"POST",
-				auth.APIPath+"/token",
+				"api/auth/token",
 				tc.reqPayload,
 			)
 

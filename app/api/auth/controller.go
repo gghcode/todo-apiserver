@@ -19,13 +19,10 @@ func NewController(service Service) *Controller {
 	}
 }
 
-// APIPath is path prefix
-const APIPath = "auth"
-
 // RegisterRoutes register handler routes.
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
-	router.Handle("POST", APIPath+"/token", controller.issueToken)
-	router.Handle("POST", APIPath+"/refresh", controller.refreshToken)
+	router.Handle("POST", "api/auth/token", controller.issueToken)
+	router.Handle("POST", "api/auth/refresh", controller.refreshToken)
 }
 
 // @Description Get new access token by refreshtoken
@@ -36,7 +33,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 // @Failure 400 {object} api.ErrorResponse "Invalid payload"
 // @Failure 401 {object} api.ErrorResponse "Invalid credential"
 // @Tags Auth API
-// @Router /auth/refresh [post]
+// @Router /api/auth/refresh [post]
 func (controller *Controller) refreshToken(ctx *gin.Context) {
 	refreshTokenRequestValidator := RefreshTokenRequestValidator{}
 	if err := refreshTokenRequestValidator.Bind(ctx); err != nil {
@@ -61,7 +58,7 @@ func (controller *Controller) refreshToken(ctx *gin.Context) {
 // @Failure 400 {object} api.ErrorResponse "Invalid payload"
 // @Failure 401 {object} api.ErrorResponse "Invalid credential"
 // @Tags Auth API
-// @Router /auth/token [post]
+// @Router /api/auth/token [post]
 func (controller *Controller) issueToken(ctx *gin.Context) {
 	loginRequestValidator := NewLoginRequestValidator()
 	if err := loginRequestValidator.Bind(ctx); err != nil {
