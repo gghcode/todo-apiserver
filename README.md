@@ -1,7 +1,7 @@
 <h1 align="center">Welcome to APAS Todo API 👋</h1>
 <p>
   <a href="https://circleci.com/gh/gghcode/apas-todo-apiserver/tree/master">
-    <img src="https://circleci.com/gh/gghcode/apas-todo-apiserver/tree/master.svg?style=svg" />
+    <img src="https://circleci.com/gh/gghcode/apas-todo-apiserver.svg?style=svg&circle-token=8838c75938b2cefd737e120f2897d4f74ac0d6c2" />
   </a>
 
   <a href="https://codecov.io/gh/gghcode/apas-todo-apiserver">
