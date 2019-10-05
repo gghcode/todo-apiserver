@@ -7,11 +7,6 @@ TEST_POSTGRES_NAME=postgres
 TEST_POSTGRES_PASSWORD=postgres
 TEST_REDIS_ADDR=127.0.0.1:6378
 
-dependency:
-	@go get -v ./...
-	@go get -u github.com/swaggo/swag/cmd/swag
-	@go get -u github.com/oxequa/realize
-
 live:
 	@realize start --run --fmt --no-config
 
@@ -34,9 +29,3 @@ docker_up: docker_down
 
 docker_down:
 	@docker-compose -p integration -f docker-compose.integration.yml down -v
-
-postgres:
-	@docker run -d --name apas_postgres -p 5432:5432 postgres:11.3-alpine
- 
-redis:
-	@docker run -d --name apas_redis -p 6379:6379 redis:5.0.5-alpine
