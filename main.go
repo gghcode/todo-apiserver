@@ -43,7 +43,7 @@ func main() {
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	for _, controller := range controllers {
-		controller.RegisterRoutes(router)
+		controller.RegisterRoutes(router.Group(""))
 	}
 
 	if err := router.Run(cfg.Addr); err != nil {

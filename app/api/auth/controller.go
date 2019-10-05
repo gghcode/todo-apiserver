@@ -21,8 +21,8 @@ func NewController(service Service) *Controller {
 
 // RegisterRoutes register handler routes.
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
-	router.Handle("POST", "api/auth/token", controller.issueToken)
-	router.Handle("POST", "api/auth/refresh", controller.refreshToken)
+	router.POST("api/auth/token", controller.issueToken)
+	router.POST("api/auth/refresh", controller.refreshToken)
 }
 
 // @Description Get new access token by refreshtoken
