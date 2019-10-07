@@ -9,9 +9,17 @@ import (
 // NewCors godoc
 func NewCors(cfg config.CorsConfig) gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     cfg.AllowOrigins,
-		AllowMethods:     cfg.AllowMethods,
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowOrigins: cfg.AllowOrigins,
+		AllowMethods: cfg.AllowMethods,
+		AllowHeaders: []string{
+			"Authorization",
+			"Accept",
+			"Access-Control-Request-Method",
+			"Access-Control-Request-Headers",
+			"Origin",
+			"Content-Type",
+			"X-Requested-With",
+		},
 		AllowCredentials: true,
 	})
 }

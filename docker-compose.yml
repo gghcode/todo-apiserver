@@ -6,16 +6,8 @@ services:
     ports:
       - 8080:8080
     environment:
-      - REST_ADDR=0.0.0.0:8080
-      - REST_BASEPATH=api
       - REST_REDIS_ADDR=redis:6379
-      - REST_POSTGRES_DRIVER=postgres
       - REST_POSTGRES_HOST=postgres
-      - REST_POSTGRES_PORT=5432
-      - REST_POSTGRES_NAME=postgres
-      - REST_POSTGRES_USER=postgres
-      - REST_POSTGRES_PASSWORD=postgres
-      - REST_POSTGRES_DB=postgres
     depends_on:
       - postgres
       - redis
