@@ -21,3 +21,9 @@ func (repo *TodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error) 
 	args := repo.Called(userID)
 	return args.Get(0).([]todo.Todo), args.Error(1)
 }
+
+// RemoveTodo godoc
+func (repo *TodoRepository) RemoveTodo(todoID string) error {
+	args := repo.Called(todoID)
+	return args.Error(0)
+}

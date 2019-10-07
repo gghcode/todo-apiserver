@@ -210,6 +210,50 @@
                 }
             }
         },
+        "/api/todos/{todo_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove todo by todo id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo API"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "todo_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/todo.TodoResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Todo Not Found",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users": {
             "get": {
                 "description": "Fetch user by user id",

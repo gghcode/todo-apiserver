@@ -3,6 +3,7 @@ package todo
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
@@ -28,7 +29,10 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.GET("api/todos", controller.AllTodosByUserID)
 
 	authorized := router.Use(middleware.JwtAuthRequired())
-	authorized.POST("api/todos", controller.AddTodo)
+	{
+		authorized.POST("api/todos", controller.AddTodo)
+		authorized.DELETE("api/todos/:todo_id", controller.RemoveTodoByTodoID)
+	}
 }
 
 // AddTodo godoc
@@ -91,4 +95,30 @@ func (controller *Controller) AllTodosByUserID(ctx *gin.Context) {
 	todosSerializer := TodosSerializer{Model: todos}
 
 	ctx.JSON(http.StatusOK, todosSerializer.Response())
+}
+
+// RemoveTodoByTodoID godoc
+// @Description Remove todo by todo id
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param todo_id path string true "Todo ID"
+// @Success 204 {object} todo.TodoResponse "ok"
+// @Failure 404 {object} api.ErrorResponse "Todo Not Found"
+// @Tags Todo API
+// @Router /api/todos/{todo_id} [delete]
+func (controller *Controller) RemoveTodoByTodoID(ctx *gin.Context) {
+	todoID := ctx.Param("todo_id")
+	todoID = strings.Trim(todoID, " ")
+	if len(todoID) <= 0 {
+		api.WriteErrorResponse(ctx, ErrEmptyTodoID)
+		return
+	}
+
+	if err := controller.todoRepo.RemoveTodo(todoID); err != nil {
+		api.WriteErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }

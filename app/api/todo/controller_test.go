@@ -136,6 +136,72 @@ func (suite *ControllerUnit) TestAddTodo() {
 	}
 }
 
+func (suite *ControllerUnit) TestRemoveTodoByTodoID() {
+	testCases := []struct {
+		description        string
+		queryTodoID        string
+		stubUserID         int64
+		stubTodoRepoRetErr error
+		expectedStatus     int
+		expectedJSON       string
+	}{
+		{
+			description:        "ShouldRemoveTodo",
+			queryTodoID:        "fasdf",
+			stubUserID:         1,
+			stubTodoRepoRetErr: nil,
+			expectedStatus:     http.StatusNoContent,
+		},
+		{
+			description:    "ShouldReturnErrEmptyTodoID",
+			queryTodoID:    " ",
+			stubUserID:     -1,
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.NewErrRes(todo.ErrEmptyTodoID),
+			),
+		},
+		{
+			description:        "ShouldReturnErrNotFoundTodo",
+			queryTodoID:        "NOT_EXISTS_TODO_ID",
+			stubUserID:         1,
+			stubTodoRepoRetErr: todo.ErrNotFoundTodo,
+			expectedStatus:     http.StatusNotFound,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.NewErrRes(todo.ErrNotFoundTodo),
+			),
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			suite.userIDFactory.
+				On("UserID").
+				Return(tc.stubUserID)
+
+			suite.todoRepo.
+				On("RemoveTodo", tc.queryTodoID).
+				Return(tc.stubTodoRepoRetErr)
+
+			actual := testutil.Response(
+				suite.T(),
+				suite.router,
+				"DELETE",
+				"api/todos/"+tc.queryTodoID,
+				nil,
+			)
+
+			suite.Equal(tc.expectedStatus, actual.StatusCode)
+
+			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+
+			suite.Equal(tc.expectedJSON, actualJSON)
+		})
+	}
+}
+
 func (suite *ControllerUnit) TestAllTodos() {
 	fakeTodos := []todo.Todo{
 		{

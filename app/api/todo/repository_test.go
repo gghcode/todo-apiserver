@@ -7,6 +7,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
+	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -94,6 +95,34 @@ func (suite *RepositoryIntegration) TestAddTodo() {
 			suite.Equal(tc.expected.Title, actual.Title)
 			suite.Equal(tc.expected.Contents, actual.Contents)
 			suite.Equal(tc.expected.AssignorID, actual.AssignorID)
+
+			suite.Equal(tc.expectedErr, actualErr)
+		})
+	}
+}
+
+func (suite *RepositoryIntegration) TestRemoveTodo() {
+	testCases := []struct {
+		description string
+		argTodoID   uuid.UUID
+		expectedErr error
+	}{
+		{
+			description: "ShouldRemoveTodo",
+			argTodoID:   suite.testTodos[0].ID,
+			expectedErr: nil,
+		},
+		{
+			description: "ShouldReturnErrNotFoundTodo",
+			argTodoID:   uuid.Nil,
+			expectedErr: todo.ErrNotFoundTodo,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			argTodoID := tc.argTodoID.String()
+			actualErr := suite.todoRepository.RemoveTodo(argTodoID)
 
 			suite.Equal(tc.expectedErr, actualErr)
 		})
