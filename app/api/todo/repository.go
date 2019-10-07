@@ -1,11 +1,15 @@
 package todo
 
-import "github.com/gghcode/apas-todo-apiserver/db"
+import (
+	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/jinzhu/gorm"
+)
 
 // Repository godoc
 type Repository interface {
 	AddTodo(todo Todo) (Todo, error)
 	AllTodosByUserID(userID int64) ([]Todo, error)
+	RemoveTodo(todoID string) error
 }
 
 type repository struct {
@@ -46,4 +50,24 @@ func (repo *repository) AllTodosByUserID(userID int64) ([]Todo, error) {
 	}
 
 	return result, nil
+}
+
+func (repo *repository) RemoveTodo(todoID string) error {
+	var todo Todo
+
+	err := repo.pgConn.DB().
+		Where("id=?", todoID).
+		First(&todo).Error
+
+	if err == gorm.ErrRecordNotFound {
+		return ErrNotFoundTodo
+	} else if err != nil {
+		return err
+	}
+
+	if err := repo.pgConn.DB().Delete(todo).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
