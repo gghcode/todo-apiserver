@@ -1,5 +1,16 @@
 package config
 
+// DefaultConfig is default config
+var DefaultConfig = Configuration{
+	Addr:     ":8080",
+	BasePath: "api",
+
+	Cors:     DefaultCorsConfig,
+	Postgres: DefaultPostgresConfig,
+	Redis:    DefaultRedisConfig,
+	Jwt:      DefaultJwtConfig,
+}
+
 // Configuration is config type.
 type Configuration struct {
 	Addr     string `mapstructure:"addr"`
@@ -11,10 +22,26 @@ type Configuration struct {
 	Jwt      JwtConfig      `mapstructure:"jwt"`
 }
 
+// DefaultCorsConfig is default config
+var DefaultCorsConfig = CorsConfig{
+	AllowOrigins: []string{"*"},
+	AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+}
+
 // CorsConfig godoc
 type CorsConfig struct {
 	AllowOrigins []string `mapstructure:"allow_origins"`
 	AllowMethods []string `mapstructure:"allow_methods"`
+}
+
+// DefaultPostgresConfig is default config
+var DefaultPostgresConfig = PostgresConfig{
+	Driver:   "postgres",
+	Host:     "localhost",
+	Port:     "5432",
+	User:     "postgres",
+	Name:     "postgres",
+	Password: "postgres",
 }
 
 // PostgresConfig is postgres config
@@ -27,9 +54,21 @@ type PostgresConfig struct {
 	Password string `mapstructure:"password"`
 }
 
+// DefaultRedisConfig is config
+var DefaultRedisConfig = RedisConfig{
+	Addr: "localhost:6378",
+}
+
 // RedisConfig is redis config
 type RedisConfig struct {
 	Addr string `mapstructure:"addr"`
+}
+
+// DefaultJwtConfig is default config
+var DefaultJwtConfig = JwtConfig{
+	SecretKey:           "debugKey",
+	AccessExpiresInSec:  3600,
+	RefreshExpiresInSec: 60 * 60 * 24,
 }
 
 // JwtConfig is jwt config
