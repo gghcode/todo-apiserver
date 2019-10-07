@@ -25,7 +25,7 @@ type Configuration struct {
 // DefaultCorsConfig is default config
 var DefaultCorsConfig = CorsConfig{
 	AllowOrigins: []string{"*"},
-	AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+	AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 }
 
 // CorsConfig godoc
