@@ -17,27 +17,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type fakeTodoRepository struct {
-	mock.Mock
-}
-
-func (repo *fakeTodoRepository) AddTodo(t todo.Todo) (todo.Todo, error) {
-	args := repo.Called(t)
-	return args.Get(0).(todo.Todo), args.Error(1)
-}
-
-func (repo *fakeTodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error) {
-	args := repo.Called(userID)
-	return args.Get(0).([]todo.Todo), args.Error(1)
-}
-
 type ControllerUnit struct {
 	suite.Suite
 
 	router        *gin.Engine
 	userIDFactory *fake.MockUserID
 	controller    *todo.Controller
-	todoRepo      *fakeTodoRepository
+	todoRepo      *fake.TodoRepository
 }
 
 func TestTodoControllerUnit(t *testing.T) {
@@ -51,7 +37,7 @@ func (suite *ControllerUnit) SetupTest() {
 	suite.router = gin.New()
 	suite.router.Use(fake.AddJwtAuthHandler(suite.userIDFactory))
 
-	suite.todoRepo = &fakeTodoRepository{}
+	suite.todoRepo = &fake.TodoRepository{}
 
 	suite.controller = todo.NewController(suite.todoRepo)
 	suite.controller.RegisterRoutes(suite.router)
