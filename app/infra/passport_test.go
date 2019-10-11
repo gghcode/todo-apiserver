@@ -21,7 +21,7 @@ func (suite *PassportUnit) SetupTest() {
 	suite.passport = infra.NewPassport(1)
 }
 
-func (suite *PassportUnit) TestPasswordVerfication() {
+func (suite *PassportUnit) TestPasswordVerification() {
 	testCases := []struct {
 		description    string
 		password       string
