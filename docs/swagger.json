@@ -7,8 +7,6 @@
         "license": {},
         "version": "1.0"
     },
-    "host": "{{.Host}}",
-    "basePath": "{{.BasePath}}",
     "paths": {
         "/api/auth/refresh": {
             "post": {
@@ -38,21 +36,18 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/auth.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -87,21 +82,18 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/auth.TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -158,7 +150,6 @@
                     "404": {
                         "description": "User Not Found",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -196,14 +187,12 @@
                     "201": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/todo.TodoResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -240,14 +229,40 @@
                     "204": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/todo.TodoResponse"
                         }
                     },
                     "404": {
                         "description": "Todo Not Found",
                         "schema": {
-                            "type": "object",
+                            "$ref": "#/definitions/api.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "description": "Fetch user itself by access_token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/user.UserResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -279,14 +294,12 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "404": {
                         "description": "User Not Found",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -319,21 +332,18 @@
                     "201": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "400": {
                         "description": "Invalid user payload",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     },
                     "409": {
                         "description": "Already exists user",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
@@ -365,14 +375,12 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/user.UserResponse"
                         }
                     },
                     "404": {
                         "description": "User Not Found",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/api.ErrorResponse"
                         }
                     }
