@@ -1,4 +1,3 @@
-basePath: '{{.BasePath}}'
 definitions:
   api.ErrorMetaData:
     properties:
@@ -84,7 +83,6 @@ definitions:
       username:
         type: string
     type: object
-host: '{{.Host}}'
 info:
   contact: {}
   description: This is a apas todo api server.
@@ -112,17 +110,14 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/auth.TokenResponse'
-            type: object
         "400":
           description: Invalid payload
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
         "401":
           description: Invalid credential
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - Auth API
   /api/auth/token:
@@ -145,17 +140,14 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/auth.TokenResponse'
-            type: object
         "400":
           description: Invalid payload
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
         "401":
           description: Invalid credential
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - Auth API
   /api/healthy:
@@ -192,7 +184,6 @@ paths:
           description: User Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - Todo API
     post:
@@ -214,12 +205,10 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/todo.TodoResponse'
-            type: object
         "400":
           description: Invalid payload
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       security:
       - ApiKeyAuth: []
       tags:
@@ -242,16 +231,32 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/todo.TodoResponse'
-            type: object
         "404":
           description: Todo Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       security:
       - ApiKeyAuth: []
       tags:
       - Todo API
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Fetch user itself by access_token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      tags:
+      - User API
   /api/users:
     get:
       consumes:
@@ -270,12 +275,10 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/user.UserResponse'
-            type: object
         "404":
           description: User Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - User API
     post:
@@ -297,17 +300,14 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/user.UserResponse'
-            type: object
         "400":
           description: Invalid user payload
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
         "409":
           description: Already exists user
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - User API
   /api/users/{username}:
@@ -328,12 +328,10 @@ paths:
           description: ok
           schema:
             $ref: '#/definitions/user.UserResponse'
-            type: object
         "404":
           description: User Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponse'
-            type: object
       tags:
       - User API
   /api/version:

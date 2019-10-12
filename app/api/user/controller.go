@@ -6,6 +6,8 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/infra"
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +30,11 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.POST("api/users", controller.CreateUser)
 	router.GET("api/users", controller.UserByID)
 	router.GET("api/users/:username", controller.UserByName)
+
+	authorized := router.Use(middleware.JwtAuthRequired())
+	{
+		authorized.GET("api/user", controller.AuthenticatedUser)
+	}
 }
 
 // CreateUser godoc
@@ -101,6 +108,27 @@ func (controller *Controller) UserByName(ctx *gin.Context) {
 	username := ctx.Param("username")
 
 	user, err := controller.userRepository.UserByUserName(username)
+	if err != nil {
+		api.WriteErrorResponse(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, user.Response())
+}
+
+// AuthenticatedUser godoc
+// @Description Fetch user itself by access_token
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} user.UserResponse "ok"
+// @Failure 404 {object} api.ErrorResponse "User Not Found"
+// @Tags User API
+// @Router /api/user [get]
+func (controller *Controller) AuthenticatedUser(ctx *gin.Context) {
+	userID := ctx.GetInt64(val.UserID)
+
+	user, err := controller.userRepository.UserByID(userID)
 	if err != nil {
 		api.WriteErrorResponse(ctx, err)
 		return

@@ -5,7 +5,6 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
-	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,7 @@ func AddJwtAuthHandler(conf config.JwtConfig) gin.HandlerFunc {
 
 			userID, err := strconv.ParseInt(claims["sub"].(string), 10, 64)
 			if err != nil {
-				api.AbortErrorResponse(ctx, user.ErrInvalidUserID)
+				api.AbortErrorResponse(ctx, auth.ErrInvalidToken)
 				return
 			}
 

@@ -21,6 +21,7 @@ type ControllerUnit struct {
 
 	router         *gin.Engine
 	controller     *user.Controller
+	userIDFactory  *fake.MockUserID
 	userRepository *fake.UserRepository
 }
 
@@ -31,7 +32,9 @@ func TestUserControllerUnit(t *testing.T) {
 func (suite *ControllerUnit) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
+	suite.userIDFactory = &fake.MockUserID{}
 	suite.router = gin.New()
+	suite.router.Use(fake.AddJwtAuthHandler(suite.userIDFactory))
 	suite.userRepository = &fake.UserRepository{}
 
 	suite.controller = user.NewController(suite.userRepository, infra.NewPassport(0))
@@ -132,63 +135,51 @@ func (suite *ControllerUnit) TestCreateUser() {
 	}
 }
 
-// func (suite *ControllerUnit) TestUserByID() {
-// 	stubUser := user.User{ID: 1, UserName: "test_user"}
+func (suite *ControllerUnit) TestAuthenticatedUser() {
+	testCases := []struct {
+		description    string
+		stubUserID     int64
+		stubUser       user.User
+		stubErr        error
+		expectedStatus int
+		expectedJSON   string
+	}{
+		{
+			description:    "ShouldReturnUser",
+			stubUserID:     10,
+			stubUser:       user.User{},
+			stubErr:        nil,
+			expectedStatus: http.StatusOK,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), user.UserResponse{}),
+		},
+	}
 
-// 	testCases := []struct {
-// 		description    string
-// 		argUserID      int64
-// 		stubUser       user.User
-// 		stubErr        error
-// 		expectedStatus int
-// 		expectedJSON   string
-// 	}{
-// 		{
-// 			description:    "ShouldFetchUser",
-// 			argUserID:      1,
-// 			stubUser:       stubUser,
-// 			stubErr:        nil,
-// 			expectedStatus: http.StatusOK,
-// 			expectedJSON: testutil.JSONStringFromInterface(
-// 				suite.T(),
-// 				stubUser.Response(),
-// 			),
-// 		},
-// 		{
-// 			description:    "ShouldBeUserNotFound",
-// 			argUserID:      -1,
-// 			stubUser:       user.EmptyUser,
-// 			stubErr:        user.ErrUserNotFound,
-// 			expectedStatus: http.StatusNotFound,
-// 			expectedJSON: testutil.JSONStringFromInterface(
-// 				suite.T(),
-// 				common.NewErrResp(user.ErrUserNotFound),
-// 			),
-// 		},
-// 	}
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			suite.userIDFactory.
+				On("UserID").
+				Return(tc.stubUserID)
 
-// 	for _, tc := range testCases {
-// 		suite.Run(tc.description, func() {
-// 			suite.userRepository.
-// 				On("UserByID", tc.argUserID).
-// 				Return(tc.stubUser, tc.stubErr)
+			suite.userRepository.
+				On("UserByID", tc.stubUserID).
+				Return(tc.stubUser, tc.stubErr)
 
-// 			actual := testutil.Response(
-// 				suite.T(),
-// 				suite.router,
-// 				"GET",
-// 				fmt.Sprintf("/users/%d", tc.argUserID),
-// 				nil,
-// 			)
+			actual := testutil.Response(
+				suite.T(),
+				suite.router,
+				"GET",
+				"api/user",
+				nil,
+			)
 
-// 			suite.Equal(tc.expectedStatus, actual.StatusCode)
+			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-// 			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
 
-// 			suite.Equal(tc.expectedJSON, actualJSON)
-// 		})
-// 	}
-// }
+			suite.Equal(tc.expectedJSON, actualJSON)
+		})
+	}
+}
 
 func (suite *ControllerUnit) TestUserByName() {
 	testUser := user.User{
