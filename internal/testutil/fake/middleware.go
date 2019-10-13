@@ -31,7 +31,7 @@ func AddJwtAuthHandler(userIDFactory UserIDFactory) gin.HandlerFunc {
 			ctx.Next()
 		}
 
-		ctx.Set(middleware.JwtAuthHandlerToken, innerHandler)
+		ctx.Set(middleware.JwtAuthHandlerToken, &innerHandler)
 		ctx.Next()
 	}
 }

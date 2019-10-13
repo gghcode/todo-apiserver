@@ -1,11 +1,6 @@
 package middleware
 
 import (
-	"strconv"
-
-	"github.com/gghcode/apas-todo-apiserver/app/api"
-	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
-	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gin-gonic/gin"
 )
@@ -14,28 +9,9 @@ import (
 const JwtAuthHandlerToken = "JWT_AUTH_HANDLER_TOKEN"
 
 // AddJwtAuthHandler godoc
-func AddJwtAuthHandler(conf config.JwtConfig) gin.HandlerFunc {
+func AddJwtAuthHandler(conf config.JwtConfig, authHandler *gin.HandlerFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		var innerHandler gin.HandlerFunc = func(ctx *gin.Context) {
-			token := ctx.GetHeader("Authorization")
-
-			claims, err := auth.VerifyAccessToken(conf.SecretKey, token)
-			if err != nil {
-				api.AbortErrorResponse(ctx, err)
-				return
-			}
-
-			userID, err := strconv.ParseInt(claims["sub"].(string), 10, 64)
-			if err != nil {
-				api.AbortErrorResponse(ctx, auth.ErrInvalidToken)
-				return
-			}
-
-			ctx.Set(val.UserID, userID)
-			ctx.Next()
-		}
-
-		ctx.Set(JwtAuthHandlerToken, innerHandler)
+		ctx.Set(JwtAuthHandlerToken, authHandler)
 		ctx.Next()
 	}
 }
@@ -43,8 +19,8 @@ func AddJwtAuthHandler(conf config.JwtConfig) gin.HandlerFunc {
 // JwtAuthRequired godoc
 func JwtAuthRequired() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		verifyHandler := ctx.MustGet(JwtAuthHandlerToken).(gin.HandlerFunc)
-		verifyHandler(ctx)
+		verifyHandler := ctx.MustGet(JwtAuthHandlerToken).(*gin.HandlerFunc)
+		(*verifyHandler)(ctx)
 
 		ctx.Next()
 	}

@@ -136,6 +136,12 @@ func (suite *ControllerUnit) TestCreateUser() {
 }
 
 func (suite *ControllerUnit) TestAuthenticatedUser() {
+	testUser := user.User{
+		ID:        100,
+		UserName:  "testuser",
+		CreatedAt: time.Now().Unix(),
+	}
+
 	testCases := []struct {
 		description    string
 		stubUserID     int64
@@ -146,11 +152,11 @@ func (suite *ControllerUnit) TestAuthenticatedUser() {
 	}{
 		{
 			description:    "ShouldReturnUser",
-			stubUserID:     10,
-			stubUser:       user.User{},
+			stubUserID:     testUser.ID,
+			stubUser:       testUser,
 			stubErr:        nil,
 			expectedStatus: http.StatusOK,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), user.UserResponse{}),
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), testUser.Response()),
 		},
 	}
 
