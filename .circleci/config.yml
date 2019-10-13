@@ -50,7 +50,7 @@ jobs:
   "Integration Test":
     machine:
       image: ubuntu-1604:201903-01
-      docker_layer_caching: true
+      # docker_layer_caching: true
     environment:
       GOPATH: /go
     steps:
