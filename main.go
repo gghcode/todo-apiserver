@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gghcode/apas-todo-apiserver/app"
 	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
 	"github.com/gghcode/apas-todo-apiserver/app/middleware"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
@@ -39,7 +40,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(middleware.NewCors(cfg.Cors))
-	router.Use(middleware.AddJwtAuthHandler(cfg.Jwt))
+	router.Use(middleware.AddJwtAuthHandler(cfg.Jwt, &auth.JwtAuthHandler))
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	for _, controller := range controllers {
