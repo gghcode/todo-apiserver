@@ -85,8 +85,7 @@ jobs:
             - "/go/pkg/mod"
 
   "Push Docker Image":
-    machine:
-      docker_layer_caching: true
+    machine: true
     steps:
       - checkout
 
