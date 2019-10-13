@@ -243,6 +243,11 @@
         },
         "/api/user": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Fetch user itself by access_token",
                 "consumes": [
                     "application/json"
