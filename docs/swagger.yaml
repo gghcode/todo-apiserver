@@ -255,6 +255,8 @@ paths:
           description: User Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
       tags:
       - User API
   /api/users:

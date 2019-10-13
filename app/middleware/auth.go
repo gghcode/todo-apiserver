@@ -11,6 +11,7 @@ const JwtAuthHandlerToken = "JWT_AUTH_HANDLER_TOKEN"
 // AddJwtAuthHandler godoc
 func AddJwtAuthHandler(conf config.JwtConfig, authHandler *gin.HandlerFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		ctx.Set("tok_secret", conf.SecretKey)
 		ctx.Set(JwtAuthHandlerToken, authHandler)
 		ctx.Next()
 	}

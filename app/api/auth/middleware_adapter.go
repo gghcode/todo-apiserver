@@ -70,6 +70,7 @@ func ExtractTokenClaims(jwtParam JwtParam, token string) (jwt.MapClaims, error) 
 
 	if err != nil {
 		validationErr, ok := err.(*jwt.ValidationError)
+
 		if ok && validationErr.Errors == jwt.ValidationErrorExpired {
 			return nil, ErrTokenExpired
 		}
