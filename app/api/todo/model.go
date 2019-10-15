@@ -1,6 +1,7 @@
 package todo
 
 import (
+	"database/sql"
 	"time"
 
 	uuid "github.com/satori/go.uuid"
@@ -11,12 +12,13 @@ var EmptyTodo = Todo{}
 
 // Todo godoc
 type Todo struct {
-	ID         uuid.UUID `gorm:"type:uuid"`
-	Title      string    `gorm:"not null;"`
-	Contents   string    `gorm:"not null;"`
-	AssignorID int64     `gorm:"not null;"`
-	CreatedAt  time.Time `sql:"DEFAULT:current_timestamp"`
-	UpdatedAt  time.Time `sql:"DEFAULT:current_timestamp"`
+	ID         uuid.UUID    `gorm:"type:uuid"`
+	Title      string       `gorm:"not null;"`
+	Contents   string       `gorm:"not null;"`
+	AssignorID int64        `gorm:"not null;"`
+	CreatedAt  time.Time    `sql:"DEFAULT:current_timestamp"`
+	UpdatedAt  time.Time    `sql:"DEFAULT:current_timestamp"`
+	DueDate    sql.NullTime `sql:"DEFAULT:null"`
 }
 
 // BeforeSave godoc

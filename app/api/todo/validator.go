@@ -1,21 +1,25 @@
 package todo
 
 import (
+	"time"
+
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gin-gonic/gin"
 )
 
-// AddTodoRequest godoc
-// struct tag use swagger
-type AddTodoRequest struct {
-	Title    string `json:"title" validate:"required,min=1"`
-	Contents string `json:"contents" validate:"required,min=1"`
-}
+type (
+	// AddTodoRequest godoc
+	// struct tag use swagger
+	AddTodoRequest struct {
+		Title    string `json:"title" validate:"required,min=1"`
+		Contents string `json:"contents" validate:"required,min=1"`
+	}
 
-// AddTodoValidator godoc
-type AddTodoValidator struct {
-	Model AddTodoRequest
-}
+	// AddTodoValidator godoc
+	AddTodoValidator struct {
+		Model AddTodoRequest
+	}
+)
 
 // NewAddTodoValidator godoc
 func NewAddTodoValidator() *AddTodoValidator {
@@ -30,3 +34,12 @@ func (v *AddTodoValidator) Bind(ctx *gin.Context) error {
 
 	return api.Validate(v.Model)
 }
+
+type (
+	// UpdateTodoRequest godoc
+	UpdateTodoRequest struct {
+		Title    string    `json:"title" validate:"min=1"`
+		Contents string    `json:"contents" validate:"min=1"`
+		DueDate  time.Time `json:"due_date"`
+	}
+)

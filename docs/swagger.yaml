@@ -64,6 +64,15 @@ definitions:
       updated_at:
         type: string
     type: object
+  todo.UpdateTodoRequest:
+    properties:
+      contents:
+        type: string
+      due_date:
+        type: string
+      title:
+        type: string
+    type: object
   user.CreateUserRequest:
     properties:
       password:
@@ -228,6 +237,38 @@ paths:
       - application/json
       responses:
         "204":
+          description: ok
+          schema:
+            $ref: '#/definitions/todo.TodoResponse'
+        "404":
+          description: Todo Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Todo API
+    patch:
+      consumes:
+      - application/json
+      description: Update todo by todo id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todo_id
+        required: true
+        type: string
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/todo.UpdateTodoRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
           description: ok
           schema:
             $ref: '#/definitions/todo.TodoResponse'

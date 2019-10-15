@@ -9,6 +9,8 @@ import (
 type Repository interface {
 	AddTodo(todo Todo) (Todo, error)
 	AllTodosByUserID(userID int64) ([]Todo, error)
+	TodoByTodoID(todoID string, todo *Todo) error
+	UpdateTodo(todoID string, todo Todo) (Todo, error)
 	RemoveTodo(todoID string) error
 }
 
@@ -52,9 +54,7 @@ func (repo *repository) AllTodosByUserID(userID int64) ([]Todo, error) {
 	return result, nil
 }
 
-func (repo *repository) RemoveTodo(todoID string) error {
-	var todo Todo
-
+func (repo *repository) TodoByTodoID(todoID string, todo *Todo) error {
 	err := repo.pgConn.DB().
 		Where("id=?", todoID).
 		First(&todo).Error
@@ -62,6 +62,26 @@ func (repo *repository) RemoveTodo(todoID string) error {
 	if err == gorm.ErrRecordNotFound {
 		return ErrNotFoundTodo
 	} else if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo *repository) UpdateTodo(todoID string, todoData Todo) (Todo, error) {
+	var todo Todo
+	if err := repo.TodoByTodoID(todoID, &todo); err != nil {
+		return todo, err
+	}
+
+	repo.pgConn.DB().Model(&todo).UpdateColumns(todoData)
+
+	return todo, nil
+}
+
+func (repo *repository) RemoveTodo(todoID string) error {
+	var todo Todo
+	if err := repo.TodoByTodoID(todoID, &todo); err != nil {
 		return err
 	}
 
