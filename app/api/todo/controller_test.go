@@ -136,6 +136,40 @@ func (suite *ControllerUnit) TestAddTodo() {
 	}
 }
 
+func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
+	testCases := []struct {
+		description    string
+		argTodoID      string
+		stubUserID     int64
+		expectedStatus int
+		expectedJSON   string
+	}{
+		{
+			description:    "ShouldPatchedTodo",
+			argTodoID:      "fasdfsa",
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			suite.userIDFactory.
+				On("UserID").
+				Return(tc.stubUserID)
+
+			actual := testutil.Response(
+				suite.T(),
+				suite.router,
+				"PATCH",
+				"api/todos/"+tc.argTodoID,
+				nil,
+			)
+
+			suite.Equal(tc.expectedStatus, actual.StatusCode)
+		})
+	}
+}
+
 func (suite *ControllerUnit) TestRemoveTodoByTodoID() {
 	testCases := []struct {
 		description        string

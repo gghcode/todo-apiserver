@@ -1,7 +1,9 @@
 package todo_test
 
 import (
+	"database/sql"
 	"testing"
+	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
 	"github.com/gghcode/apas-todo-apiserver/config"
@@ -96,6 +98,89 @@ func (suite *RepositoryIntegration) TestAddTodo() {
 			suite.Equal(tc.expected.Contents, actual.Contents)
 			suite.Equal(tc.expected.AssignorID, actual.AssignorID)
 
+			suite.Equal(tc.expectedErr, actualErr)
+		})
+	}
+}
+
+func (suite *RepositoryIntegration) TestTodoByTodoID() {
+	testCases := []struct {
+		description string
+		argTodoID   string
+		expected    todo.Todo
+		expectedErr error
+	}{
+		{
+			description: "ShouldReturnTodo",
+			argTodoID:   suite.testTodos[0].ID.String(),
+			expected:    suite.testTodos[0],
+			expectedErr: nil,
+		},
+		{
+			description: "ShouldReturnErrNotFoundTodo",
+			argTodoID:   uuid.Nil.String(),
+			expected:    todo.EmptyTodo,
+			expectedErr: todo.ErrNotFoundTodo,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			var actual todo.Todo
+			actualErr := suite.todoRepository.
+				TodoByTodoID(tc.argTodoID, &actual)
+
+			suite.Equal(tc.expected, actual)
+			suite.Equal(tc.expectedErr, actualErr)
+		})
+	}
+}
+
+func (suite *RepositoryIntegration) TestUpdateTodo() {
+	expectedTodo := todo.Todo{
+		Title:    "update title",
+		Contents: "update contents",
+		DueDate: sql.NullTime{
+			Time: time.Unix(100000, 0),
+		},
+	}
+
+	testCases := []struct {
+		description string
+		argTodoID   string
+		argTodo     todo.Todo
+		expected    todo.Todo
+		expectedErr error
+	}{
+		{
+			description: "ShouldUpdateTodo",
+			argTodoID:   suite.testTodos[0].ID.String(),
+			argTodo:     expectedTodo,
+			expected: todo.Todo{
+				Title:      expectedTodo.Title,
+				Contents:   expectedTodo.Contents,
+				DueDate:    expectedTodo.DueDate,
+				ID:         suite.testTodos[0].ID,
+				AssignorID: suite.testTodos[0].AssignorID,
+				CreatedAt:  suite.testTodos[0].CreatedAt,
+				UpdatedAt:  suite.testTodos[0].UpdatedAt,
+			},
+			expectedErr: nil,
+		},
+		{
+			description: "ShouldReturnErrNotFoundTodo",
+			argTodoID:   uuid.Nil.String(),
+			argTodo:     expectedTodo,
+			expected:    todo.EmptyTodo,
+			expectedErr: todo.ErrNotFoundTodo,
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			actual, actualErr := suite.todoRepository.UpdateTodo(tc.argTodoID, tc.argTodo)
+
+			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)
 		})
 	}

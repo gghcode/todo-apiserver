@@ -31,6 +31,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	authorized := router.Use(middleware.JwtAuthRequired())
 	{
 		authorized.POST("api/todos", controller.AddTodo)
+		authorized.PATCH("api/todos/:todo_id", controller.UpdateTodoByTodoID)
 		authorized.DELETE("api/todos/:todo_id", controller.RemoveTodoByTodoID)
 	}
 }
@@ -95,6 +96,21 @@ func (controller *Controller) AllTodosByUserID(ctx *gin.Context) {
 	todosSerializer := TodosSerializer{Model: todos}
 
 	ctx.JSON(http.StatusOK, todosSerializer.Response())
+}
+
+// UpdateTodoByTodoID godoc
+// @Description Update todo by todo id
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param todo_id path string true "Todo ID"
+// @Param payload body todo.UpdateTodoRequest true "payload"
+// @Success 200 {object} todo.TodoResponse "ok"
+// @Failure 404 {object} api.ErrorResponse "Todo Not Found"
+// @Tags Todo API
+// @Router /api/todos/{todo_id} [patch]
+func (controller *Controller) UpdateTodoByTodoID(ctx *gin.Context) {
+
 }
 
 // RemoveTodoByTodoID godoc
