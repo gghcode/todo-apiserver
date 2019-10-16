@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
@@ -137,17 +138,51 @@ func (suite *ControllerUnit) TestAddTodo() {
 }
 
 func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
+	updateTodoRequest := todo.UpdateTodoRequest{
+		Title:    "update title",
+		Contents: "update contents",
+	}
+
+	updateTodoEntity := updateTodoRequest.Entity()
+	updateTodoEntity.ID = uuid.NewV4()
+	updateTodoEntity.AssignorID = 10
+	updateTodoEntity.CreatedAt = time.Now()
+
 	testCases := []struct {
 		description    string
 		argTodoID      string
+		argTodo        todo.Todo
+		reqPayload     io.Reader
 		stubUserID     int64
+		stubTodo       todo.Todo
+		stubErr        error
 		expectedStatus int
 		expectedJSON   string
 	}{
 		{
-			description:    "ShouldPatchedTodo",
-			argTodoID:      "fasdfsa",
+			description: "ShouldPatchedTodo",
+			argTodoID:   "abcde",
+			argTodo:     updateTodoRequest.Entity(),
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				updateTodoRequest,
+			),
+			stubUserID:     10,
+			stubTodo:       updateTodoEntity,
 			expectedStatus: http.StatusOK,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				todo.TodoSerializer{Model: updateTodoEntity}.Response(),
+			),
+		},
+		{
+			description:    "ShouldReturnErrEmptyTodoID",
+			argTodoID:      " ",
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.NewErrRes(todo.ErrEmptyTodoID),
+			),
 		},
 	}
 
@@ -157,15 +192,23 @@ func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
 				On("UserID").
 				Return(tc.stubUserID)
 
+			suite.todoRepo.
+				On("UpdateTodo", tc.argTodoID, tc.argTodo).
+				Return(tc.stubTodo, tc.stubErr)
+
 			actual := testutil.Response(
 				suite.T(),
 				suite.router,
 				"PATCH",
 				"api/todos/"+tc.argTodoID,
-				nil,
+				tc.reqPayload,
 			)
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
+
+			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+
+			suite.Equal(tc.expectedJSON, actualJSON)
 		})
 	}
 }
