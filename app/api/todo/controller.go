@@ -110,7 +110,28 @@ func (controller *Controller) AllTodosByUserID(ctx *gin.Context) {
 // @Tags Todo API
 // @Router /api/todos/{todo_id} [patch]
 func (controller *Controller) UpdateTodoByTodoID(ctx *gin.Context) {
+	todoID := ctx.Param("todo_id")
+	todoID = strings.Trim(todoID, " ")
+	if len(todoID) <= 0 {
+		api.WriteErrorResponse(ctx, ErrEmptyTodoID)
+		return
+	}
 
+	todoValidator := NewUpdateTodoValidator()
+	if err := todoValidator.Bind(ctx); err != nil {
+		api.WriteErrorResponse(ctx, err)
+		return
+	}
+
+	todo, err := controller.todoRepo.UpdateTodo(todoID, todoValidator.Model.Entity())
+	if err != nil {
+		api.WriteErrorResponse(ctx, err)
+		return
+	}
+
+	todoSerializer := TodoSerializer{Model: todo}
+
+	ctx.JSON(http.StatusOK, todoSerializer.Response())
 }
 
 // RemoveTodoByTodoID godoc
