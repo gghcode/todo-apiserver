@@ -2,9 +2,10 @@ package todo
 
 import (
 	"database/sql"
-	"time"
+	"fmt"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/tool"
 	"github.com/gin-gonic/gin"
 )
 
@@ -39,9 +40,9 @@ func (v *AddTodoValidator) Bind(ctx *gin.Context) error {
 type (
 	// UpdateTodoRequest godoc
 	UpdateTodoRequest struct {
-		Title    string    `json:"title"`
-		Contents string    `json:"contents"`
-		DueDate  time.Time `json:"due_date"`
+		Title    *string `json:"title"`
+		Contents *string `json:"contents,min=1"`
+		DueDate  *string `json:"due_date"`
 	}
 
 	// UpdateTodoValidator godoc
@@ -66,11 +67,26 @@ func (v *UpdateTodoValidator) Bind(ctx *gin.Context) error {
 
 // Entity convert to entity from request
 func (model UpdateTodoRequest) Entity() Todo {
+	sqlNullTime := sql.NullTime{Valid: false}
+	if model.DueDate != nil {
+		parsedTime, err := tool.ParseTime(*model.DueDate)
+		if err == nil {
+			sqlNullTime.Time = parsedTime
+			sqlNullTime.Valid = true
+		}
+	}
+	fmt.Println(sqlNullTime)
+	// parsedTime, err := tool.ParseTime(*model.DueDate)
+	// sqlNullTime := sql.NullTime{Time: parsedTime, Valid: true}
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	sqlNullTime.Time = time.Time{}
+	// 	sqlNullTime.Valid = false
+	// }
+	// fmt.Println(sqlNullTime)
 	return Todo{
-		Title:    model.Title,
-		Contents: model.Contents,
-		DueDate: sql.NullTime{
-			Time: model.DueDate,
-		},
+		Title:    *model.Title,
+		Contents: *model.Contents,
+		DueDate:  sqlNullTime,
 	}
 }
