@@ -7,42 +7,59 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// ErrorMetaData godoc
-type ErrorMetaData struct {
-	Message string `json:"message"`
-}
-
-// ErrorResponse godoc
-type ErrorResponse struct {
-	Errors []ErrorMetaData `json:"errors"`
-}
-
-// NewErrRes godoc
-func NewErrRes(err ...error) ErrorResponse {
-	result := ErrorResponse{Errors: []ErrorMetaData{}}
-
-	for _, err := range err {
-		result.Errors = append(result.Errors, ErrorMetaData{Message: err.Error()})
+type (
+	// ErrorMetaData godoc
+	ErrorMetaData struct {
+		Message string `json:"message"`
 	}
 
-	return result
-}
+	// ErrorResponse godoc
+	ErrorResponse struct {
+		Errors []ErrorMetaData `json:"errors"`
+	}
 
-// HandledError godoc
-type HandledError struct {
-	Status int
-	Errors []error
+	// handledError godoc
+	handledError struct {
+		Status int
+		Errors []error
+	}
+
+	// HandledError godoc
+	HandledError interface {
+		StatusCode() int
+		Error() string
+	}
+
+	// ErrorResponseFactory is factory that create error response.
+	ErrorResponseFactory interface {
+		ErrorResponse() ErrorResponse
+	}
+)
+
+// NewErrRes godoc
+func NewErrRes(err error) ErrorResponse {
+	return ErrorResponse{
+		Errors: []ErrorMetaData{
+			{
+				Message: err.Error(),
+			},
+		},
+	}
 }
 
 // NewHandledError godoc
-func NewHandledError(code int, err ...error) *HandledError {
-	return &HandledError{
+func NewHandledError(code int, err ...error) HandledError {
+	return &handledError{
 		Status: code,
 		Errors: err,
 	}
 }
 
-func (err HandledError) Error() string {
+func (err handledError) StatusCode() int {
+	return err.Status
+}
+
+func (err handledError) Error() string {
 	var errStrings []string
 
 	for _, err := range err.Errors {
@@ -54,22 +71,27 @@ func (err HandledError) Error() string {
 
 // WriteErrorResponse godoc
 func WriteErrorResponse(ctx *gin.Context, err error) {
-	handledErr, ok := err.(*HandledError)
+	handledErr, ok := err.(HandledError)
 	if !ok {
 		ctx.JSON(http.StatusInternalServerError, NewErrRes(err))
 		return
 	}
 
-	ctx.JSON(handledErr.Status, NewErrRes(handledErr.Errors...))
+	if errResFactory, ok := err.(ErrorResponseFactory); ok {
+		ctx.JSON(handledErr.StatusCode(), errResFactory.ErrorResponse())
+		return
+	}
+
+	ctx.JSON(handledErr.StatusCode(), NewErrRes(handledErr))
 }
 
 // AbortErrorResponse godoc
 func AbortErrorResponse(ctx *gin.Context, err error) {
-	handledErr, ok := err.(*HandledError)
+	handledErr, ok := err.(HandledError)
 	if !ok {
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, NewErrRes(err))
 		return
 	}
 
-	ctx.AbortWithStatusJSON(handledErr.Status, NewErrRes(handledErr.Errors...))
+	ctx.AbortWithStatusJSON(handledErr.StatusCode(), NewErrRes(handledErr))
 }
