@@ -17,7 +17,7 @@ unit_ci:
 	@go test -race -coverprofile=coverage.txt -covermode=atomic -v -short ./...
 
 integration: docker_up
-	@go test -race -v -run Integration ./... || $(MAKE) docker_down
+	@go test -race -run Integration ./... || $(MAKE) docker_down
 	@$(MAKE) docker_down
 
 integration_ci: docker_up
