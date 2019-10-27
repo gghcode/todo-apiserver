@@ -7,6 +7,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gin-gonic/gin"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -33,6 +34,10 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 	})
 
 	fakeTitle := "fake title"
+	wrongContents := "1"
+	fakeModel := todo.UpdateTodoRequest{
+		Contents: &wrongContents,
+	}
 
 	testCases := []struct {
 		description       string
@@ -43,7 +48,7 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 		{
 			description: "ShouldBindModelWithTitle",
 			reqPayload: testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
-				"title": fakeTitle,
+				"title": &fakeTitle,
 			}),
 			expectedErr: nil,
 			expectedBindModel: todo.UpdateTodoRequest{
@@ -51,11 +56,23 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 			},
 		},
 		{
-			description: "ShouldReturnErrWhenNotContentsMin",
+			description: "ShouldReturnErrWhenInvalidFieldType",
 			reqPayload: testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
 				"contents": 5,
 			}),
-			expectedErr:       nil,
+			expectedErr: todo.JsonTypeError{
+				Value: "number",
+				Field: "contents",
+			},
+		},
+		{
+			description: "ShouldReturnErrWhenNotContentsMin",
+			reqPayload: testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
+				"contents": "1",
+			}),
+			expectedErr: validation.ValidateStruct(&fakeModel,
+				validation.Field(&fakeModel.Contents, validation.Length(5, 10)),
+			),
 			expectedBindModel: todo.UpdateTodoRequest{},
 		},
 	}
@@ -65,8 +82,11 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 			bodyValidator := todo.NewUpdateTodoValidator()
 			actualErr := bodyValidator.Bind(ctx)
 
-			suite.Equal(actualErr, tc.expectedErr)
-			suite.Equal(bodyValidator.Model, tc.expectedBindModel)
+			suite.Equal(tc.expectedErr, actualErr)
+
+			if tc.expectedErr == nil {
+				suite.Equal(tc.expectedBindModel, bodyValidator.Model)
+			}
 		}
 
 		suite.Run(tc.description, func() {
@@ -79,32 +99,4 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 			)
 		})
 	}
-}
-
-func TestUpdateTodoValidatorBind(t *testing.T) {
-	reqBody := map[string]interface{}{
-		"a": 5,
-	}
-
-	r := gin.New()
-	r.POST("test", func(ctx *gin.Context) {
-		bodyValidator := todo.NewUpdateTodoValidator()
-		if err := bodyValidator.Bind(ctx); err != nil {
-			t.Error(err)
-		}
-
-		// if _, ok := m["a"]; !ok {
-		// 	t.Error("Not Exists Key a")
-		// }
-	})
-
-	gin.SetMode(gin.TestMode)
-
-	testutil.Response(
-		t,
-		r,
-		"POST",
-		"/test",
-		testutil.ReqBodyFromInterface(t, reqBody),
-	)
 }

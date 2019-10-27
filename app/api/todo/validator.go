@@ -2,11 +2,14 @@ package todo
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/tool"
 	"github.com/gin-gonic/gin"
+	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 type (
@@ -41,7 +44,7 @@ type (
 	// UpdateTodoRequest godoc
 	UpdateTodoRequest struct {
 		Title    *string `json:"title"`
-		Contents *string `json:"contents,min=1"`
+		Contents *string `json:"contents"`
 		DueDate  *string `json:"due_date"`
 	}
 
@@ -58,9 +61,47 @@ func NewUpdateTodoValidator() *UpdateTodoValidator {
 
 // Bind godoc
 func (v *UpdateTodoValidator) Bind(ctx *gin.Context) error {
-	if err := ctx.ShouldBindJSON(&v.Model); err != nil {
+	var jsonErr *json.UnmarshalTypeError
+
+	err := ctx.ShouldBindJSON(&v.Model)
+	if errors.As(err, &jsonErr) {
+		return JsonTypeError{
+			Value: jsonErr.Value,
+			Field: jsonErr.Field,
+		}
+	} else if err != nil {
 		return err
 	}
+
+	err = validation.ValidateStruct(&v.Model,
+		validation.Field(&v.Model.Contents, validation.Length(5, 10)),
+	)
+	// err = nil
+	// // err = validation.ValidateStruct(&v.Model, )
+	// if v.Model.Title != nil {
+	// 	err = validation.Validate(*v.Model.Title,
+	// 		validation.Length(5, 10),
+	// 	)
+	// }
+
+	// if v.Model.Contents != nil {
+	// 	fmt.Println(v.Model.Contents)
+	// 	err = validation.Validate(v.Model.Contents,
+	// 		validation.Required,
+	// 		validation.Length(5, 10),
+	// 	)
+
+	// 	fmt.Println(err)
+	// }
+
+	return err
+
+	// return validation.Validate(&v.Model,
+	// 	validation.Field(&v.Model.Contents, validation.Length(5, 50)),
+	// )
+	// if err := ctx.ShouldBindJSON(&v.Model); err != nil {
+	// 	return err
+	// }
 
 	return api.Validate(v.Model)
 }
