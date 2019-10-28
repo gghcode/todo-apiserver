@@ -13,7 +13,7 @@ aliases:
 jobs:
   "Build":
     docker:
-      - image: golang:1.12.8
+      - image: golang:1.13.2
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
@@ -32,7 +32,7 @@ jobs:
 
   "Unit Test":
     docker:
-      - image: golang:1.12.8
+      - image: golang:1.13.2
     working_directory: ~/apas-todo-apiserver
     steps:
       - checkout
@@ -57,9 +57,9 @@ jobs:
       - checkout
 
       - run:
-          name: Install Go Runtime 1.12.5
+          name: Install Go Runtime 1.13.2
           command: |
-            curl -L https://storage.googleapis.com/golang/go1.12.5.linux-amd64.tar.gz > ~/go.tar.gz
+            curl -L https://storage.googleapis.com/golang/go1.13.2.linux-amd64.tar.gz > ~/go.tar.gz
             sudo tar -C ~ -xvf ~/go.tar.gz 1> /dev/null
             sudo rm -rf /usr/local/go
             sudo mv ~/go /usr/local 
