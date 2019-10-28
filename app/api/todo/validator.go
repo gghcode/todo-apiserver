@@ -1,13 +1,10 @@
 package todo
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
-	"github.com/gghcode/apas-todo-apiserver/app/tool"
 	"github.com/gin-gonic/gin"
 	validation "github.com/go-ozzo/ozzo-validation"
 )
@@ -98,28 +95,28 @@ func (model UpdateTodoRequest) Map() map[string]interface{} {
 	return result
 }
 
-// Entity convert to entity from request
-func (model UpdateTodoRequest) Entity() Todo {
-	sqlNullTime := sql.NullTime{Valid: false}
-	if model.DueDate != nil {
-		parsedTime, err := tool.ParseTime(*model.DueDate)
-		if err == nil {
-			sqlNullTime.Time = parsedTime
-			sqlNullTime.Valid = true
-		}
-	}
-	fmt.Println(sqlNullTime)
-	// parsedTime, err := tool.ParseTime(*model.DueDate)
-	// sqlNullTime := sql.NullTime{Time: parsedTime, Valid: true}
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	sqlNullTime.Time = time.Time{}
-	// 	sqlNullTime.Valid = false
-	// }
-	// fmt.Println(sqlNullTime)
-	return Todo{
-		Title:    *model.Title,
-		Contents: *model.Contents,
-		DueDate:  sqlNullTime,
-	}
-}
+// // Entity convert to entity from request
+// func (model UpdateTodoRequest) Entity() Todo {
+// 	sqlNullTime := sql.NullTime{Valid: false}
+// 	if model.DueDate != nil {
+// 		parsedTime, err := tool.ParseTime(*model.DueDate)
+// 		if err == nil {
+// 			sqlNullTime.Time = parsedTime
+// 			sqlNullTime.Valid = true
+// 		}
+// 	}
+// 	fmt.Println(sqlNullTime)
+// 	// parsedTime, err := tool.ParseTime(*model.DueDate)
+// 	// sqlNullTime := sql.NullTime{Time: parsedTime, Valid: true}
+// 	// if err != nil {
+// 	// 	fmt.Println(err)
+// 	// 	sqlNullTime.Time = time.Time{}
+// 	// 	sqlNullTime.Valid = false
+// 	// }
+// 	// fmt.Println(sqlNullTime)
+// 	return Todo{
+// 		Title:    *model.Title,
+// 		Contents: *model.Contents,
+// 		DueDate:  sqlNullTime,
+// 	}
+// }
