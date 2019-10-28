@@ -10,7 +10,7 @@ type Repository interface {
 	AddTodo(todo Todo) (Todo, error)
 	AllTodosByUserID(userID int64) ([]Todo, error)
 	TodoByTodoID(todoID string, todo *Todo) error
-	UpdateTodo(todoID string, todo Todo) (Todo, error)
+	UpdateTodo(todoID string, todo map[string]interface{}) (Todo, error)
 	RemoveTodo(todoID string) error
 }
 
@@ -68,7 +68,7 @@ func (repo *repository) TodoByTodoID(todoID string, todo *Todo) error {
 	return nil
 }
 
-func (repo *repository) UpdateTodo(todoID string, todoData Todo) (Todo, error) {
+func (repo *repository) UpdateTodo(todoID string, todoData map[string]interface{}) (Todo, error) {
 	var todo Todo
 	if err := repo.TodoByTodoID(todoID, &todo); err != nil {
 		return todo, err

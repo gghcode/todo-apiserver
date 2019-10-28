@@ -4,6 +4,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gin-gonic/gin"
@@ -60,7 +61,7 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 			reqPayload: testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
 				"contents": 5,
 			}),
-			expectedErr: todo.JsonTypeError{
+			expectedErr: api.JsonTypeError{
 				Value: "number",
 				Field: "contents",
 			},
@@ -71,7 +72,7 @@ func (suite *ValidatorUnit) TestUpdateTodoBind() {
 				"contents": "1",
 			}),
 			expectedErr: validation.ValidateStruct(&fakeModel,
-				validation.Field(&fakeModel.Contents, validation.Length(5, 10)),
+				validation.Field(&fakeModel.Contents, validation.Length(2, 50)),
 			),
 			expectedBindModel: todo.UpdateTodoRequest{},
 		},

@@ -138,12 +138,19 @@ func (suite *ControllerUnit) TestAddTodo() {
 }
 
 func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
-	updateTodoRequest := todo.UpdateTodoRequest{
-		Title:    "update title",
-		Contents: "update contents",
+	updateTodoRequest := map[string]interface{}{
+		"title":    "updated title",
+		"contents": "updated contents",
 	}
 
-	updateTodoEntity := updateTodoRequest.Entity()
+	// todo.UpdateTodoRequest{
+	// 	Title:    "update title",
+	// 	Contents: "update contents",
+	// }
+
+	updateTodoEntity := todo.Todo{}
+	updateTodoEntity.Title = updateTodoRequest["title"].(string)
+	updateTodoEntity.Contents = updateTodoRequest["contents"].(string)
 	updateTodoEntity.ID = uuid.NewV4()
 	updateTodoEntity.AssignorID = 10
 	updateTodoEntity.CreatedAt = time.Now()
@@ -162,7 +169,6 @@ func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
 		{
 			description: "ShouldPatchedTodo",
 			argTodoID:   "abcde",
-			argTodo:     updateTodoRequest.Entity(),
 			reqPayload: testutil.ReqBodyFromInterface(
 				suite.T(),
 				updateTodoRequest,
@@ -193,7 +199,7 @@ func (suite *ControllerUnit) TestUpdateTodoByTodoID() {
 				Return(tc.stubUserID)
 
 			suite.todoRepo.
-				On("UpdateTodo", tc.argTodoID, tc.argTodo).
+				On("UpdateTodo", tc.argTodoID, mock.Anything).
 				Return(tc.stubTodo, tc.stubErr)
 
 			actual := testutil.Response(

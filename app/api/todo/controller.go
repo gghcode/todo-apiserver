@@ -123,7 +123,9 @@ func (controller *Controller) UpdateTodoByTodoID(ctx *gin.Context) {
 		return
 	}
 
-	todo, err := controller.todoRepo.UpdateTodo(todoID, todoValidator.Model.Entity())
+	patchData := todoValidator.Model.Map()
+
+	todo, err := controller.todoRepo.UpdateTodo(todoID, patchData)
 	if err != nil {
 		api.WriteErrorResponse(ctx, err)
 		return

@@ -137,18 +137,23 @@ func (suite *RepositoryIntegration) TestTodoByTodoID() {
 }
 
 func (suite *RepositoryIntegration) TestUpdateTodo() {
-	expectedTodo := todo.Todo{
-		Title:    "update title",
-		Contents: "update contents",
-		DueDate: sql.NullTime{
-			Time: time.Unix(100000, 0),
+	expectedTodo := map[string]interface{}{
+		"Title":    "update title",
+		"Contents": "update contents",
+		"DueDate": sql.NullTime{
+			Time:  time.Unix(100000, 0),
+			Valid: true,
 		},
+	}
+
+	expectedTodoWithBlackField := map[string]interface{}{
+		"Title": "",
 	}
 
 	testCases := []struct {
 		description string
 		argTodoID   string
-		argTodo     todo.Todo
+		argTodo     map[string]interface{}
 		expected    todo.Todo
 		expectedErr error
 	}{
@@ -157,13 +162,28 @@ func (suite *RepositoryIntegration) TestUpdateTodo() {
 			argTodoID:   suite.testTodos[0].ID.String(),
 			argTodo:     expectedTodo,
 			expected: todo.Todo{
-				Title:      expectedTodo.Title,
-				Contents:   expectedTodo.Contents,
-				DueDate:    expectedTodo.DueDate,
+				Title:      expectedTodo["Title"].(string),
+				Contents:   expectedTodo["Contents"].(string),
+				DueDate:    expectedTodo["DueDate"].(sql.NullTime),
 				ID:         suite.testTodos[0].ID,
 				AssignorID: suite.testTodos[0].AssignorID,
 				CreatedAt:  suite.testTodos[0].CreatedAt,
 				UpdatedAt:  suite.testTodos[0].UpdatedAt,
+			},
+			expectedErr: nil,
+		},
+		{
+			description: "ShouldUpdateTodoWithBlackField",
+			argTodoID:   suite.testTodos[1].ID.String(),
+			argTodo:     expectedTodoWithBlackField,
+			expected: todo.Todo{
+				Title:      expectedTodoWithBlackField["Title"].(string),
+				Contents:   suite.testTodos[1].Contents,
+				DueDate:    suite.testTodos[1].DueDate,
+				ID:         suite.testTodos[1].ID,
+				AssignorID: suite.testTodos[1].AssignorID,
+				CreatedAt:  suite.testTodos[1].CreatedAt,
+				UpdatedAt:  suite.testTodos[1].UpdatedAt,
 			},
 			expectedErr: nil,
 		},
