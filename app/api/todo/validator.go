@@ -65,7 +65,7 @@ func (v *UpdateTodoValidator) Bind(ctx *gin.Context) error {
 
 	err := ctx.ShouldBindJSON(&v.Model)
 	if errors.As(err, &jsonErr) {
-		return JsonTypeError{
+		return api.JsonTypeError{
 			Value: jsonErr.Value,
 			Field: jsonErr.Field,
 		}
@@ -73,37 +73,29 @@ func (v *UpdateTodoValidator) Bind(ctx *gin.Context) error {
 		return err
 	}
 
-	err = validation.ValidateStruct(&v.Model,
-		validation.Field(&v.Model.Contents, validation.Length(5, 10)),
+	return validation.ValidateStruct(&v.Model,
+		validation.Field(&v.Model.Contents, validation.Length(2, 50)),
+		validation.Field(&v.Model.Title, validation.Length(2, 100)),
 	)
-	// err = nil
-	// // err = validation.ValidateStruct(&v.Model, )
-	// if v.Model.Title != nil {
-	// 	err = validation.Validate(*v.Model.Title,
-	// 		validation.Length(5, 10),
-	// 	)
-	// }
+}
 
-	// if v.Model.Contents != nil {
-	// 	fmt.Println(v.Model.Contents)
-	// 	err = validation.Validate(v.Model.Contents,
-	// 		validation.Required,
-	// 		validation.Length(5, 10),
-	// 	)
+// Map godoc
+func (model UpdateTodoRequest) Map() map[string]interface{} {
+	result := map[string]interface{}{}
 
-	// 	fmt.Println(err)
-	// }
+	if model.Title != nil {
+		result["title"] = *model.Title
+	}
 
-	return err
+	if model.Contents != nil {
+		result["contents"] = *model.Contents
+	}
 
-	// return validation.Validate(&v.Model,
-	// 	validation.Field(&v.Model.Contents, validation.Length(5, 50)),
-	// )
-	// if err := ctx.ShouldBindJSON(&v.Model); err != nil {
-	// 	return err
-	// }
+	if model.DueDate != nil {
+		result["due_date"] = *model.DueDate
+	}
 
-	return api.Validate(v.Model)
+	return result
 }
 
 // Entity convert to entity from request

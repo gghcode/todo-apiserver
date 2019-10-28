@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,6 +25,12 @@ type (
 		Errors []error
 	}
 
+	// JsonTypeError is error
+	JsonTypeError struct {
+		Value string
+		Field string
+	}
+
 	// HandledError godoc
 	HandledError interface {
 		StatusCode() int
@@ -35,6 +42,15 @@ type (
 		ErrorResponse() ErrorResponse
 	}
 )
+
+// StatusCode godoc
+func (err JsonTypeError) StatusCode() int {
+	return http.StatusBadRequest
+}
+
+func (err JsonTypeError) Error() string {
+	return fmt.Sprintf("'%s' field is %s type", err.Field, err.Value)
+}
 
 // NewErrRes godoc
 func NewErrRes(err error) ErrorResponse {

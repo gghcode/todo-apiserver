@@ -11,6 +11,7 @@ type (
 		AssignorID int64     `json:"assignor_id"`
 		CreatedAt  time.Time `json:"created_at"`
 		UpdatedAt  time.Time `json:"updated_at"`
+		DueDate    string    `json:"due_date"`
 	}
 
 	// TodoSerializer godoc
@@ -41,6 +42,11 @@ func (serializer TodosSerializer) Response() []TodoResponse {
 }
 
 func serializeTodoResponse(todo Todo) TodoResponse {
+	date := ""
+	if todo.DueDate.Valid {
+		date = todo.DueDate.Time.String()
+	}
+
 	return TodoResponse{
 		ID:         todo.ID.String(),
 		Title:      todo.Title,
@@ -48,5 +54,6 @@ func serializeTodoResponse(todo Todo) TodoResponse {
 		AssignorID: todo.AssignorID,
 		CreatedAt:  todo.CreatedAt,
 		UpdatedAt:  todo.UpdatedAt,
+		DueDate:    date,
 	}
 }

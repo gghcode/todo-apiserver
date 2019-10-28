@@ -29,7 +29,7 @@ func (repo *TodoRepository) TodoByTodoID(todoID string, todo *todo.Todo) error {
 }
 
 // UpdateTodo godoc
-func (repo *TodoRepository) UpdateTodo(todoID string, todoData todo.Todo) (todo.Todo, error) {
+func (repo *TodoRepository) UpdateTodo(todoID string, todoData map[string]interface{}) (todo.Todo, error) {
 	args := repo.Called(todoID, todoData)
 	return args.Get(0).(todo.Todo), args.Error(1)
 }
