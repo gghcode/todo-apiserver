@@ -15,7 +15,7 @@ type RedisIntegration struct {
 }
 
 func (suite *RedisIntegration) SetupSuite() {
-	cfg, err := config.NewBuilder().
+	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
 

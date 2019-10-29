@@ -23,7 +23,7 @@ const (
 // @in header
 // @name Authorization
 func main() {
-	cfg, err := config.NewBuilder().
+	cfg, err := config.NewViperBuilder().
 		AddConfigFile("config.yaml", true).
 		BindEnvs(envPrefix).
 		Build()

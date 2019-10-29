@@ -12,7 +12,7 @@ func TestPostgresConnIntegration(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	cfg, err := config.NewBuilder().
+	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
 

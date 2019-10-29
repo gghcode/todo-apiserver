@@ -29,7 +29,7 @@ func TestUserRepositoryIntegration(t *testing.T) {
 }
 
 func (suite *RepositoryIntegration) SetupTest() {
-	cfg, err := config.NewBuilder().
+	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
 
