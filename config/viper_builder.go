@@ -72,7 +72,7 @@ func bindEnvsToViper(viper *viper.Viper, iface interface{}, parts ...string) {
 
 // Build return new configuration instance.
 func (builder *viperBuilder) Build() (Configuration, error) {
-	result := DefaultConfig
+	result := DefaultConfig()
 	v := viper.New()
 
 	for _, pipeline := range builder.pipelines {
