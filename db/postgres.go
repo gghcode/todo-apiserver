@@ -10,11 +10,11 @@ import (
 
 // PostgresConn godoc
 type PostgresConn struct {
-	db        *gorm.DB
+	db *gorm.DB
 }
 
 // NewPostgresConn godoc
-func NewPostgresConn(cfg config.Configuration) (*PostgresConn, error) {
+func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 	gormDB, err := gorm.Open(cfg.Postgres.Driver,
 		"host="+cfg.Postgres.Host+
 			" port="+cfg.Postgres.Port+

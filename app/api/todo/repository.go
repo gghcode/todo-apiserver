@@ -15,20 +15,20 @@ type Repository interface {
 }
 
 type repository struct {
-	pgConn *db.PostgresConn
+	dbConn db.GormConnection
 }
 
 // NewRepository godoc
-func NewRepository(pgConn *db.PostgresConn) Repository {
-	pgConn.DB().AutoMigrate(Todo{})
+func NewRepository(dbConn db.GormConnection) Repository {
+	dbConn.DB().AutoMigrate(Todo{})
 
 	return &repository{
-		pgConn: pgConn,
+		dbConn: dbConn,
 	}
 }
 
 func (repo *repository) AddTodo(todo Todo) (Todo, error) {
-	err := repo.pgConn.DB().
+	err := repo.dbConn.DB().
 		Create(&todo).
 		Error
 
@@ -42,7 +42,7 @@ func (repo *repository) AddTodo(todo Todo) (Todo, error) {
 func (repo *repository) AllTodosByUserID(userID int64) ([]Todo, error) {
 	var result []Todo
 
-	err := repo.pgConn.DB().
+	err := repo.dbConn.DB().
 		Where("assignor_id = ?", userID).
 		Find(&result).
 		Error
@@ -55,7 +55,7 @@ func (repo *repository) AllTodosByUserID(userID int64) ([]Todo, error) {
 }
 
 func (repo *repository) TodoByTodoID(todoID string, todo *Todo) error {
-	err := repo.pgConn.DB().
+	err := repo.dbConn.DB().
 		Where("id=?", todoID).
 		First(&todo).Error
 
@@ -74,7 +74,7 @@ func (repo *repository) UpdateTodo(todoID string, todoData map[string]interface{
 		return todo, err
 	}
 
-	repo.pgConn.DB().Model(&todo).UpdateColumns(todoData)
+	repo.dbConn.DB().Model(&todo).UpdateColumns(todoData)
 
 	return todo, nil
 }
@@ -85,7 +85,7 @@ func (repo *repository) RemoveTodo(todoID string) error {
 		return err
 	}
 
-	if err := repo.pgConn.DB().Delete(todo).Error; err != nil {
+	if err := repo.dbConn.DB().Delete(todo).Error; err != nil {
 		return err
 	}
 

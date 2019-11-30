@@ -16,7 +16,7 @@ import (
 type RepositoryIntegration struct {
 	suite.Suite
 
-	pgConn         *db.PostgresConn
+	dbConn         db.GormConnection
 	dbCleanup      func()
 	todoRepository todo.Repository
 
@@ -38,10 +38,10 @@ func (suite *RepositoryIntegration) SetupTest() {
 
 	suite.NoError(err)
 
-	suite.pgConn, err = db.NewPostgresConn(cfg)
-	suite.pgConn.DB().LogMode(false)
-	suite.dbCleanup = testutil.DbCleanupFunc(suite.pgConn.DB())
-	suite.todoRepository = todo.NewRepository(suite.pgConn)
+	suite.dbConn, err = db.NewPostgresConn(cfg)
+	suite.dbConn.DB().LogMode(false)
+	suite.dbCleanup = testutil.DbCleanupFunc(suite.dbConn.DB())
+	suite.todoRepository = todo.NewRepository(suite.dbConn)
 
 	suite.testTodos = []todo.Todo{
 		{Title: "test title 1", Contents: "test contents 2", AssignorID: 4},
@@ -49,10 +49,10 @@ func (suite *RepositoryIntegration) SetupTest() {
 	}
 
 	for i := range suite.testTodos {
-		err := suite.pgConn.DB().Create(&suite.testTodos[i]).Error
+		err := suite.dbConn.DB().Create(&suite.testTodos[i]).Error
 		suite.NoError(err)
 
-		err = suite.pgConn.DB().
+		err = suite.dbConn.DB().
 			Where("id=?", suite.testTodos[i].ID.String()).
 			First(&suite.testTodos[i]).
 			Error
@@ -63,7 +63,7 @@ func (suite *RepositoryIntegration) SetupTest() {
 
 func (suite *RepositoryIntegration) TearDownTest() {
 	suite.dbCleanup()
-	suite.pgConn.Close()
+	suite.dbConn.Close()
 }
 
 func (suite *RepositoryIntegration) TestAddTodo() {

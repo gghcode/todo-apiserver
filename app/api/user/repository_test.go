@@ -13,9 +13,9 @@ import (
 type RepositoryIntegration struct {
 	suite.Suite
 
-	postgresConn *db.PostgresConn
-	repo         user.Repository
-	dbCleanup    func()
+	dbConn    db.GormConnection
+	repo      user.Repository
+	dbCleanup func()
 
 	testUsers []user.User
 }
@@ -35,10 +35,10 @@ func (suite *RepositoryIntegration) SetupTest() {
 
 	suite.NoError(err)
 
-	suite.postgresConn, err = db.NewPostgresConn(cfg)
-	suite.postgresConn.DB().LogMode(false)
-	suite.dbCleanup = testutil.DbCleanupFunc(suite.postgresConn.DB())
-	suite.repo = user.NewRepository(suite.postgresConn)
+	suite.dbConn, err = db.NewPostgresConn(cfg)
+	suite.dbConn.DB().LogMode(false)
+	suite.dbCleanup = testutil.DbCleanupFunc(suite.dbConn.DB())
+	suite.repo = user.NewRepository(suite.dbConn)
 
 	suite.testUsers = []user.User{
 		{UserName: "fakeUser1", PasswordHash: []byte("password")},
@@ -46,13 +46,13 @@ func (suite *RepositoryIntegration) SetupTest() {
 	}
 
 	for i := range suite.testUsers {
-		suite.postgresConn.DB().Create(&suite.testUsers[i])
+		suite.dbConn.DB().Create(&suite.testUsers[i])
 	}
 }
 
 func (suite *RepositoryIntegration) TearDownTest() {
 	suite.dbCleanup()
-	suite.postgresConn.Close()
+	suite.dbConn.Close()
 }
 
 func (suite *RepositoryIntegration) TestCreateUser() {

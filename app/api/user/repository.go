@@ -23,11 +23,11 @@ type repository struct {
 }
 
 // NewRepository godoc
-func NewRepository(postgres db.GormConnection) Repository {
-	postgres.DB().AutoMigrate(User{})
+func NewRepository(dbConn db.GormConnection) Repository {
+	dbConn.DB().AutoMigrate(User{})
 
 	return &repository{
-		dbConn: postgres,
+		dbConn: dbConn,
 	}
 }
 
