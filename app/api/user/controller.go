@@ -7,7 +7,6 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/infra"
 	"github.com/gghcode/apas-todo-apiserver/app/middleware"
-	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 )
 
@@ -126,7 +125,7 @@ func (controller *Controller) UserByName(ctx *gin.Context) {
 // @Tags User API
 // @Router /api/user [get]
 func (controller *Controller) AuthenticatedUser(ctx *gin.Context) {
-	userID := ctx.GetInt64(val.UserID)
+	userID := ctx.GetInt64("user_id")
 
 	user, err := controller.userRepository.UserByID(userID)
 	if err != nil {

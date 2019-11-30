@@ -6,7 +6,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gghcode/apas-todo-apiserver/app/api"
-	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +26,7 @@ var JwtAuthHandler gin.HandlerFunc = func(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set(val.UserID, userID)
+	ctx.Set("user_id", userID)
 	ctx.Next()
 }
 

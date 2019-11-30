@@ -2,7 +2,6 @@ package fake
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/app/middleware"
-	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 )
@@ -27,7 +26,7 @@ func (m *MockUserID) UserID() int64 {
 func AddJwtAuthHandler(userIDFactory UserIDFactory) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var innerHandler gin.HandlerFunc = func(ctx *gin.Context) {
-			ctx.Set(val.UserID, userIDFactory.UserID())
+			ctx.Set("user_id", userIDFactory.UserID())
 			ctx.Next()
 		}
 

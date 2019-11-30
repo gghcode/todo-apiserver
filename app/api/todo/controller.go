@@ -8,7 +8,6 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/app/middleware"
-	"github.com/gghcode/apas-todo-apiserver/app/val"
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,7 +55,7 @@ func (controller *Controller) AddTodo(ctx *gin.Context) {
 	todoEntity := Todo{
 		Title:      todoValidator.Model.Title,
 		Contents:   todoValidator.Model.Contents,
-		AssignorID: ctx.GetInt64(val.UserID),
+		AssignorID: ctx.GetInt64("user_id"),
 	}
 
 	todo, err := controller.todoRepo.AddTodo(todoEntity)

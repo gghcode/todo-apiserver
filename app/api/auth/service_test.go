@@ -48,7 +48,7 @@ func (suite *ServiceUnit) SetupTest() {
 	suite.fakeUserRepo = fake.UserRepository{}
 	suite.fakePassport = fake.Passport{}
 	suite.service = auth.NewService(
-		suite.cfg.Jwt,
+		suite.cfg,
 		&suite.fakePassport,
 		&suite.fakeTokenRepo,
 		&suite.fakeUserRepo,
