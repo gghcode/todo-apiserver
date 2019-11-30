@@ -13,16 +13,15 @@ const prefixRefreshToken = "refresh_token"
 // Repository godoc
 type Repository interface {
 	SaveRefreshToken(userID int64, token string, expireIn time.Duration) error
-
 	UserIDByRefreshToken(refreshToken string) (int64, error)
 }
 
 type repository struct {
-	redisConn db.RedisConn
+	redisConn db.RedisConnection
 }
 
 // NewRepository godoc
-func NewRepository(redisConn db.RedisConn) Repository {
+func NewRepository(redisConn db.RedisConnection) Repository {
 	return &repository{
 		redisConn: redisConn,
 	}

@@ -13,7 +13,7 @@ import (
 type RepositoryIntegration struct {
 	suite.Suite
 
-	redisConn db.RedisConn
+	redisConn db.RedisConnection
 	tokenRepo auth.Repository
 }
 
