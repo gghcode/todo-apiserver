@@ -8,8 +8,6 @@ import (
 	"github.com/go-redis/redis"
 )
 
-const prefixRefreshToken = "refresh_token"
-
 // Repository godoc
 type Repository interface {
 	SaveRefreshToken(userID int64, token string, expireIn time.Duration) error
@@ -28,13 +26,11 @@ func NewRepository(redisConn db.RedisConnection) Repository {
 }
 
 func (repo *repository) SaveRefreshToken(userID int64, token string, expireIn time.Duration) error {
-	err := repo.redisConn.Client().Set(
+	return repo.redisConn.Client().Set(
 		redisRefreshTokenKey(token),
 		userID,
 		expireIn*time.Second,
 	).Err()
-
-	return err
 }
 
 func (repo *repository) UserIDByRefreshToken(refreshToken string) (int64, error) {
@@ -53,5 +49,6 @@ func (repo *repository) UserIDByRefreshToken(refreshToken string) (int64, error)
 }
 
 func redisRefreshTokenKey(token string) string {
+	const prefixRefreshToken = "refresh_token"
 	return prefixRefreshToken + "-" + token
 }

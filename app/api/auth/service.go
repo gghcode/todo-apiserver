@@ -40,7 +40,7 @@ type authService struct {
 
 // NewService return new auth authService instance.
 func NewService(
-	cfg config.JwtConfig,
+	cfg config.Configuration,
 	passport infra.Passport,
 	tokenRepo Repository,
 	userRepo user.Repository,
@@ -48,13 +48,13 @@ func NewService(
 	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) Service {
 
 	params := JwtParam{
-		SecretKeyBytes:      []byte(cfg.SecretKey),
-		AccessExpiresInSec:  time.Duration(cfg.AccessExpiresInSec),
-		RefreshExpiresInSec: time.Duration(cfg.RefreshExpiresInSec),
+		SecretKeyBytes:      []byte(cfg.Jwt.SecretKey),
+		AccessExpiresInSec:  time.Duration(cfg.Jwt.AccessExpiresInSec),
+		RefreshExpiresInSec: time.Duration(cfg.Jwt.RefreshExpiresInSec),
 	}
 
 	return &authService{
-		cfg:                       cfg,
+		cfg:                       cfg.Jwt,
 		userRepo:                  userRepo,
 		tokenRepo:                 tokenRepo,
 		passport:                  passport,
