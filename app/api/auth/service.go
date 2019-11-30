@@ -10,14 +10,6 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 )
 
-// TokenResponse godoc
-type TokenResponse struct {
-	Type         string `json:"type"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	ExpiresIn    int64  `json:"expires_in"`
-}
-
 // JwtParam godoc
 type JwtParam struct {
 	SecretKeyBytes      []byte
@@ -25,102 +17,97 @@ type JwtParam struct {
 	RefreshExpiresInSec time.Duration
 }
 
-// EmptyTokenResponse godoc
-var EmptyTokenResponse = TokenResponse{}
-
 // CreateAccessTokenHandler godoc
-type CreateAccessTokenHandler func(param JwtParam, userID int64) (string, error)
+type CreateAccessTokenHandler func(userID int64) (string, error)
+
+// CreateAccessTokenHandlerFactory is factory that return CreateAccessTokenHandler
+type CreateAccessTokenHandlerFactory func(JwtParam) CreateAccessTokenHandler
 
 // CreateRefreshTokenHandler godoc
-type CreateRefreshTokenHandler func(tokenRepo Repository, param JwtParam, userID int64) (string, error)
+type CreateRefreshTokenHandler func(userID int64) (string, error)
 
-// Service godoc
-type Service interface {
-	IssueToken(req LoginRequest) (TokenResponse, error)
-	RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error)
-}
+// CreateRefreshTokenHandlerFactory is factory that return CreateRefreshTokenHandler
+type CreateRefreshTokenHandlerFactory func(JwtParam, Repository) CreateRefreshTokenHandler
 
 type authService struct {
-	cfg      config.Configuration
-	jwtParam JwtParam
-
-	secretKeyBytes      []byte
-	accessExpiresInSec  time.Duration
-	refreshExpiresInSec time.Duration
-
-	tokenRepo Repository
-	userRepo  user.Repository
-	passport  infra.Passport
-
+	cfg                       config.JwtConfig
+	tokenRepo                 Repository
+	userRepo                  user.Repository
+	passport                  infra.Passport
 	createAccessTokenHandler  CreateAccessTokenHandler
 	createRefreshTokenHandler CreateRefreshTokenHandler
 }
 
 // NewService return new auth authService instance.
 func NewService(
-	conf config.Configuration,
+	cfg config.JwtConfig,
 	passport infra.Passport,
 	tokenRepo Repository,
 	userRepo user.Repository,
-	createAccessTokenHandler CreateAccessTokenHandler,
-	createRefreshTokenHandler CreateRefreshTokenHandler) Service {
+	accessTokenHandlerFactory CreateAccessTokenHandlerFactory,
+	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) Service {
+
+	params := JwtParam{
+		SecretKeyBytes:      []byte(cfg.SecretKey),
+		AccessExpiresInSec:  time.Duration(cfg.AccessExpiresInSec),
+		RefreshExpiresInSec: time.Duration(cfg.RefreshExpiresInSec),
+	}
 
 	return &authService{
-		cfg: conf,
-		jwtParam: JwtParam{
-			SecretKeyBytes:      []byte(conf.Jwt.SecretKey),
-			AccessExpiresInSec:  time.Duration(conf.Jwt.AccessExpiresInSec),
-			RefreshExpiresInSec: time.Duration(conf.Jwt.RefreshExpiresInSec),
-		},
+		cfg:                       cfg,
 		userRepo:                  userRepo,
 		tokenRepo:                 tokenRepo,
 		passport:                  passport,
-		createAccessTokenHandler:  createAccessTokenHandler,
-		createRefreshTokenHandler: createRefreshTokenHandler,
+		createAccessTokenHandler:  accessTokenHandlerFactory(params),
+		createRefreshTokenHandler: refreshTokenHandlerFactory(params, tokenRepo),
 	}
 }
 
 // IssueToken godoc
-func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
+func (service *authService) IssueToken(req LoginRequest, res *TokenResponse) error {
 	var userID int64
 	if err := service.authenticate(req, &userID); err != nil {
-		return TokenResponse{}, err
+		return err
 	}
 
-	accessToken, err := service.createAccessTokenHandler(service.jwtParam, userID)
+	accessToken, err := service.createAccessTokenHandler(userID)
 	if err != nil {
-		return EmptyTokenResponse, err
+		return err
 	}
 
-	refreshToken, err := service.createRefreshTokenHandler(service.tokenRepo, service.jwtParam, userID)
+	refreshToken, err := service.createRefreshTokenHandler(userID)
 	if err != nil {
-		return EmptyTokenResponse, err
+		return err
 	}
 
-	return TokenResponse{
+	*res = TokenResponse{
 		Type:         "Bearer",
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		ExpiresIn:    service.cfg.Jwt.AccessExpiresInSec,
-	}, nil
+		ExpiresIn:    service.cfg.AccessExpiresInSec,
+	}
+
+	return nil
 }
 
-func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error) {
+func (service *authService) RefreshToken(req AccessTokenByRefreshRequest, res *TokenResponse) error {
 	userID, err := service.tokenRepo.UserIDByRefreshToken(req.Token)
 	if err != nil {
-		return EmptyTokenResponse, err
+		return err
 	}
 
-	accessToken, err := service.createAccessTokenHandler(service.jwtParam, userID)
+	accessToken, err := service.createAccessTokenHandler(userID)
 	if err != nil {
-		return EmptyTokenResponse, err
+		return err
 	}
 
-	return TokenResponse{
+	*res = TokenResponse{
 		Type:        "Bearer",
 		AccessToken: accessToken,
-		ExpiresIn:   service.cfg.Jwt.AccessExpiresInSec,
-	}, nil
+		ExpiresIn:   service.cfg.AccessExpiresInSec,
+	}
+
+	return nil
 }
 
 func (service *authService) authenticate(req LoginRequest, userID *int64) error {
@@ -140,25 +127,29 @@ func (service *authService) authenticate(req LoginRequest, userID *int64) error 
 	return nil
 }
 
-// CreateAccessToken godoc
-func CreateAccessToken(jwtParam JwtParam, userID int64) (string, error) {
-	return createJwtToken(jwtParam, "access", userID)
+// CreateAccessTokenFactory godoc
+func CreateAccessTokenFactory(jwtParam JwtParam) CreateAccessTokenHandler {
+	return func(userID int64) (string, error) {
+		return createJwtToken(jwtParam, "access", userID)
+	}
 }
 
-// CreateRefreshToken godoc
-func CreateRefreshToken(tokenRepo Repository, jwtParam JwtParam, userID int64) (string, error) {
-	token, err := createJwtToken(jwtParam, "refresh", userID)
-	if err != nil {
-		return "", err
+// CreateRefreshTokenFactory godoc
+func CreateRefreshTokenFactory(jwtParam JwtParam, tokenRepo Repository) CreateRefreshTokenHandler {
+	return func(userID int64) (string, error) {
+		token, err := createJwtToken(jwtParam, "refresh", userID)
+		if err != nil {
+			return "", err
+		}
+
+		tokenRepo.SaveRefreshToken(
+			userID,
+			token,
+			jwtParam.RefreshExpiresInSec,
+		)
+
+		return token, nil
 	}
-
-	tokenRepo.SaveRefreshToken(
-		userID,
-		token,
-		jwtParam.RefreshExpiresInSec,
-	)
-
-	return token, nil
 }
 
 func createJwtToken(jwtParam JwtParam, tokenType string, sub int64) (string, error) {

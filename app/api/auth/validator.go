@@ -12,12 +12,6 @@ type AccessTokenByRefreshRequest struct {
 	Token string `json:"token" validate:"required"`
 }
 
-// LoginRequest godoc
-type LoginRequest struct {
-	Username string `json:"username" validate:"required,min=4"`
-	Password string `json:"password" validate:"required,min=8"`
-}
-
 // RefreshTokenRequestValidator godoc
 type RefreshTokenRequestValidator struct {
 	Model AccessTokenByRefreshRequest

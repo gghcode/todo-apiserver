@@ -37,11 +37,11 @@ func NewContainer(cfg config.Configuration) (*inject.Container, error) {
 		inject.Provide(auth.NewRepository),
 
 		inject.Provide(auth.NewService),
-		inject.Provide(func() auth.CreateAccessTokenHandler {
-			return auth.CreateAccessToken
+		inject.Provide(func() auth.CreateAccessTokenHandlerFactory {
+			return auth.CreateAccessTokenFactory
 		}),
-		inject.Provide(func() auth.CreateRefreshTokenHandler {
-			return auth.CreateRefreshToken
+		inject.Provide(func() auth.CreateRefreshTokenHandlerFactory {
+			return auth.CreateRefreshTokenFactory
 		}),
 
 		inject.Provide(common.NewController, inject.As(api.ControllerToken)),

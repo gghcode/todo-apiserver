@@ -41,7 +41,9 @@ func (controller *Controller) refreshToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := controller.service.RefreshToken(refreshTokenRequestValidator.Model)
+	var token TokenResponse = TokenResponse{}
+
+	err := controller.service.RefreshToken(refreshTokenRequestValidator.Model, &token)
 	if err != nil {
 		api.WriteErrorResponse(ctx, err)
 		return
@@ -66,7 +68,9 @@ func (controller *Controller) issueToken(ctx *gin.Context) {
 		return
 	}
 
-	token, err := controller.service.IssueToken(loginRequestValidator.Model)
+	var token TokenResponse = TokenResponse{}
+
+	err := controller.service.IssueToken(loginRequestValidator.Model, &token)
 	if err != nil {
 		api.WriteErrorResponse(ctx, err)
 		return

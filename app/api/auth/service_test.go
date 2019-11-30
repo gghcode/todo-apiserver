@@ -48,31 +48,37 @@ func (suite *ServiceUnit) SetupTest() {
 	suite.fakeUserRepo = fake.UserRepository{}
 	suite.fakePassport = fake.Passport{}
 	suite.service = auth.NewService(
-		suite.cfg,
+		suite.cfg.Jwt,
 		&suite.fakePassport,
 		&suite.fakeTokenRepo,
 		&suite.fakeUserRepo,
-		fakeCreateAccessToken,
-		fakeCreateRefreshToken,
+		fakeCreateAccessTokenFactory,
+		fakeCreateRefreshTokenFactory,
 	)
 }
 
 func stubCreateAccessToken(p auth.JwtParam, userID int64) string {
-	token, _ := fakeCreateAccessToken(p, userID)
+	handler := fakeCreateAccessTokenFactory(p)
+	token, _ := handler(userID)
 	return token
 }
 
-func fakeCreateAccessToken(jwtParam auth.JwtParam, userID int64) (string, error) {
-	return "access_token", nil
+func fakeCreateAccessTokenFactory(jwtParam auth.JwtParam) auth.CreateAccessTokenHandler {
+	return func(userID int64) (string, error) {
+		return "access_token", nil
+	}
 }
 
 func stubCreateRefreshToken(tokenRepo auth.Repository, p auth.JwtParam, userID int64) string {
-	token, _ := fakeCreateRefreshToken(tokenRepo, p, userID)
+	handler := fakeCreateRefreshTokenFactory(p, tokenRepo)
+	token, _ := handler(userID)
 	return token
 }
 
-func fakeCreateRefreshToken(tokenRepo auth.Repository, jwtParam auth.JwtParam, userID int64) (string, error) {
-	return "refresh_token", nil
+func fakeCreateRefreshTokenFactory(jwtParam auth.JwtParam, tokenRepo auth.Repository) auth.CreateRefreshTokenHandler {
+	return func(userID int64) (string, error) {
+		return "refresh_token", nil
+	}
 }
 
 func (suite *ServiceUnit) TestCreateRefreshToken() {
@@ -86,7 +92,8 @@ func (suite *ServiceUnit) TestCreateRefreshToken() {
 		argJwtParam.RefreshExpiresInSec,
 	).Return(nil)
 
-	token, err := auth.CreateRefreshToken(&suite.fakeTokenRepo, argJwtParam, argUserID)
+	createRefreshTokenHandler := auth.CreateRefreshTokenFactory(argJwtParam, &suite.fakeTokenRepo)
+	token, err := createRefreshTokenHandler(argUserID)
 	suite.NoError(err)
 
 	claims, err := auth.ExtractTokenClaims(argJwtParam, token)
@@ -109,7 +116,8 @@ func (suite *ServiceUnit) TestCreateAccessToken() {
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
-			token, err := auth.CreateAccessToken(tc.argJwtParam, tc.argUserID)
+			createAccessTokenHandler := auth.CreateAccessTokenFactory(tc.argJwtParam)
+			token, err := createAccessTokenHandler(tc.argUserID)
 
 			suite.NoError(err)
 
@@ -197,7 +205,8 @@ func (suite *ServiceUnit) TestIssueToken() {
 				Once().
 				Return(tc.stubUser, tc.stubErr)
 
-			actual, actualErr := suite.service.IssueToken(tc.argReq)
+			var actual auth.TokenResponse
+			actualErr := suite.service.IssueToken(tc.argReq, &actual)
 
 			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)
@@ -230,7 +239,7 @@ func (suite *ServiceUnit) TestRefreshToken() {
 			description: "ShouldReturnNotStoredErr",
 			stubUserID:  0,
 			stubErr:     auth.ErrNotStoredToken,
-			expected:    auth.EmptyTokenResponse,
+			expected:    auth.TokenResponse{},
 			expectedErr: auth.ErrNotStoredToken,
 		},
 	}
@@ -242,7 +251,8 @@ func (suite *ServiceUnit) TestRefreshToken() {
 				Once().
 				Return(tc.stubUserID, tc.stubErr)
 
-			actual, actualErr := suite.service.RefreshToken(tc.argReq)
+			var actual auth.TokenResponse
+			actualErr := suite.service.RefreshToken(tc.argReq, &actual)
 
 			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)

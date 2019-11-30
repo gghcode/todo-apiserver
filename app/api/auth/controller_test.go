@@ -69,9 +69,13 @@ func (suite *ControllerUnit) TestRefreshToken() {
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
 			suite.fakeAuthService.
-				On("RefreshToken", mock.Anything).
+				On("RefreshToken", mock.Anything, mock.Anything).
 				Once().
-				Return(tc.stubToken, tc.stubErr)
+				Run(func(args mock.Arguments) {
+					res := args.Get(1).(*auth.TokenResponse)
+					*res = tc.stubToken
+				}).
+				Return(tc.stubErr)
 
 			actual := testutil.Response(
 				suite.T(),
@@ -147,9 +151,13 @@ func (suite *ControllerUnit) TestIssueToken() {
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
 			suite.fakeAuthService.
-				On("IssueToken", mock.Anything).
+				On("IssueToken", mock.Anything, mock.Anything).
 				Once().
-				Return(tc.stubTokenRes, tc.stubErr)
+				Run(func(args mock.Arguments) {
+					res := args.Get(1).(*auth.TokenResponse)
+					*res = tc.stubTokenRes
+				}).
+				Return(tc.stubErr)
 
 			actual := testutil.Response(
 				suite.T(),

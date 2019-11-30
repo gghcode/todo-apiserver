@@ -30,7 +30,8 @@ func TestAuthMiddlewareAdapterUnit(t *testing.T) {
 func (suite *ServiceUnit) TestVerifyAccessToken() {
 	var fakeUserID int64 = 10
 
-	fakeAccessToken, _ := auth.CreateAccessToken(suite.jwtParam, fakeUserID)
+	createAccessTokenHandler := auth.CreateAccessTokenFactory(suite.jwtParam)
+	fakeAccessToken, _ := createAccessTokenHandler(fakeUserID)
 	fakeJwtClaims, _ := auth.ExtractTokenClaims(suite.jwtParam, fakeAccessToken)
 
 	testCases := []struct {
