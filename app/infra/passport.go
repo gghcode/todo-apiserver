@@ -8,11 +8,11 @@ type Passport interface {
 	IsValidPassword(password string, hash []byte) bool
 }
 
-type passport struct {
+type bcryptPassport struct {
 	cost int
 }
 
-func (passport *passport) HashPassword(password string) ([]byte, error) {
+func (passport *bcryptPassport) HashPassword(password string) ([]byte, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), passport.cost)
 	if err != nil {
 		return nil, err
@@ -21,14 +21,14 @@ func (passport *passport) HashPassword(password string) ([]byte, error) {
 	return bytes, nil
 }
 
-func (passport *passport) IsValidPassword(password string, hash []byte) bool {
+func (passport *bcryptPassport) IsValidPassword(password string, hash []byte) bool {
 	err := bcrypt.CompareHashAndPassword(hash, []byte(password))
 	return err == nil
 }
 
-// NewPassport return new passport.
-func NewPassport(cost int) Passport {
-	return &passport{
+// NewBcryptPassport return new passport.
+func NewBcryptPassport(cost int) Passport {
+	return &bcryptPassport{
 		cost: cost,
 	}
 }

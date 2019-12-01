@@ -8,7 +8,6 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
-	"github.com/gghcode/apas-todo-apiserver/app/infra"
 	"github.com/gghcode/apas-todo-apiserver/app/middleware"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
@@ -24,6 +23,7 @@ type ControllerUnit struct {
 	controller     *user.Controller
 	userIDFactory  *fake.MockUserID
 	userRepository *fake.UserRepository
+	passport       *fake.Passport
 }
 
 func TestUserControllerUnit(t *testing.T) {
@@ -37,8 +37,9 @@ func (suite *ControllerUnit) SetupTest() {
 	suite.router = gin.New()
 	suite.router.Use(middleware.AddAccessTokenHandler(fake.NewAccessTokenHandlerFactory(suite.userIDFactory)))
 	suite.userRepository = &fake.UserRepository{}
+	suite.passport = &fake.Passport{}
 
-	suite.controller = user.NewController(suite.userRepository, infra.NewPassport(0))
+	suite.controller = user.NewController(suite.userRepository, suite.passport)
 	suite.controller.RegisterRoutes(suite.router)
 }
 
@@ -117,6 +118,10 @@ func (suite *ControllerUnit) TestCreateUser() {
 			suite.userRepository.
 				On("CreateUser", mock.Anything).
 				Return(tc.stubCreatedUser, tc.stubErr)
+
+			suite.passport.
+				On("HashPassword", mock.AnythingOfType("string")).
+				Return([]byte("abcd"), nil)
 
 			actualRes := testutil.Response(
 				suite.T(),

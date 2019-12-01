@@ -24,7 +24,7 @@ func NewContainer(cfg config.Configuration) (*inject.Container, error) {
 		inject.Provide(db.NewPostgresConn),
 		inject.Provide(db.NewRedisConn),
 		inject.Provide(func() infra.Passport {
-			return infra.NewPassport(12)
+			return infra.NewBcryptPassport(12)
 		}),
 		inject.Provide(func() afero.Fs {
 			return afero.NewOsFs()

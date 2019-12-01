@@ -18,7 +18,7 @@ func TestPassportUnit(t *testing.T) {
 }
 
 func (suite *PassportUnit) SetupTest() {
-	suite.passport = infra.NewPassport(1)
+	suite.passport = infra.NewBcryptPassport(1)
 }
 
 func (suite *PassportUnit) TestPasswordVerification() {
