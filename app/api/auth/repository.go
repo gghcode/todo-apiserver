@@ -8,24 +8,24 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// Repository godoc
-type Repository interface {
+// TokenRepository godoc
+type TokenRepository interface {
 	SaveRefreshToken(userID int64, token string, expireIn time.Duration) error
 	UserIDByRefreshToken(refreshToken string) (int64, error)
 }
 
-type repository struct {
+type redisTokenRepository struct {
 	redisConn db.RedisConnection
 }
 
-// NewRepository godoc
-func NewRepository(redisConn db.RedisConnection) Repository {
-	return &repository{
+// NewRedisTokenRepository godoc
+func NewRedisTokenRepository(redisConn db.RedisConnection) TokenRepository {
+	return &redisTokenRepository{
 		redisConn: redisConn,
 	}
 }
 
-func (repo *repository) SaveRefreshToken(userID int64, token string, expireIn time.Duration) error {
+func (repo *redisTokenRepository) SaveRefreshToken(userID int64, token string, expireIn time.Duration) error {
 	return repo.redisConn.Client().Set(
 		redisRefreshTokenKey(token),
 		userID,
@@ -33,7 +33,7 @@ func (repo *repository) SaveRefreshToken(userID int64, token string, expireIn ti
 	).Err()
 }
 
-func (repo *repository) UserIDByRefreshToken(refreshToken string) (int64, error) {
+func (repo *redisTokenRepository) UserIDByRefreshToken(refreshToken string) (int64, error) {
 	userIDStr, err := repo.redisConn.
 		Client().
 		Get(redisRefreshTokenKey(refreshToken)).

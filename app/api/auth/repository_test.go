@@ -14,7 +14,7 @@ type RepositoryIntegration struct {
 	suite.Suite
 
 	redisConn db.RedisConnection
-	tokenRepo auth.Repository
+	tokenRepo auth.TokenRepository
 }
 
 func TestTokenRepositoryIntegration(t *testing.T) {
@@ -33,7 +33,7 @@ func (suite *RepositoryIntegration) SetupTest() {
 	suite.NoError(err)
 
 	suite.redisConn = db.NewRedisConn(cfg)
-	suite.tokenRepo = auth.NewRepository(suite.redisConn)
+	suite.tokenRepo = auth.NewRedisTokenRepository(suite.redisConn)
 }
 
 func (suite *RepositoryIntegration) TestSaveRefreshToken() {

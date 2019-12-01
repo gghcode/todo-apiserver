@@ -27,11 +27,11 @@ type CreateAccessTokenHandlerFactory func(JwtParam) CreateAccessTokenHandler
 type CreateRefreshTokenHandler func(userID int64) (string, error)
 
 // CreateRefreshTokenHandlerFactory is factory that return CreateRefreshTokenHandler
-type CreateRefreshTokenHandlerFactory func(JwtParam, Repository) CreateRefreshTokenHandler
+type CreateRefreshTokenHandlerFactory func(JwtParam, TokenRepository) CreateRefreshTokenHandler
 
 type authService struct {
 	cfg                       config.JwtConfig
-	tokenRepo                 Repository
+	tokenRepo                 TokenRepository
 	userRepo                  user.Repository
 	passport                  infra.Passport
 	createAccessTokenHandler  CreateAccessTokenHandler
@@ -42,7 +42,7 @@ type authService struct {
 func NewService(
 	cfg config.Configuration,
 	passport infra.Passport,
-	tokenRepo Repository,
+	tokenRepo TokenRepository,
 	userRepo user.Repository,
 	accessTokenHandlerFactory CreateAccessTokenHandlerFactory,
 	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) Service {
@@ -135,7 +135,7 @@ func CreateAccessTokenFactory(jwtParam JwtParam) CreateAccessTokenHandler {
 }
 
 // CreateRefreshTokenFactory godoc
-func CreateRefreshTokenFactory(jwtParam JwtParam, tokenRepo Repository) CreateRefreshTokenHandler {
+func CreateRefreshTokenFactory(jwtParam JwtParam, tokenRepo TokenRepository) CreateRefreshTokenHandler {
 	return func(userID int64) (string, error) {
 		token, err := createJwtToken(jwtParam, "refresh", userID)
 		if err != nil {

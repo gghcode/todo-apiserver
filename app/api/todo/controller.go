@@ -27,7 +27,7 @@ func NewController(todoRepo Repository) *Controller {
 func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.GET("api/todos", controller.AllTodosByUserID)
 
-	authorized := router.Use(middleware.JwtAuthRequired())
+	authorized := router.Use(middleware.RequiredAccessToken())
 	{
 		authorized.POST("api/todos", controller.AddTodo)
 		authorized.PATCH("api/todos/:todo_id", controller.UpdateTodoByTodoID)

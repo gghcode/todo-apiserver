@@ -5,23 +5,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// JwtAuthHandlerToken godoc
-const JwtAuthHandlerToken = "JWT_AUTH_HANDLER_TOKEN"
+// accessTokenHandlerToken godoc
+const accessTokenHandlerToken = "JWT_AUTH_HANDLER_TOKEN"
 
-// AddJwtAuthHandler godoc
-func AddJwtAuthHandler(conf config.JwtConfig, authHandler *gin.HandlerFunc) gin.HandlerFunc {
+// AddAccessTokenHandler godoc
+func AddAccessTokenHandler(conf config.JwtConfig, accessTokenHandler *gin.HandlerFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Set("tok_secret", conf.SecretKey)
-		ctx.Set(JwtAuthHandlerToken, authHandler)
+		ctx.Set(accessTokenHandlerToken, accessTokenHandler)
 		ctx.Next()
 	}
 }
 
-// JwtAuthRequired godoc
-func JwtAuthRequired() gin.HandlerFunc {
+// RequiredAccessToken godoc
+func RequiredAccessToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		verifyHandler := ctx.MustGet(JwtAuthHandlerToken).(*gin.HandlerFunc)
-		(*verifyHandler)(ctx)
+		accessTokenHandler := ctx.MustGet(accessTokenHandlerToken).(*gin.HandlerFunc)
+		(*accessTokenHandler)(ctx)
 
 		ctx.Next()
 	}

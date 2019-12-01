@@ -9,6 +9,8 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/app/infra"
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gin-gonic/gin"
@@ -33,8 +35,11 @@ func (suite *ControllerUnit) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
 	suite.userIDFactory = &fake.MockUserID{}
+
+	fakeAccessTokenHandler := fake.AccessTokenHandler(suite.userIDFactory)
+
 	suite.router = gin.New()
-	suite.router.Use(fake.AddJwtAuthHandler(suite.userIDFactory))
+	suite.router.Use(middleware.AddAccessTokenHandler(config.Configuration{}.Jwt, &fakeAccessTokenHandler))
 	suite.userRepository = &fake.UserRepository{}
 
 	suite.controller = user.NewController(suite.userRepository, infra.NewPassport(0))

@@ -30,7 +30,7 @@ func (controller *Controller) RegisterRoutes(router gin.IRouter) {
 	router.GET("api/users", controller.UserByID)
 	router.GET("api/users/:username", controller.UserByName)
 
-	authorized := router.Use(middleware.JwtAuthRequired())
+	authorized := router.Use(middleware.RequiredAccessToken())
 	{
 		authorized.GET("api/user", controller.AuthenticatedUser)
 	}

@@ -69,13 +69,13 @@ func fakeCreateAccessTokenFactory(jwtParam auth.JwtParam) auth.CreateAccessToken
 	}
 }
 
-func stubCreateRefreshToken(tokenRepo auth.Repository, p auth.JwtParam, userID int64) string {
+func stubCreateRefreshToken(tokenRepo auth.TokenRepository, p auth.JwtParam, userID int64) string {
 	handler := fakeCreateRefreshTokenFactory(p, tokenRepo)
 	token, _ := handler(userID)
 	return token
 }
 
-func fakeCreateRefreshTokenFactory(jwtParam auth.JwtParam, tokenRepo auth.Repository) auth.CreateRefreshTokenHandler {
+func fakeCreateRefreshTokenFactory(jwtParam auth.JwtParam, tokenRepo auth.TokenRepository) auth.CreateRefreshTokenHandler {
 	return func(userID int64) (string, error) {
 		return "refresh_token", nil
 	}

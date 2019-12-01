@@ -34,7 +34,7 @@ func NewContainer(cfg config.Configuration) (*inject.Container, error) {
 
 		inject.Provide(user.NewRepository),
 		inject.Provide(todo.NewRepository),
-		inject.Provide(auth.NewRepository),
+		inject.Provide(auth.NewRedisTokenRepository),
 
 		inject.Provide(auth.NewService),
 		inject.Provide(func() auth.CreateAccessTokenHandlerFactory {
