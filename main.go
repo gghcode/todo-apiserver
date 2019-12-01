@@ -40,7 +40,7 @@ func main() {
 
 	router := gin.New()
 	router.Use(middleware.NewCors(cfg.Cors))
-	router.Use(middleware.AddAccessTokenHandler(cfg.Jwt, &auth.JwtAuthHandler))
+	router.Use(middleware.AddAccessTokenHandler(auth.NewJwtAccessTokenHandlerFactory(cfg)))
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	for _, controller := range controllers {

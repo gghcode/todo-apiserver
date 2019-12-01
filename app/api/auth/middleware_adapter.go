@@ -5,32 +5,44 @@ import (
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gghcode/apas-todo-apiserver/app/api"
+	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gin-gonic/gin"
 )
 
-// JwtAuthHandler godoc
-var JwtAuthHandler gin.HandlerFunc = func(ctx *gin.Context) {
-	token := ctx.GetHeader("Authorization")
-	tokenSecretKey := ctx.GetString("tok_secret")
-
-	claims, err := VerifyAccessToken(tokenSecretKey, token)
-	if err != nil {
-		api.AbortErrorResponse(ctx, err)
-		return
-	}
-
-	userID, err := strconv.ParseInt(claims["sub"].(string), 10, 64)
-	if err != nil {
-		api.AbortErrorResponse(ctx, ErrInvalidToken)
-		return
-	}
-
-	ctx.Set("user_id", userID)
-	ctx.Next()
+type jwtAccessTokenHandler struct {
+	jwtCfg config.JwtConfig
 }
 
-// VerifyAccessToken godoc
+func (handler *jwtAccessTokenHandler) Create() middleware.AccessTokenHandlerFunc {
+	return func(ctx *gin.Context) error {
+		token := ctx.GetHeader("Authorization")
+		tokenSecretKey := handler.jwtCfg.SecretKey
+
+		claims, err := VerifyAccessToken(tokenSecretKey, token)
+		if err != nil {
+			return err
+		}
+
+		userID, err := strconv.ParseInt(claims["sub"].(string), 10, 64)
+		if err != nil {
+			return err
+		}
+
+		ctx.Set("user_id", userID)
+
+		return nil
+	}
+}
+
+// NewJwtAccessTokenHandlerFactory return new jwtAccessTokenHandler instance
+func NewJwtAccessTokenHandlerFactory(cfg config.Configuration) middleware.AccessTokenHandlerFactory {
+	return &jwtAccessTokenHandler{
+		jwtCfg: cfg.Jwt,
+	}
+}
+
+// verifyAccessToken godoc
 func VerifyAccessToken(secret string, accessToken string) (jwt.MapClaims, error) {
 	if accessToken == "" {
 		return nil, ErrNotContainToken
@@ -55,7 +67,7 @@ func VerifyAccessToken(secret string, accessToken string) (jwt.MapClaims, error)
 	return ExtractTokenClaims(param, tokenString)
 }
 
-// ExtractTokenClaims godoc
+// extractTokenClaims godoc
 func ExtractTokenClaims(jwtParam JwtParam, token string) (jwt.MapClaims, error) {
 	claims := jwt.MapClaims{}
 

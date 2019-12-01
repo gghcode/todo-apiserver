@@ -27,7 +27,7 @@ func TestAuthMiddlewareAdapterUnit(t *testing.T) {
 	suite.Run(t, new(MiddlewareAdapterUnit))
 }
 
-func (suite *ServiceUnit) TestVerifyAccessToken() {
+func (suite *MiddlewareAdapterUnit) TestVerifyAccessToken() {
 	var fakeUserID int64 = 10
 
 	createAccessTokenHandler := auth.CreateAccessTokenFactory(suite.jwtParam)
