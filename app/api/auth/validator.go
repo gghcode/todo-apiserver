@@ -7,11 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// AccessTokenByRefreshRequest godoc
-type AccessTokenByRefreshRequest struct {
-	Token string `json:"token" validate:"required"`
-}
-
 // RefreshTokenRequestValidator godoc
 type RefreshTokenRequestValidator struct {
 	Model AccessTokenByRefreshRequest

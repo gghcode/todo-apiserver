@@ -12,6 +12,11 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=8"`
 }
 
+// AccessTokenByRefreshRequest godoc
+type AccessTokenByRefreshRequest struct {
+	Token string `json:"token" validate:"required"`
+}
+
 // TokenResponse godoc
 type TokenResponse struct {
 	Type         string `json:"type"`
