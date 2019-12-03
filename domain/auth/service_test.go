@@ -6,7 +6,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
-	"github.com/gghcode/apas-todo-apiserver/usecase/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )

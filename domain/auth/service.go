@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/usecase/security"
+	"github.com/gghcode/apas-todo-apiserver/domain/security"
 )
 
 // CreateAccessTokenHandler godoc
