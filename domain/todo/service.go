@@ -30,3 +30,22 @@ func (srv *todoService) AddTodo(req AddTodoRequest) (TodoResponse, error) {
 		// DueDate:    insertedTodo.DueDate,
 	}, nil
 }
+
+func (srv *todoService) GetTodosByUserID(userID int64) ([]TodoResponse, error) {
+	todos, err := srv.todoRepo.AllTodosByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []TodoResponse
+	for _, todo := range todos {
+		res = append(res, TodoResponse{
+			ID:         todo.ID.String(),
+			Title:      todo.Title,
+			Contents:   todo.Contents,
+			AssignorID: todo.AssignorID,
+		})
+	}
+
+	return res, nil
+}
