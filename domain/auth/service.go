@@ -34,7 +34,7 @@ func NewService(
 	tokenRepo TokenRepository,
 	userRepo user.Repository,
 	accessTokenHandlerFactory CreateAccessTokenHandlerFactory,
-	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) AuthUsecaseInteractor {
+	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) UsecaseInteractor {
 
 	return &authService{
 		cfg:                       cfg.Jwt,
@@ -47,50 +47,54 @@ func NewService(
 }
 
 // IssueToken godoc
-func (service *authService) IssueToken(req LoginRequest, res *TokenResponse) error {
+func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
+	var res TokenResponse
+
 	var userID int64
 	if err := service.authenticate(req, &userID); err != nil {
-		return err
+		return res, err
 	}
 
 	accessToken, err := service.createAccessTokenHandler(userID)
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	refreshToken, err := service.createRefreshTokenHandler(userID)
 	if err != nil {
-		return err
+		return res, err
 	}
 
-	*res = TokenResponse{
+	res = TokenResponse{
 		Type:         "Bearer",
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresIn:    service.cfg.AccessExpiresInSec,
 	}
 
-	return nil
+	return res, nil
 }
 
-func (service *authService) RefreshToken(req AccessTokenByRefreshRequest, res *TokenResponse) error {
+func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error) {
+	var res TokenResponse
+
 	userID, err := service.tokenRepo.UserIDByRefreshToken(req.Token)
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	accessToken, err := service.createAccessTokenHandler(userID)
 	if err != nil {
-		return err
+		return res, err
 	}
 
-	*res = TokenResponse{
+	res = TokenResponse{
 		Type:        "Bearer",
 		AccessToken: accessToken,
 		ExpiresIn:   service.cfg.AccessExpiresInSec,
 	}
 
-	return nil
+	return res, nil
 }
 
 func (service *authService) authenticate(req LoginRequest, userID *int64) error {

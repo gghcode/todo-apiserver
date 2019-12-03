@@ -5,8 +5,8 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
@@ -19,7 +19,7 @@ type ServiceUnit struct {
 	fakeTokenRepo fake.TokenRepository
 	fakeUserRepo  fake.UserRepository
 	fakePassport  fake.Passport
-	service       auth.AuthUsecaseInteractor
+	service       auth.UsecaseInteractor
 }
 
 func TestAuthServiceUnit(t *testing.T) {
@@ -196,8 +196,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 				Once().
 				Return(tc.stubUser, tc.stubErr)
 
-			var actual auth.TokenResponse
-			actualErr := suite.service.IssueToken(tc.argReq, &actual)
+			actual, actualErr := suite.service.IssueToken(tc.argReq)
 
 			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)
@@ -242,8 +241,7 @@ func (suite *ServiceUnit) TestRefreshToken() {
 				Once().
 				Return(tc.stubUserID, tc.stubErr)
 
-			var actual auth.TokenResponse
-			actualErr := suite.service.RefreshToken(tc.argReq, &actual)
+			actual, actualErr := suite.service.RefreshToken(tc.argReq)
 
 			suite.Equal(tc.expected, actual)
 			suite.Equal(tc.expectedErr, actualErr)
