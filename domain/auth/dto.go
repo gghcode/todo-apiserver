@@ -1,6 +1,5 @@
 package auth
 
-
 // LoginRequest godoc
 type LoginRequest struct {
 	Username string `json:"username" validate:"required,min=4"`
