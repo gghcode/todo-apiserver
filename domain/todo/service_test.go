@@ -11,6 +11,99 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 )
 
+func TestTodoService_RemoveTodo(t *testing.T) {
+	testCases := []struct {
+		description   string
+		argTodoID     string
+		stubRemoveErr error
+		expectedErr   error
+	}{
+		{
+			description:   "ShouldRemoveTodo",
+			argTodoID:     "abcd",
+			stubRemoveErr: nil,
+			expectedErr:   nil,
+		},
+		{
+			description:   "ShouldReturnErrStub",
+			argTodoID:     "",
+			stubRemoveErr: fake.ErrStub,
+			expectedErr:   fake.ErrStub,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			fakeTodoRepo := fake.NewTodoRepository()
+			fakeTodoRepo.
+				On("RemoveTodo", tc.argTodoID).
+				Return(tc.stubRemoveErr)
+
+			srv := todo.NewTodoService(fakeTodoRepo)
+			actualErr := srv.RemoveTodo(tc.argTodoID)
+
+			assert.Equal(t, tc.expectedErr, actualErr)
+		})
+	}
+}
+
+func TestTodoService_AddTodo(t *testing.T) {
+	testCases := []struct {
+		description    string
+		argAddTodoReq  todo.AddTodoRequest
+		stubAddTodoRes todo.Todo
+		stubAddTodoErr error
+		expectedRes    todo.TodoResponse
+		expectedErr    error
+	}{
+		{
+			description: "ShouldAddTodo",
+			argAddTodoReq: todo.AddTodoRequest{
+				Title:    "test title",
+				Contents: "test contents",
+			},
+			stubAddTodoRes: todo.Todo{
+				Title:    "test title",
+				Contents: "test contents",
+			},
+			stubAddTodoErr: nil,
+			expectedRes: todo.TodoResponse{
+				Title:    "test title",
+				Contents: "test contents",
+			},
+			expectedErr: nil,
+		},
+		{
+			description:    "ShouldReturnErrStub",
+			argAddTodoReq:  todo.AddTodoRequest{},
+			stubAddTodoRes: todo.Todo{},
+			stubAddTodoErr: fake.ErrStub,
+			expectedRes:    todo.TodoResponse{},
+			expectedErr:    fake.ErrStub,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			fakeTodoRepo := fake.NewTodoRepository()
+			fakeTodoRepo.
+				On("AddTodo", mock.Anything).
+				Return(tc.stubAddTodoRes, tc.stubAddTodoErr)
+
+			todoService := todo.NewTodoService(fakeTodoRepo)
+
+			actualRes, actualErr := todoService.AddTodo(tc.argAddTodoReq)
+
+			assert.Equal(t, tc.expectedErr, actualErr)
+
+			assert.Equal(t, tc.expectedRes.Title, actualRes.Title)
+			assert.Equal(t, tc.expectedRes.Contents, actualRes.Contents)
+			assert.Equal(t, tc.expectedRes.AssignorID, actualRes.AssignorID)
+			assert.Equal(t, tc.expectedRes.DueDate, actualRes.DueDate)
+		})
+	}
+}
+
 func TestTodoService_GetTodosByUserID(t *testing.T) {
 	testCases := []struct {
 		description  string
@@ -51,12 +144,12 @@ func TestTodoService_GetTodosByUserID(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			description:  "ShouldReturnErrFake",
+			description:  "ShouldReturnErrStub",
 			argUserID:    -1,
 			stubTodosRes: nil,
-			stubErr:      fake.ErrFake,
+			stubErr:      fake.ErrStub,
 			expectedRes:  nil,
-			expectedErr:  fake.ErrFake,
+			expectedErr:  fake.ErrStub,
 		},
 	}
 
@@ -73,63 +166,6 @@ func TestTodoService_GetTodosByUserID(t *testing.T) {
 
 			assert.Equal(t, tc.expectedRes, actualRes)
 			assert.Equal(t, tc.expectedErr, actualErr)
-		})
-	}
-}
-
-func TestTodoService_AddTodo(t *testing.T) {
-	testCases := []struct {
-		description    string
-		argAddTodoReq  todo.AddTodoRequest
-		stubAddTodoRes todo.Todo
-		stubAddTodoErr error
-		expectedRes    todo.TodoResponse
-		expectedErr    error
-	}{
-		{
-			description: "ShouldAddTodo",
-			argAddTodoReq: todo.AddTodoRequest{
-				Title:    "test title",
-				Contents: "test contents",
-			},
-			stubAddTodoRes: todo.Todo{
-				Title:    "test title",
-				Contents: "test contents",
-			},
-			stubAddTodoErr: nil,
-			expectedRes: todo.TodoResponse{
-				Title:    "test title",
-				Contents: "test contents",
-			},
-			expectedErr: nil,
-		},
-		{
-			description:    "ShouldReturnErrFake",
-			argAddTodoReq:  todo.AddTodoRequest{},
-			stubAddTodoRes: todo.Todo{},
-			stubAddTodoErr: fake.ErrFake,
-			expectedRes:    todo.TodoResponse{},
-			expectedErr:    fake.ErrFake,
-		},
-	}
-
-	for _, tc := range testCases {
-		t.Run(tc.description, func(t *testing.T) {
-			fakeTodoRepo := fake.NewTodoRepository()
-			fakeTodoRepo.
-				On("AddTodo", mock.Anything).
-				Return(tc.stubAddTodoRes, tc.stubAddTodoErr)
-
-			todoService := todo.NewTodoService(fakeTodoRepo)
-
-			actualRes, actualErr := todoService.AddTodo(tc.argAddTodoReq)
-
-			assert.Equal(t, tc.expectedErr, actualErr)
-
-			assert.Equal(t, tc.expectedRes.Title, actualRes.Title)
-			assert.Equal(t, tc.expectedRes.Contents, actualRes.Contents)
-			assert.Equal(t, tc.expectedRes.AssignorID, actualRes.AssignorID)
-			assert.Equal(t, tc.expectedRes.DueDate, actualRes.DueDate)
 		})
 	}
 }

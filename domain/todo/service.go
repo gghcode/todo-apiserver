@@ -49,3 +49,7 @@ func (srv *todoService) GetTodosByUserID(userID int64) ([]TodoResponse, error) {
 
 	return res, nil
 }
+
+func (srv *todoService) RemoveTodo(todoID string) error {
+	return srv.todoRepo.RemoveTodo(todoID)
+}
