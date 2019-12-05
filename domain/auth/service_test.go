@@ -3,9 +3,9 @@ package auth_test
 import (
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -159,7 +159,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 				Username: "NOT_EXISTS_USER",
 				Password: "testtest",
 			},
-			stubUser:    user.EmptyUser,
+			stubUser:    user.User{},
 			stubErr:     user.ErrUserNotFound,
 			expected:    auth.TokenResponse{},
 			expectedErr: auth.ErrInvalidCredential,

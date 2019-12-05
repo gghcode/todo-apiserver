@@ -3,8 +3,10 @@ package middleware_test
 import (
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/app/middleware"
 	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewCors(t *testing.T) {
@@ -12,7 +14,5 @@ func TestNewCors(t *testing.T) {
 		AllowOrigins: []string{"*"},
 	})
 
-	if handlerFunc == nil {
-		t.Errorf("handlerFunc is nil")
-	}
+	assert.NotNil(t, handlerFunc)
 }

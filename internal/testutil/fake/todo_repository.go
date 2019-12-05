@@ -1,13 +1,18 @@
 package fake
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app/api/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/todo"
 	"github.com/stretchr/testify/mock"
 )
 
 // TodoRepository godoc
 type TodoRepository struct {
 	mock.Mock
+}
+
+// NewTodoRepository return fake todo repository
+func NewTodoRepository() *TodoRepository {
+	return &TodoRepository{}
 }
 
 // AddTodo godoc

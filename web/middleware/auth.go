@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,7 +28,7 @@ func RequiredAccessToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		accessTokenHandler := ctx.MustGet(accessTokenHandlerToken).(AccessTokenHandlerFunc)
 		if err := accessTokenHandler(ctx); err != nil {
-			api.AbortErrorResponse(ctx, err)
+			// api.AbortErrorResponse(ctx, err)
 			return
 		}
 

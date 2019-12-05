@@ -1,15 +1,7 @@
 package main
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app"
-	"github.com/gghcode/apas-todo-apiserver/app/api"
-	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
-	"github.com/gghcode/apas-todo-apiserver/app/middleware"
 	"github.com/gghcode/apas-todo-apiserver/config"
-	_ "github.com/gghcode/apas-todo-apiserver/docs"
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
@@ -23,31 +15,46 @@ const (
 // @in header
 // @name Authorization
 func main() {
-	cfg, err := config.NewViperBuilder().
+	config.NewViperBuilder().
 		AddConfigFile("config.yaml", true).
 		BindEnvs(envPrefix).
 		Build()
-
-	container, err := app.NewContainer(cfg)
-	if err != nil {
-		panic(err)
-	}
-
-	var controllers []api.Controller
-	if err := container.Extract(&controllers); err != nil {
-		panic(err)
-	}
-
-	router := gin.New()
-	router.Use(middleware.NewCors(cfg.Cors))
-	router.Use(middleware.AddAccessTokenHandler(auth.NewJwtAccessTokenHandlerFactory(cfg)))
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	for _, controller := range controllers {
-		controller.RegisterRoutes(router.Group(""))
-	}
-
-	if err := router.Run(cfg.Addr); err != nil {
-		panic(err)
-	}
 }
+
+// func setupContainer(cfg config.Configuration) (*inject.Container, error) {
+// 	container, err := inject.New(
+// 		inject.Provide(func() config.Configuration {
+// 			return cfg
+// 		}),
+
+// 		inject.Provide(db.NewPostgresConn),
+// 		inject.Provide(db.NewRedisConn),
+// 		inject.Provide(func() security.Passport {
+// 			return security.NewBcryptPassport(12)
+// 		}),
+// 		inject.Provide(func() afero.Fs {
+// 			return afero.NewOsFs()
+// 		}),
+
+// 		inject.Provide(loader.NewVersionLoader),
+
+// 		inject.Provide(user.NewRepository),
+// 		inject.Provide(todo.NewRepository),
+// 		inject.Provide(auth.NewRedisTokenRepository),
+
+// 		inject.Provide(auth.NewService),
+// 		inject.Provide(func() auth.CreateAccessTokenHandlerFactory {
+// 			return auth.CreateAccessTokenFactory
+// 		}),
+// 		inject.Provide(func() auth.CreateRefreshTokenHandlerFactory {
+// 			return auth.CreateRefreshTokenFactory
+// 		}),
+
+// 		inject.Provide(common.NewController, inject.As(api.ControllerToken)),
+// 		inject.Provide(user.NewController, inject.As(api.ControllerToken)),
+// 		inject.Provide(todo.NewController, inject.As(api.ControllerToken)),
+// 		inject.Provide(auth.NewController, inject.As(api.ControllerToken)),
+// 	)
+
+// 	return container, err
+// }

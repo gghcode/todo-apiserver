@@ -1,7 +1,7 @@
 package fake
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app/middleware"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 )
