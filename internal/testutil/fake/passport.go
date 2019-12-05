@@ -7,6 +7,11 @@ type Passport struct {
 	mock.Mock
 }
 
+// NewPassport return fake passport
+func NewPassport() *Passport {
+	return &Passport{}
+}
+
 // HashPassword godoc
 func (passport *Passport) HashPassword(password string) ([]byte, error) {
 	args := passport.Called(password)
