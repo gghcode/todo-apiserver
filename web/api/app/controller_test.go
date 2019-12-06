@@ -11,19 +11,18 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ControllerUnit struct {
+type ControllerUnitTestSuite struct {
 	suite.Suite
 
 	fakeAppService *fake.AppService
-
-	router *gin.Engine
+	router         *gin.Engine
 }
 
-func TestCommonControllerUnit(t *testing.T) {
-	suite.Run(t, new(ControllerUnit))
+func TestAppControllerUnitTests(t *testing.T) {
+	suite.Run(t, new(ControllerUnitTestSuite))
 }
 
-func (suite *ControllerUnit) SetupTest() {
+func (suite *ControllerUnitTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
 	suite.router = gin.New()
@@ -33,7 +32,7 @@ func (suite *ControllerUnit) SetupTest() {
 	c.RegisterRoutes(suite.router)
 }
 
-func (suite *ControllerUnit) TestVersion() {
+func (suite *ControllerUnitTestSuite) TestVersion() {
 	testCases := []struct {
 		description      string
 		stubVersion      string
@@ -71,7 +70,7 @@ func (suite *ControllerUnit) TestVersion() {
 	}
 }
 
-func (suite *ControllerUnit) TestHealthy() {
+func (suite *ControllerUnitTestSuite) TestHealthy() {
 	testCases := []struct {
 		description    string
 		expectedStatus int
