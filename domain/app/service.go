@@ -24,7 +24,8 @@ func NewService(reader FileReader) UsecaseInteractor {
 const _defaultVersion = "dev version"
 
 func (srv *appService) Version() string {
-	versionFilePath, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	versionFileDir, _ := filepath.Abs(filepath.Dir(os.Args[0]))
+	versionFilePath := filepath.Join(versionFileDir, "VERSION")
 
 	version, err := srv.reader.ReadString(versionFilePath)
 	if err != nil {
