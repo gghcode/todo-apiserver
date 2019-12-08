@@ -3,6 +3,7 @@ package security_test
 import (
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/security"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,7 +31,9 @@ func TestBcryptPassportPasswordVerification(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			bcryptPassport := security.NewBcryptPassport(1)
+			bcryptPassport := security.NewBcryptPassport(config.Configuration{
+				BcryptCost: 1,
+			})
 
 			passwordHash, err := bcryptPassport.HashPassword(tc.password)
 			assert.NoError(t, err)

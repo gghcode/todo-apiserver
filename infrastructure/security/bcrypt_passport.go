@@ -1,6 +1,7 @@
 package security
 
 import (
+	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/domain/security"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -10,9 +11,9 @@ type bcryptPassport struct {
 }
 
 // NewBcryptPassport return new passport.
-func NewBcryptPassport(cost int) security.Passport {
+func NewBcryptPassport(cfg config.Configuration) security.Passport {
 	return &bcryptPassport{
-		cost: cost,
+		cost: cfg.BcryptCost,
 	}
 }
 

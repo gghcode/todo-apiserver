@@ -10,14 +10,19 @@ type AuthService struct {
 	mock.Mock
 }
 
+// NewAuthService return fake auth service
+func NewAuthService() *AuthService {
+	return &AuthService{}
+}
+
 // IssueToken godoc
-func (service *AuthService) IssueToken(req auth.LoginRequest, res *auth.TokenResponse) error {
-	args := service.Called(req, res)
-	return args.Error(0)
+func (service *AuthService) IssueToken(req auth.LoginRequest) (auth.TokenResponse, error) {
+	args := service.Called(req)
+	return args.Get(0).(auth.TokenResponse), args.Error(1)
 }
 
 // RefreshToken godoc
-func (service *AuthService) RefreshToken(req auth.AccessTokenByRefreshRequest, res *auth.TokenResponse) error {
-	args := service.Called(req, res)
-	return args.Error(0)
+func (service *AuthService) RefreshToken(req auth.AccessTokenByRefreshRequest) (auth.TokenResponse, error) {
+	args := service.Called(req)
+	return args.Get(0).(auth.TokenResponse), args.Error(1)
 }

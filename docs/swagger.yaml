@@ -6,10 +6,9 @@ definitions:
     type: object
   api.ErrorResponse:
     properties:
-      errors:
-        items:
-          $ref: '#/definitions/api.ErrorMetaData'
-        type: array
+      error:
+        $ref: '#/definitions/api.ErrorMetaData'
+        type: object
     type: object
   auth.AccessTokenByRefreshRequest:
     properties:
@@ -39,59 +38,15 @@ definitions:
       type:
         type: string
     type: object
-  todo.AddTodoRequest:
+  auth.tokenResponse:
     properties:
-      contents:
+      access_token:
         type: string
-      title:
-        type: string
-    required:
-    - contents
-    - title
-    type: object
-  todo.TodoResponse:
-    properties:
-      assignor_id:
+      expires_in:
         type: integer
-      contents:
+      refresh_token:
         type: string
-      created_at:
-        type: string
-      due_date:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  todo.UpdateTodoRequest:
-    properties:
-      contents:
-        type: string
-      due_date:
-        type: string
-      title:
-        type: string
-    type: object
-  user.CreateUserRequest:
-    properties:
-      password:
-        type: string
-      username:
-        type: string
-    required:
-    - password
-    - username
-    type: object
-  user.UserResponse:
-    properties:
-      create_at:
-        type: string
-      id:
-        type: integer
-      username:
+      type:
         type: string
     type: object
 info:
@@ -120,7 +75,7 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/auth.TokenResponse'
+            $ref: '#/definitions/auth.tokenResponse'
         "400":
           description: Invalid payload
           schema:
@@ -171,214 +126,6 @@ paths:
             type: string
       tags:
       - App API
-  /api/todos:
-    get:
-      consumes:
-      - application/json
-      description: Fetch todos by user id
-      parameters:
-      - description: User ID
-        in: query
-        name: user_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            items:
-              $ref: '#/definitions/todo.TodoResponse'
-            type: array
-        "404":
-          description: User Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      tags:
-      - Todo API
-    post:
-      consumes:
-      - application/json
-      description: Add new todo
-      parameters:
-      - description: payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/todo.AddTodoRequest'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: ok
-          schema:
-            $ref: '#/definitions/todo.TodoResponse'
-        "400":
-          description: Invalid payload
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      tags:
-      - Todo API
-  /api/todos/{todo_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Remove todo by todo id
-      parameters:
-      - description: Todo ID
-        in: path
-        name: todo_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: ok
-          schema:
-            $ref: '#/definitions/todo.TodoResponse'
-        "404":
-          description: Todo Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      tags:
-      - Todo API
-    patch:
-      consumes:
-      - application/json
-      description: Update todo by todo id
-      parameters:
-      - description: Todo ID
-        in: path
-        name: todo_id
-        required: true
-        type: string
-      - description: payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/todo.UpdateTodoRequest'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/todo.TodoResponse'
-        "404":
-          description: Todo Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      tags:
-      - Todo API
-  /api/user:
-    get:
-      consumes:
-      - application/json
-      description: Fetch user itself by access_token
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/user.UserResponse'
-        "404":
-          description: User Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      tags:
-      - User API
-  /api/users:
-    get:
-      consumes:
-      - application/json
-      description: Fetch user by user id
-      parameters:
-      - description: User ID
-        in: query
-        name: user_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/user.UserResponse'
-        "404":
-          description: User Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      tags:
-      - User API
-    post:
-      consumes:
-      - application/json
-      description: Create new user
-      parameters:
-      - description: user payload
-        in: body
-        name: payload
-        required: true
-        schema:
-          $ref: '#/definitions/user.CreateUserRequest'
-          type: object
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: ok
-          schema:
-            $ref: '#/definitions/user.UserResponse'
-        "400":
-          description: Invalid user payload
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-        "409":
-          description: Already exists user
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      tags:
-      - User API
-  /api/users/{username}:
-    get:
-      consumes:
-      - application/json
-      description: Fetch user by username
-      parameters:
-      - description: User Name
-        in: path
-        name: username
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: ok
-          schema:
-            $ref: '#/definitions/user.UserResponse'
-        "404":
-          description: User Not Found
-          schema:
-            $ref: '#/definitions/api.ErrorResponse'
-      tags:
-      - User API
   /api/version:
     get:
       description: Get server version

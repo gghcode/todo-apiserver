@@ -2,6 +2,21 @@ package main
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/domain/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
+	infraSecurity "github.com/gghcode/apas-todo-apiserver/infrastructure/security"
+	"github.com/gghcode/apas-todo-apiserver/web"
+	"github.com/gghcode/apas-todo-apiserver/web/api"
+	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
+	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
+
+	"github.com/defval/inject/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/afero"
 )
 
 const (
@@ -15,46 +30,48 @@ const (
 // @in header
 // @name Authorization
 func main() {
-	config.NewViperBuilder().
+	cfg, err := config.NewViperBuilder().
 		AddConfigFile("config.yaml", true).
 		BindEnvs(envPrefix).
 		Build()
+
+	if err != nil {
+		panic(err)
+	}
+
+	var ginRouter *gin.Engine
+
+	c := setupContainer(cfg)
+	if err := c.Extract(&ginRouter); err != nil {
+		panic(err)
+	}
+
+	ginRouter.Run(cfg.Addr)
 }
 
-// func setupContainer(cfg config.Configuration) (*inject.Container, error) {
-// 	container, err := inject.New(
-// 		inject.Provide(func() config.Configuration {
-// 			return cfg
-// 		}),
+func setupContainer(cfg config.Configuration) *inject.Container {
+	container := inject.New(
+		inject.Provide(func() config.Configuration {
+			return cfg
+		}),
 
-// 		inject.Provide(db.NewPostgresConn),
-// 		inject.Provide(db.NewRedisConn),
-// 		inject.Provide(func() security.Passport {
-// 			return security.NewBcryptPassport(12)
-// 		}),
-// 		inject.Provide(func() afero.Fs {
-// 			return afero.NewOsFs()
-// 		}),
+		inject.Provide(db.NewPostgresConn),
+		inject.Provide(db.NewRedisConn),
+		inject.Provide(infraSecurity.NewBcryptPassport),
 
-// 		inject.Provide(loader.NewVersionLoader),
+		inject.Provide(afero.NewOsFs),
+		inject.Provide(file.NewAferoFileReader),
+		inject.Provide(app.NewService),
+		inject.Provide(webApp.NewController, inject.As(new(api.GinController))),
 
-// 		inject.Provide(user.NewRepository),
-// 		inject.Provide(todo.NewRepository),
-// 		inject.Provide(auth.NewRedisTokenRepository),
+		inject.Provide(repository.NewRedisTokenRepository),
+		inject.Provide(repository.NewUserRepository),
+		inject.Provide(auth.NewService),
+		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
+		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
+		inject.Provide(webAuth.NewController, inject.As(new(api.GinController))),
+		inject.Provide(web.NewMux),
+	)
 
-// 		inject.Provide(auth.NewService),
-// 		inject.Provide(func() auth.CreateAccessTokenHandlerFactory {
-// 			return auth.CreateAccessTokenFactory
-// 		}),
-// 		inject.Provide(func() auth.CreateRefreshTokenHandlerFactory {
-// 			return auth.CreateRefreshTokenFactory
-// 		}),
-
-// 		inject.Provide(common.NewController, inject.As(api.ControllerToken)),
-// 		inject.Provide(user.NewController, inject.As(api.ControllerToken)),
-// 		inject.Provide(todo.NewController, inject.As(api.ControllerToken)),
-// 		inject.Provide(auth.NewController, inject.As(api.ControllerToken)),
-// 	)
-
-// 	return container, err
-// }
+	return container
+}

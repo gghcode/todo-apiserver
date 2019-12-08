@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gghcode/apas-todo-apiserver/domain/app"
-	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,7 +12,7 @@ type appController struct {
 }
 
 // NewController return new app controller
-func NewController(appService app.UsecaseInteractor) api.GinController {
+func NewController(appService app.UsecaseInteractor) *appController {
 	return &appController{
 		appService: appService,
 	}
