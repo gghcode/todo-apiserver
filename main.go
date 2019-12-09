@@ -3,18 +3,20 @@ package main
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
+	_ "github.com/gghcode/apas-todo-apiserver/docs"
 	"github.com/gghcode/apas-todo-apiserver/domain/app"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	infraSecurity "github.com/gghcode/apas-todo-apiserver/infrastructure/security"
-	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
 
-	"github.com/defval/inject/v2"
+	"github.com/defval/inject"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/afero"
 )
@@ -46,14 +48,17 @@ func main() {
 		panic(err)
 	}
 
+	ginRouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	ginRouter.Run(cfg.Addr)
 }
 
 func setupContainer(cfg config.Configuration) *inject.Container {
-	container := inject.New(
-		inject.Provide(func() config.Configuration {
-			return cfg
-		}),
+	provideConfig := func() config.Configuration {
+		return cfg
+	}
+
+	container, _ := inject.New(
+		inject.Provide(provideConfig),
 
 		inject.Provide(db.NewPostgresConn),
 		inject.Provide(db.NewRedisConn),
@@ -70,8 +75,18 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
 		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
 		inject.Provide(webAuth.NewController, inject.As(new(api.GinController))),
-		inject.Provide(web.NewMux),
+		inject.Provide(newGinRouter),
 	)
 
 	return container
+}
+
+func newGinRouter(controllers []api.GinController) *gin.Engine {
+	router := gin.New()
+
+	for _, c := range controllers {
+		c.RegisterRoutes(router)
+	}
+
+	return router
 }
