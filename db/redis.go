@@ -5,8 +5,8 @@ import (
 	"github.com/go-redis/redis"
 )
 
-// RedisConn godoc
-type RedisConn interface {
+// RedisConnection godoc
+type RedisConnection interface {
 	Client() *redis.Client
 }
 
@@ -19,7 +19,7 @@ func (conn *redisConn) Client() *redis.Client {
 }
 
 // NewRedisConn return new connection of redis
-func NewRedisConn(cfg config.Configuration) RedisConn {
+func NewRedisConn(cfg config.Configuration) RedisConnection {
 	conn := redisConn{
 		client: redis.NewClient(&redis.Options{
 			Addr: cfg.Redis.Addr,

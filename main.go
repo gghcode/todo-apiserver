@@ -1,15 +1,24 @@
 package main
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app"
-	"github.com/gghcode/apas-todo-apiserver/app/api"
-	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
-	"github.com/gghcode/apas-todo-apiserver/app/middleware"
 	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
-	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
+	"github.com/gghcode/apas-todo-apiserver/domain/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
+	infraSecurity "github.com/gghcode/apas-todo-apiserver/infrastructure/security"
+	"github.com/gghcode/apas-todo-apiserver/web/api"
+	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
+	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/swaggo/gin-swagger/swaggerFiles"
+
+	"github.com/defval/inject"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/afero"
 )
 
 const (
@@ -28,26 +37,56 @@ func main() {
 		BindEnvs(envPrefix).
 		Build()
 
-	container, err := app.NewContainer(cfg)
 	if err != nil {
 		panic(err)
 	}
 
-	var controllers []api.Controller
-	if err := container.Extract(&controllers); err != nil {
+	var ginRouter *gin.Engine
+
+	c := setupContainer(cfg)
+	if err := c.Extract(&ginRouter); err != nil {
 		panic(err)
 	}
 
+	ginRouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	ginRouter.Run(cfg.Addr)
+}
+
+func setupContainer(cfg config.Configuration) *inject.Container {
+	provideConfig := func() config.Configuration {
+		return cfg
+	}
+
+	container, _ := inject.New(
+		inject.Provide(provideConfig),
+
+		inject.Provide(db.NewPostgresConn),
+		inject.Provide(db.NewRedisConn),
+		inject.Provide(infraSecurity.NewBcryptPassport),
+
+		inject.Provide(afero.NewOsFs),
+		inject.Provide(file.NewAferoFileReader),
+		inject.Provide(app.NewService),
+		inject.Provide(webApp.NewController, inject.As(new(api.GinController))),
+
+		inject.Provide(repository.NewRedisTokenRepository),
+		inject.Provide(repository.NewUserRepository),
+		inject.Provide(auth.NewService),
+		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
+		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
+		inject.Provide(webAuth.NewController, inject.As(new(api.GinController))),
+		inject.Provide(newGinRouter),
+	)
+
+	return container
+}
+
+func newGinRouter(controllers []api.GinController) *gin.Engine {
 	router := gin.New()
-	router.Use(middleware.NewCors(cfg.Cors))
-	router.Use(middleware.AddJwtAuthHandler(cfg.Jwt, &auth.JwtAuthHandler))
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	for _, controller := range controllers {
-		controller.RegisterRoutes(router.Group(""))
+	for _, c := range controllers {
+		c.RegisterRoutes(router)
 	}
 
-	if err := router.Run(cfg.Addr); err != nil {
-		panic(err)
-	}
+	return router
 }

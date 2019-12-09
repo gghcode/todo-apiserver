@@ -1,13 +1,18 @@
 package fake
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app/api/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/stretchr/testify/mock"
 )
 
 // UserRepository godoc
 type UserRepository struct {
 	mock.Mock
+}
+
+// NewUserRepository return fake user repository
+func NewUserRepository() *UserRepository {
+	return &UserRepository{}
 }
 
 // CreateUser godoc

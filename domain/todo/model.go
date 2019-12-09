@@ -1,0 +1,30 @@
+package todo
+
+import (
+	"time"
+
+	uuid "github.com/satori/go.uuid"
+)
+
+// Todo godoc
+type Todo struct {
+	ID         uuid.UUID  `gorm:"type:uuid"`
+	Title      string     `gorm:"not null;"`
+	Contents   string     `gorm:"not null;"`
+	AssignorID int64      `gorm:"not null;"`
+	CreatedAt  time.Time  `sql:"DEFAULT:current_timestamp"`
+	UpdatedAt  time.Time  `sql:"DEFAULT:current_timestamp"`
+	DueDate    *time.Time `sql:"DEFAULT:null"`
+}
+
+// // BeforeSave godoc
+// func (todo *Todo) BeforeSave() (err error) {
+// 	todo.ID = uuid.NewV4()
+// 	return
+// }
+
+// // BeforeUpdate godoc
+// func (todo *Todo) BeforeUpdate() (err error) {
+// 	todo.UpdatedAt = time.Now()
+// 	return
+// }

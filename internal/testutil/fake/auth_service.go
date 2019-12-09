@@ -1,13 +1,18 @@
 package fake
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/app/api/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/stretchr/testify/mock"
 )
 
 // AuthService godoc
 type AuthService struct {
 	mock.Mock
+}
+
+// NewAuthService return fake auth service
+func NewAuthService() *AuthService {
+	return &AuthService{}
 }
 
 // IssueToken godoc

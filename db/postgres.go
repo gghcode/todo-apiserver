@@ -8,17 +8,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// PostgresProviderFunc godoc
-type PostgresProviderFunc func(*gorm.DB) *gorm.DB
-
 // PostgresConn godoc
 type PostgresConn struct {
-	db        *gorm.DB
-	provideDB PostgresProviderFunc
+	db *gorm.DB
 }
 
 // NewPostgresConn godoc
-func NewPostgresConn(cfg config.Configuration) (*PostgresConn, error) {
+func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 	gormDB, err := gorm.Open(cfg.Postgres.Driver,
 		"host="+cfg.Postgres.Host+
 			" port="+cfg.Postgres.Port+
@@ -33,20 +29,12 @@ func NewPostgresConn(cfg config.Configuration) (*PostgresConn, error) {
 
 	return &PostgresConn{
 		db: gormDB,
-		provideDB: func(db *gorm.DB) *gorm.DB {
-			return db
-		},
 	}, nil
-}
-
-// SetDbProvider godoc
-func (conn *PostgresConn) SetDbProvider(provider PostgresProviderFunc) {
-	conn.provideDB = provider
 }
 
 // DB return database connection.
 func (conn *PostgresConn) DB() *gorm.DB {
-	return conn.provideDB(conn.db)
+	return conn.db
 }
 
 // Close close db session.

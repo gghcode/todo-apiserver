@@ -2,8 +2,9 @@ package config
 
 // Configuration is config type.
 type Configuration struct {
-	Addr     string `mapstructure:"addr"`
-	BasePath string `mapstructure:"basePath"`
+	Addr       string `mapstructure:"addr"`
+	BasePath   string `mapstructure:"basePath"`
+	BcryptCost int    `mapstructure:"bcryptCost"`
 
 	Cors     CorsConfig     `mapstructure:"cors"`
 	Postgres PostgresConfig `mapstructure:"postgres"`
@@ -14,8 +15,9 @@ type Configuration struct {
 // DefaultConfig is default config
 func DefaultConfig() Configuration {
 	return Configuration{
-		Addr:     ":8080",
-		BasePath: "api",
+		Addr:       ":8080",
+		BasePath:   "api",
+		BcryptCost: 12,
 
 		Cors:     DefaultCorsConfig(),
 		Postgres: DefaultPostgresConfig(),
