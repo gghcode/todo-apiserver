@@ -14,7 +14,7 @@ import (
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"github.com/defval/inject"
 	"github.com/gin-gonic/gin"

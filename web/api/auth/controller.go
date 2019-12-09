@@ -1,9 +1,10 @@
 package auth
 
 import (
+	"net/http"
+
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,7 +44,10 @@ func (controller *Controller) refreshToken(ctx *gin.Context) {
 	}
 
 	res, err := controller.service.RefreshToken(req)
-	if err != nil {
+	if err == auth.ErrNotStoredToken {
+		ctx.JSON(http.StatusUnauthorized, api.MakeErrorResponse(err))
+		return
+	} else if err != nil {
 		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponse(err))
 		return
 	}

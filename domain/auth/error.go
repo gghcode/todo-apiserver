@@ -8,9 +8,6 @@ var (
 	// ErrInvalidCredential godoc
 	ErrInvalidCredential = errors.New("Invalid user credential")
 
-	// ErrNotContainToken godoc
-	ErrNotContainToken = errors.New("Not contain token")
-
 	// ErrInvalidToken godoc
 	ErrInvalidToken = errors.New("Invalid token")
 

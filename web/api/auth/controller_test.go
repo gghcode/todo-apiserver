@@ -1,6 +1,7 @@
 package auth_test
 
 import (
+	"bytes"
 	"io"
 	"net/http"
 	"testing"
@@ -114,7 +115,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 
 	testCases := []struct {
 		description    string
-		reqPayload     io.Reader
+		reqPayload     *bytes.Buffer
 		stubToken      auth.TokenResponse
 		stubErr        error
 		expectedStatus int
@@ -168,14 +169,37 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 				),
 			),
 		},
+		{
+			description: "ShouldReturnUnauthrizedWhenErrNotStoredToken",
+			reqPayload: testutil.ReqBodyFromInterface(
+				suite.T(),
+				auth.AccessTokenByRefreshRequest{Token: "abcd"},
+			),
+			stubToken:      auth.TokenResponse{},
+			stubErr:        auth.ErrNotStoredToken,
+			expectedStatus: http.StatusUnauthorized,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.MakeErrorResponse(
+					auth.ErrNotStoredToken,
+				),
+			),
+		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
-			suite.fakeAuthService.
-				On("RefreshToken", mock.Anything).
-				Once().
-				Return(tc.stubToken, tc.stubErr)
+			m := testutil.ObjectFromBytesBuffer(
+				suite.T(),
+				tc.reqPayload,
+			).(map[string]interface{})
+
+			tok, ok := m["token"].(string)
+			if ok {
+				suite.fakeAuthService.
+					On("RefreshToken", auth.AccessTokenByRefreshRequest{Token: tok}).
+					Return(tc.stubToken, tc.stubErr)
+			}
 
 			actual := testutil.Response(
 				suite.T(),
