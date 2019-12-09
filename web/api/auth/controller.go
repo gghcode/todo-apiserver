@@ -74,7 +74,10 @@ func (controller *Controller) issueToken(ctx *gin.Context) {
 	}
 
 	res, err := controller.service.IssueToken(req)
-	if err != nil {
+	if err == auth.ErrInvalidCredential {
+		ctx.JSON(http.StatusUnauthorized, api.MakeErrorResponse(err))
+		return
+	} else if err != nil {
 		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponse(err))
 		return
 	}
@@ -82,17 +85,4 @@ func (controller *Controller) issueToken(ctx *gin.Context) {
 	serializer := newTokenResponseSerializer(res)
 
 	ctx.JSON(http.StatusOK, serializer.Response())
-	// loginRequestValidator := NewLoginRequestValidator()
-	// if err := loginRequestValidator.Bind(ctx); err != nil {
-	// 	api.WriteErrorResponse(ctx, err)
-	// 	return
-	// }
-
-	// token, err := controller.service.IssueToken(loginRequestValidator.Model)
-	// if err != nil {
-	// 	api.WriteErrorResponse(ctx, err)
-	// 	return
-	// }
-
-	// ctx.JSON(http.StatusOK, token)
 }
