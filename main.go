@@ -6,6 +6,7 @@ import (
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
 	"github.com/gghcode/apas-todo-apiserver/domain/app"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
@@ -13,6 +14,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
+	webUser "github.com/gghcode/apas-todo-apiserver/web/api/user"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 
@@ -75,6 +77,10 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
 		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
 		inject.Provide(webAuth.NewController, inject.As(new(api.GinController))),
+
+		inject.Provide(user.NewService),
+		inject.Provide(webUser.NewController, inject.As(new(api.GinController))),
+
 		inject.Provide(newGinRouter),
 	)
 

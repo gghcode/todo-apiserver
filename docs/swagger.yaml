@@ -49,6 +49,22 @@ definitions:
       type:
         type: string
     type: object
+  user.UserResponse:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  user.createUserRequestDto:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a apas todo api server.
@@ -126,6 +142,36 @@ paths:
             type: string
       tags:
       - App API
+  /api/users:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: user payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/user.createUserRequestDto'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+        "400":
+          description: Invalid user payload
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "409":
+          description: Already exists user
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      tags:
+      - User API
   /api/version:
     get:
       description: Get server version

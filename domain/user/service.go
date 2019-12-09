@@ -29,6 +29,9 @@ func (srv *userService) CreateUser(req CreateUserRequest) (UserResponse, error) 
 	}
 
 	createdUser, err := srv.userRepo.CreateUser(usr)
+	if err != nil {
+		return res, err
+	}
 
 	return UserResponse{
 		ID:       createdUser.ID,
