@@ -1,12 +1,18 @@
 package repository
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/go-redis/redis"
+)
+
+var (
+	// ErrRedisConnection is redis command error
+	ErrRedisConnection = errors.New("redis command was failed")
 )
 
 type redisTokenRepository struct {
@@ -35,7 +41,9 @@ func (repo *redisTokenRepository) UserIDByRefreshToken(refreshToken string) (int
 		Result()
 
 	if err == redis.Nil {
-		return 0, auth.ErrNotStoredToken
+		return -1, auth.ErrNotStoredToken
+	} else if err != nil {
+		return -1, ErrRedisConnection
 	}
 
 	userID, err := strconv.ParseInt(userIDStr, 10, 64)

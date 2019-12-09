@@ -91,7 +91,7 @@ func (suite *RepositoryIntegration) TestUserIDByRefreshToken() {
 		{
 			description:     "ShouldReturnErrNotStoredToken",
 			argRefreshToken: "",
-			expected:        0,
+			expected:        -1,
 			expectedErr:     auth.ErrNotStoredToken,
 		},
 	}
