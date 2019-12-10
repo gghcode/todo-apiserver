@@ -1,8 +1,10 @@
 package user
 
-import "github.com/gghcode/apas-todo-apiserver/domain/user"
+import (
+	"time"
 
-import "time"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
+)
 
 type (
 	userResponse struct {

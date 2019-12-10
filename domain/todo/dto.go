@@ -6,8 +6,9 @@ type (
 	// AddTodoRequest godoc
 	// struct tag use swagger
 	AddTodoRequest struct {
-		Title    string `json:"title" validate:"required,min=1"`
-		Contents string `json:"contents" validate:"required,min=1"`
+		Title      string
+		Contents   string
+		AssignorID int64
 	}
 
 	// UpdateTodoRequest godoc

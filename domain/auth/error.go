@@ -5,6 +5,9 @@ import (
 )
 
 var (
+	// ErrNotContainTokenInHeader is error
+	ErrNotContainTokenInHeader = errors.New("Token doesn't contain in header")
+
 	// ErrInvalidCredential godoc
 	ErrInvalidCredential = errors.New("Invalid user credential")
 

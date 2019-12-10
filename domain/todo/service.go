@@ -1,5 +1,7 @@
 package todo
 
+import uuid "github.com/satori/go.uuid"
+
 type todoService struct {
 	todoRepo Repository
 }
@@ -13,8 +15,10 @@ func NewTodoService(todoRepo Repository) UsecaseInteractor {
 
 func (srv *todoService) AddTodo(req AddTodoRequest) (TodoResponse, error) {
 	todo := Todo{
-		Title:    req.Title,
-		Contents: req.Contents,
+		ID:         uuid.NewV4(),
+		Title:      req.Title,
+		Contents:   req.Contents,
+		AssignorID: req.AssignorID,
 	}
 
 	insertedTodo, err := srv.todoRepo.AddTodo(todo)
