@@ -24,4 +24,6 @@ func TestPostgresConnIntegration(t *testing.T) {
 	if err := postgresConn.DB().DB().Ping(); err != nil {
 		t.Error(err)
 	}
+
+	postgresConn.Close()
 }
