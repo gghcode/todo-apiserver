@@ -12,51 +12,49 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type userRepositoryIntegration struct {
+type userRepositoryIntegrationTestSuite struct {
 	suite.Suite
 
-	dbConn    db.GormConnection
 	repo      user.Repository
 	dbCleanup func()
 
 	testUsers []user.User
 }
 
-func TestUserRepositoryIntegration(t *testing.T) {
+func TestUserRepositoryIntegrationTests(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
 	}
 
-	suite.Run(t, new(userRepositoryIntegration))
+	suite.Run(t, new(userRepositoryIntegrationTestSuite))
 }
 
-func (suite *userRepositoryIntegration) SetupTest() {
+func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
 	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
-
 	suite.NoError(err)
 
-	suite.dbConn, err = db.NewPostgresConn(cfg)
-	suite.dbConn.DB().LogMode(false)
-	suite.dbCleanup = testutil.DbCleanupFunc(suite.dbConn.DB())
-	suite.repo = repository.NewUserRepository(suite.dbConn)
+	dbConn, err := db.NewPostgresConn(cfg)
+	suite.NoError(err)
 
+	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())
+	suite.repo = repository.NewUserRepository(dbConn)
 	suite.testUsers = []user.User{
 		{UserName: "fakeUser1", PasswordHash: []byte("password")},
 		{UserName: "fakeUser2", PasswordHash: []byte("password")},
 	}
 
 	for i := range suite.testUsers {
-		suite.dbConn.DB().Create(&suite.testUsers[i])
+		suite.NoError(dbConn.DB().Create(&suite.testUsers[i]).Error)
 	}
 }
 
-func (suite *userRepositoryIntegration) TearDownTest() {
+func (suite *userRepositoryIntegrationTestSuite) TearDownTest() {
 	suite.dbCleanup()
 }
 
-func (suite *userRepositoryIntegration) TestCreateUser() {
+func (suite *userRepositoryIntegrationTestSuite) TestCreateUser() {
 	testCases := []struct {
 		description string
 		argUser     user.User
@@ -88,7 +86,7 @@ func (suite *userRepositoryIntegration) TestCreateUser() {
 	}
 }
 
-func (suite *userRepositoryIntegration) TestAllUsers() {
+func (suite *userRepositoryIntegrationTestSuite) TestAllUsers() {
 	testCases := []struct {
 		description string
 		expected    []user.User
@@ -111,7 +109,7 @@ func (suite *userRepositoryIntegration) TestAllUsers() {
 	}
 }
 
-func (suite *userRepositoryIntegration) TestUserByID() {
+func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 	testCases := []struct {
 		description string
 		argUserID   int64
@@ -142,7 +140,7 @@ func (suite *userRepositoryIntegration) TestUserByID() {
 	}
 }
 
-func (suite *userRepositoryIntegration) TestUserByUserName() {
+func (suite *userRepositoryIntegrationTestSuite) TestUserByUserName() {
 	testCases := []struct {
 		description string
 		argUserName string
@@ -173,7 +171,7 @@ func (suite *userRepositoryIntegration) TestUserByUserName() {
 	}
 }
 
-func (suite *userRepositoryIntegration) TestUpdateUserByID() {
+func (suite *userRepositoryIntegrationTestSuite) TestUpdateUserByID() {
 	testCases := []struct {
 		description string
 		argUser     user.User
@@ -214,7 +212,7 @@ func (suite *userRepositoryIntegration) TestUpdateUserByID() {
 	}
 }
 
-func (suite *userRepositoryIntegration) TestRemoveUserByID() {
+func (suite *userRepositoryIntegrationTestSuite) TestRemoveUserByID() {
 	testCases := []struct {
 		description string
 		argUserID   int64

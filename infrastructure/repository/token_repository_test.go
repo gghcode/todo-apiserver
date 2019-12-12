@@ -30,7 +30,6 @@ func (suite *RepositoryIntegration) SetupTest() {
 	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
-
 	suite.NoError(err)
 
 	suite.redisConn = db.NewRedisConn(cfg)

@@ -15,10 +15,10 @@ import (
 type todoRepositoryIntegrationTestSuite struct {
 	suite.Suite
 
-	testTodos []todo.Todo
-
 	repo      todo.Repository
 	dbCleanup func()
+
+	testTodos []todo.Todo
 }
 
 func TestTodoRepositoryIntegrationTests(t *testing.T) {
@@ -46,15 +46,13 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 	}
 
 	for i := range suite.testTodos {
-		err := dbConn.DB().Create(&suite.testTodos[i]).Error
-		suite.NoError(err)
-
-		err = dbConn.DB().
-			Where("id=?", suite.testTodos[i].ID.String()).
-			First(&suite.testTodos[i]).
-			Error
-
-		suite.NoError(err)
+		suite.NoError(dbConn.DB().Create(&suite.testTodos[i]).Error)
+		suite.NoError(
+			dbConn.DB().
+				Where("id=?", suite.testTodos[i].ID.String()).
+				First(&suite.testTodos[i]).
+				Error,
+		)
 	}
 }
 
