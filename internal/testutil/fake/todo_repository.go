@@ -28,9 +28,9 @@ func (repo *TodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error) 
 }
 
 // TodoByTodoID godoc
-func (repo *TodoRepository) TodoByTodoID(todoID string, todo *todo.Todo) error {
-	args := repo.Called(todoID, todo)
-	return args.Error(0)
+func (repo *TodoRepository) TodoByTodoID(todoID string) (todo.Todo, error) {
+	args := repo.Called(todoID)
+	return args.Get(0).(todo.Todo), args.Error(1)
 }
 
 // UpdateTodo godoc
