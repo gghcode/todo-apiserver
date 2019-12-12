@@ -2,7 +2,6 @@ package fake
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -34,8 +33,9 @@ func NewAccessTokenHandlerFactory(userIDFactory UserIDFactory) middleware.Access
 }
 
 func (handler *accessTokenHandlerFactory) Create() middleware.AccessTokenHandlerFunc {
-	return func(ctx *gin.Context) error {
-		ctx.Set("user_id", handler.userIDFactory.UserID())
-		return nil
+	return func(token string) (middleware.TokenClaims, error) {
+		return middleware.TokenClaims{
+			UserID: handler.userIDFactory.UserID(),
+		}, nil
 	}
 }

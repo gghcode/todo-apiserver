@@ -56,8 +56,9 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 		{
 			description: "ShouldAddTodo",
 			req: todo.AddTodoRequest{
-				Title:    "title",
-				Contents: "contents",
+				Title:      "title",
+				Contents:   "contents",
+				AssignorID: 10,
 			},
 			reqPayload: func(req todo.AddTodoRequest) io.Reader {
 				return testutil.ReqBodyFromInterface(

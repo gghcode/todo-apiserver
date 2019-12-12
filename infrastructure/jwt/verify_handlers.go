@@ -9,7 +9,6 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/gin-gonic/gin"
 )
 
 type jwtAccessTokenHandler struct {
@@ -26,22 +25,22 @@ func NewJwtAccessTokenVerifyHandlerFactory(cfg config.Configuration) middleware.
 func (handler *jwtAccessTokenHandler) Create() middleware.AccessTokenHandlerFunc {
 	secretKeyBytes := []byte(handler.jwtCfg.SecretKey)
 
-	return func(ctx *gin.Context) error {
-		token := ctx.GetHeader("Authorization")
+	return func(token string) (middleware.TokenClaims, error) {
+		var result middleware.TokenClaims
 
 		claims, err := verifyAccessToken(secretKeyBytes, token)
 		if err != nil {
-			return err
+			return result, err
 		}
 
 		userID, err := strconv.ParseInt(claims["sub"].(string), 10, 64)
 		if err != nil {
-			return err
+			return result, err
 		}
 
-		middleware.SetAuthUserID(ctx, userID)
-
-		return nil
+		return middleware.TokenClaims{
+			UserID: userID,
+		}, nil
 	}
 }
 
