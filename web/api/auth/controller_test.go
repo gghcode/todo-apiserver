@@ -27,13 +27,13 @@ func TestAuthControllerUnitTests(t *testing.T) {
 }
 
 func (suite *ControllerUnitTestSuite) SetupTest() {
-	gin.SetMode(gin.TestMode)
-
-	suite.router = gin.New()
 	suite.fakeAuthService = fake.NewAuthService()
+	suite.router = gin.New()
 
 	c := webAuth.NewController(suite.fakeAuthService)
 	c.RegisterRoutes(suite.router)
+
+	gin.SetMode(gin.TestMode)
 }
 
 func (suite *ControllerUnitTestSuite) TestIssueToken() {

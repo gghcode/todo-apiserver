@@ -8,6 +8,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/todo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
+	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webTodo "github.com/gghcode/apas-todo-apiserver/web/api/todo"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 
@@ -83,6 +84,36 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 					"contents": "test",
 				},
 			),
+		},
+		{
+			description: "ShouldBadRequestWhenInvalidType",
+			reqPayload: func(req todo.AddTodoRequest) io.Reader {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					map[string]interface{}{
+						"title":    3,
+						"contents": "contents",
+					},
+				)
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.MakeErrorResponse(api.NewUnmarshalError("title", "string")),
+			),
+		},
+		{
+			description: "ShouldBadRequestWhenNotContainContents",
+			reqPayload: func(req todo.AddTodoRequest) io.Reader {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					map[string]interface{}{
+						"title": "new title",
+					},
+				)
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON:   `{"error":{"message":"contents: cannot be blank."}}`,
 		},
 	}
 

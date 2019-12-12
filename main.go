@@ -72,21 +72,21 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 		inject.Provide(afero.NewOsFs),
 		inject.Provide(file.NewAferoFileReader),
 		inject.Provide(app.NewService),
-		inject.Provide(webApp.NewController, injectController()),
+		inject.Provide(webApp.NewController, injectAsGinController()),
 
 		inject.Provide(repository.NewRedisTokenRepository),
 		inject.Provide(repository.NewUserRepository),
 		inject.Provide(auth.NewService),
 		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
 		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
-		inject.Provide(webAuth.NewController, injectController()),
+		inject.Provide(webAuth.NewController, injectAsGinController()),
 
 		inject.Provide(user.NewService),
-		inject.Provide(webUser.NewController, injectController()),
+		inject.Provide(webUser.NewController, injectAsGinController()),
 
 		inject.Provide(repository.NewGormTodoRepository),
 		inject.Provide(todo.NewTodoService),
-		inject.Provide(webTodo.NewController, injectController()),
+		inject.Provide(webTodo.NewController, injectAsGinController()),
 
 		inject.Provide(newGinRouter),
 	)
@@ -94,7 +94,7 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 	return container
 }
 
-func injectController() inject.ProvideOption {
+func injectAsGinController() inject.ProvideOption {
 	return inject.As(api.GinControllerToken)
 }
 
