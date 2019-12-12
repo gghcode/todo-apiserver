@@ -119,7 +119,7 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
 			suite.Equal(tc.expectedJSON, actualJSON)
 		})
@@ -233,7 +233,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
 			suite.Equal(tc.expectedJSON, actualJSON)
 		})

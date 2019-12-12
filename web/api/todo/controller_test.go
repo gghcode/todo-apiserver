@@ -139,7 +139,7 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
 			suite.JSONEq(tc.expectedJSON, actualJSON)
 		})

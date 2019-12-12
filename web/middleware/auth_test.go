@@ -105,7 +105,7 @@ func TestAuthUserID(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, actual.StatusCode)
 
-	actualUserID := testutil.JSONStringFromResBody(t, actual.Body)
+	actualUserID := testutil.StringFromIOReader(t, actual.Body)
 
 	assert.Equal(t, expectedUserID, actualUserID)
 }
