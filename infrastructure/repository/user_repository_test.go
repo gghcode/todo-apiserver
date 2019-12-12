@@ -54,7 +54,6 @@ func (suite *userRepositoryIntegration) SetupTest() {
 
 func (suite *userRepositoryIntegration) TearDownTest() {
 	suite.dbCleanup()
-	suite.dbConn.Close()
 }
 
 func (suite *userRepositoryIntegration) TestCreateUser() {

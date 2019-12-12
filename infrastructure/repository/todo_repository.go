@@ -12,8 +12,6 @@ type gormTodoRepository struct {
 
 // NewGormTodoRepository return new todo repository
 func NewGormTodoRepository(dbConn db.GormConnection) todo.Repository {
-	dbConn.DB().AutoMigrate(todo.Todo{})
-
 	return &gormTodoRepository{
 		dbConn: dbConn,
 	}
