@@ -33,14 +33,6 @@ func ReqBodyFromInterface(t *testing.T, body interface{}) *bytes.Buffer {
 	return bytes.NewBuffer(jsonBytes)
 }
 
-func ObjectFromBytesBuffer(t *testing.T, buf *bytes.Buffer) interface{} {
-	var result interface{}
-	err := json.Unmarshal(buf.Bytes(), &result)
-	require.NoError(t, err)
-
-	return result
-}
-
 // JSONStringFromInterface return json string by interface.
 func JSONStringFromInterface(t *testing.T, res interface{}) string {
 	bytes, err := json.Marshal(res)

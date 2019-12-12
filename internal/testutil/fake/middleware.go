@@ -26,15 +26,16 @@ type accessTokenHandlerFactory struct {
 	userIDFactory UserIDFactory
 }
 
+// NewAccessTokenHandlerFactory return new fake access token handler factory
+func NewAccessTokenHandlerFactory(userIDFactory UserIDFactory) middleware.AccessTokenHandlerFactory {
+	return &accessTokenHandlerFactory{
+		userIDFactory: userIDFactory,
+	}
+}
+
 func (handler *accessTokenHandlerFactory) Create() middleware.AccessTokenHandlerFunc {
 	return func(ctx *gin.Context) error {
 		ctx.Set("user_id", handler.userIDFactory.UserID())
 		return nil
-	}
-}
-
-func NewAccessTokenHandlerFactory(userIDFactory UserIDFactory) middleware.AccessTokenHandlerFactory {
-	return &accessTokenHandlerFactory{
-		userIDFactory: userIDFactory,
 	}
 }
