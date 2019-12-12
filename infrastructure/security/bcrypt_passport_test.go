@@ -6,39 +6,52 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/security"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func TestBcryptPassportPasswordVerification(t *testing.T) {
 	testCases := []struct {
-		description    string
-		password       string
-		verifyPassword string
-		expected       bool
+		description       string
+		argBcryptCost     int
+		argOriginPassword string
+		argTargetPassword string
+		expectedErr       error
+		expected          bool
 	}{
 		{
-			description:    "ShouldBeValid",
-			password:       "12345678",
-			verifyPassword: "12345678",
-			expected:       true,
+			description:       "ShouldReturnErr",
+			argBcryptCost:     bcrypt.MaxCost + 1,
+			argOriginPassword: "1234",
+			argTargetPassword: "12",
+			expectedErr:       bcrypt.InvalidCostError(bcrypt.MaxCost + 1),
+			expected:          false,
 		},
 		{
-			description:    "ShouldBeInvalid",
-			password:       "12345678910",
-			verifyPassword: "12345",
-			expected:       false,
+			description:       "ShouldBeValid",
+			argBcryptCost:     bcrypt.MinCost,
+			argOriginPassword: "12345678",
+			argTargetPassword: "12345678",
+			expected:          true,
+		},
+		{
+			description:       "ShouldBeInvalid",
+			argBcryptCost:     bcrypt.MinCost,
+			argOriginPassword: "12345678910",
+			argTargetPassword: "12345",
+			expected:          false,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			bcryptPassport := security.NewBcryptPassport(config.Configuration{
-				BcryptCost: 1,
+				BcryptCost: tc.argBcryptCost,
 			})
 
-			passwordHash, err := bcryptPassport.HashPassword(tc.password)
-			assert.NoError(t, err)
+			passwordHash, actualErr := bcryptPassport.HashPassword(tc.argOriginPassword)
+			assert.Equal(t, tc.expectedErr, actualErr)
 
-			actual := bcryptPassport.IsValidPassword(tc.verifyPassword, passwordHash)
+			actual := bcryptPassport.IsValidPassword(tc.argTargetPassword, passwordHash)
 			assert.Equal(t, tc.expected, actual)
 		})
 	}
