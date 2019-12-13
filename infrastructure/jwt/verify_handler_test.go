@@ -8,6 +8,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,7 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 		description    string
 		argCfg         config.Configuration
 		argAccessToken string
-		expectedClaims func(claims jwt.MapClaims) jwt.MapClaims
+		expectedClaims middleware.TokenClaims
 		expectedErr    error
 	}{
 		{
@@ -33,37 +34,33 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 			argAccessToken: fmt.Sprintf("Bearer %s",
 				jwtToken(t, testSecretKeyBytes, time.Now().Add(1*time.Hour)),
 			),
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims {
-				return jwt.MapClaims{
-					"sub": "5",
-					"iat": claims["iat"],
-					"exp": claims["exp"],
-				}
+			expectedClaims: middleware.TokenClaims{
+				UserID: 5,
 			},
 			expectedErr: nil,
 		},
 		{
 			description:    "ShouldReturnErrNotContainTokenInHeader",
 			argAccessToken: "",
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims { return nil },
+			expectedClaims: middleware.TokenClaims{},
 			expectedErr:    auth.ErrNotContainTokenInHeader,
 		},
 		{
 			description:    "ShouldReturnErrInvalidToken",
 			argAccessToken: "dfadfasdfasdfasdfasdfsdfsdf",
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims { return nil },
+			expectedClaims: middleware.TokenClaims{},
 			expectedErr:    auth.ErrInvalidToken,
 		},
 		{
 			description:    "ShouldReturnErrInvalidTokenType",
 			argAccessToken: "JWT fasdfasdfasdfasdfasdfsdfasdf",
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims { return nil },
+			expectedClaims: middleware.TokenClaims{},
 			expectedErr:    auth.ErrInvalidTokenType,
 		},
 		{
 			description:    "ShouldReturnErrInvalidToken",
 			argAccessToken: "Bearer fasdfasdfasdfasdfasdfjklasdf",
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims { return nil },
+			expectedClaims: middleware.TokenClaims{},
 			expectedErr:    auth.ErrInvalidToken,
 		},
 		{
@@ -72,7 +69,7 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 			argAccessToken: fmt.Sprintf("Bearer %s",
 				jwtToken(t, testSecretKeyBytes, time.Unix(10, 0)),
 			),
-			expectedClaims: func(claims jwt.MapClaims) jwt.MapClaims { return nil },
+			expectedClaims: middleware.TokenClaims{},
 			expectedErr:    auth.ErrTokenExpired,
 		},
 	}
@@ -82,9 +79,9 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 			accessTokenHandlerFactory := NewJwtAccessTokenVerifyHandlerFactory(tc.argCfg)
 			accessTokenHandler := accessTokenHandlerFactory.Create()
 
-			_, actualErr := accessTokenHandler(tc.argAccessToken)
+			actualClaims, actualErr := accessTokenHandler(tc.argAccessToken)
 
-			// assert.Equal(t, tc.expectedClaims(actualClaims), actualClaims)
+			assert.Equal(t, tc.expectedClaims, actualClaims)
 			assert.Equal(t, tc.expectedErr, actualErr)
 		})
 	}

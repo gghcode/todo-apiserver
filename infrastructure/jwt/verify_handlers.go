@@ -38,9 +38,11 @@ func (handler *jwtAccessTokenHandler) Create() middleware.AccessTokenHandlerFunc
 			return result, err
 		}
 
-		return middleware.TokenClaims{
+		result = middleware.TokenClaims{
 			UserID: userID,
-		}, nil
+		}
+
+		return result, nil
 	}
 }
 
