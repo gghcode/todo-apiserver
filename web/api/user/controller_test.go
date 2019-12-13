@@ -27,13 +27,13 @@ func TestUserControllerUnitTests(t *testing.T) {
 }
 
 func (suite *ControllerUnitTestSuite) SetupTest() {
+	gin.SetMode(gin.TestMode)
+
 	suite.fakeUserService = fake.NewUserService()
 	suite.router = gin.New()
 
 	c := webUser.NewController(suite.fakeUserService)
 	c.RegisterRoutes(suite.router)
-
-	gin.SetMode(gin.TestMode)
 }
 
 func (suite *ControllerUnitTestSuite) TestCreateUser() {

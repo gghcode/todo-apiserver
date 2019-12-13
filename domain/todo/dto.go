@@ -13,19 +13,19 @@ type (
 
 	// UpdateTodoRequest godoc
 	UpdateTodoRequest struct {
-		Title    *string `json:"title"`
-		Contents *string `json:"contents"`
-		DueDate  *string `json:"due_date"`
+		Title    *string
+		Contents *string
+		DueDate  *string
 	}
 
 	// TodoResponse godoc
 	TodoResponse struct {
-		ID         string    `json:"id"`
-		Title      string    `json:"title"`
-		Contents   string    `json:"contents"`
-		AssignorID int64     `json:"assignor_id"`
-		CreatedAt  time.Time `json:"created_at"`
-		UpdatedAt  time.Time `json:"updated_at"`
-		DueDate    string    `json:"due_date"`
+		ID         string
+		Title      string
+		Contents   string
+		AssignorID int64
+		CreatedAt  time.Time
+		UpdatedAt  time.Time
+		DueDate    string
 	}
 )

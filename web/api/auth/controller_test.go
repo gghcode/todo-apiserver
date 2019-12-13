@@ -27,23 +27,16 @@ func TestAuthControllerUnitTests(t *testing.T) {
 }
 
 func (suite *ControllerUnitTestSuite) SetupTest() {
+	gin.SetMode(gin.TestMode)
+
 	suite.fakeAuthService = fake.NewAuthService()
 	suite.router = gin.New()
 
 	c := webAuth.NewController(suite.fakeAuthService)
 	c.RegisterRoutes(suite.router)
-
-	gin.SetMode(gin.TestMode)
 }
 
 func (suite *ControllerUnitTestSuite) TestIssueToken() {
-	fakeTokenRes := auth.TokenResponse{
-		Type:         "Bearer",
-		AccessToken:  "fasdf",
-		RefreshToken: "fasdf",
-		ExpiresIn:    123,
-	}
-
 	testCases := []struct {
 		description    string
 		req            auth.LoginRequest
@@ -62,10 +55,20 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
 				return testutil.ReqBodyFromInterface(suite.T(), req)
 			},
-			stubTokenRes:   fakeTokenRes,
+			stubTokenRes: auth.TokenResponse{
+				Type:         "Bearer",
+				AccessToken:  "fasdf",
+				RefreshToken: "fasdf",
+				ExpiresIn:    123,
+			},
 			stubErr:        nil,
 			expectedStatus: http.StatusOK,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), fakeTokenRes),
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), map[string]interface{}{
+				"type":          "Bearer",
+				"access_token":  "fasdf",
+				"refresh_token": "fasdf",
+				"expires_in":    123,
+			}),
 		},
 		{
 			description: "ShouldBeBadRequestWhenEmptyUsername",
@@ -121,18 +124,12 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 
 			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
-			suite.Equal(tc.expectedJSON, actualJSON)
+			suite.JSONEq(tc.expectedJSON, actualJSON)
 		})
 	}
 }
 
 func (suite *ControllerUnitTestSuite) TestRefreshToken() {
-	fakeTokenResponse := auth.TokenResponse{
-		Type:        "Bearer",
-		AccessToken: "abadfasdf",
-		ExpiresIn:   3600,
-	}
-
 	testCases := []struct {
 		description    string
 		req            auth.AccessTokenByRefreshRequest
@@ -148,12 +145,20 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
 				return testutil.ReqBodyFromInterface(suite.T(), req)
 			},
-			stubToken:      fakeTokenResponse,
+			stubToken: auth.TokenResponse{
+				Type:        "Bearer",
+				AccessToken: "abadfasdf",
+				ExpiresIn:   3600,
+			},
 			stubErr:        nil,
 			expectedStatus: http.StatusOK,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				fakeTokenResponse,
+				map[string]interface{}{
+					"type":         "Bearer",
+					"access_token": "abadfasdf",
+					"expires_in":   3600,
+				},
 			),
 		},
 		{
@@ -235,7 +240,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 
 			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
-			suite.Equal(tc.expectedJSON, actualJSON)
+			suite.JSONEq(tc.expectedJSON, actualJSON)
 		})
 	}
 }

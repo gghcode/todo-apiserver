@@ -29,6 +29,8 @@ func TestTodoControllerUnitTests(t *testing.T) {
 }
 
 func (suite *ControllerUnitTestSuite) SetupTest() {
+	gin.SetMode(gin.TestMode)
+
 	suite.fakeTodoService = fake.NewTodoService()
 	suite.fakeUserIDFactory = &fake.MockUserID{}
 	suite.router = gin.New()
@@ -38,8 +40,6 @@ func (suite *ControllerUnitTestSuite) SetupTest() {
 
 	c := webTodo.NewController(suite.fakeTodoService)
 	c.RegisterRoutes(suite.router)
-
-	gin.SetMode(gin.TestMode)
 }
 
 func (suite *ControllerUnitTestSuite) TestAddTodo() {

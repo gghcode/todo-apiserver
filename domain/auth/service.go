@@ -42,7 +42,6 @@ func NewService(
 	}
 }
 
-// IssueToken godoc
 func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
 	var res TokenResponse
 
