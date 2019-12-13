@@ -77,8 +77,8 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 		inject.Provide(repository.NewRedisTokenRepository),
 		inject.Provide(repository.NewUserRepository),
 		inject.Provide(auth.NewService),
-		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
-		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
+		inject.Provide(jwt.NewJwtAccessTokenGeneratorFunc),
+		inject.Provide(jwt.NewJwtRefreshTokenGeneratorFunc),
 		inject.Provide(webAuth.NewController, injectAsGinController()),
 
 		inject.Provide(user.NewService),

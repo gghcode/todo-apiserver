@@ -1,14 +1,16 @@
-package jwt
+package jwt_test
 
 import (
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
+
+	jwtGo "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -76,7 +78,7 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			accessTokenHandlerFactory := NewJwtAccessTokenVerifyHandlerFactory(tc.argCfg)
+			accessTokenHandlerFactory := jwt.NewJwtAccessTokenVerifyHandlerFactory(tc.argCfg)
 			accessTokenHandler := accessTokenHandlerFactory.Create()
 
 			actualClaims, actualErr := accessTokenHandler(tc.argAccessToken)
@@ -88,13 +90,13 @@ func TestJwtVerifyAccessToken(t *testing.T) {
 }
 
 func jwtToken(t *testing.T, secretKeyBytes []byte, expiresAt time.Time) string {
-	claims := &jwt.StandardClaims{
+	claims := &jwtGo.StandardClaims{
 		Subject:   "5",
 		ExpiresAt: expiresAt.Unix(),
 		IssuedAt:  time.Unix(1000, 0000).Unix(),
 	}
 
-	tokenObj := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenObj := jwtGo.NewWithClaims(jwtGo.SigningMethodHS256, claims)
 	tokenString, err := tokenObj.SignedString(secretKeyBytes)
 
 	assert.NoError(t, err)
