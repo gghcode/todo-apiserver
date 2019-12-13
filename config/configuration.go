@@ -70,7 +70,7 @@ type RedisConfig struct {
 // DefaultRedisConfig is config
 func DefaultRedisConfig() RedisConfig {
 	return RedisConfig{
-		Addr: "localhost:6378",
+		Addr: "localhost:6379",
 	}
 }
 
