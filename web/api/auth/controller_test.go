@@ -85,6 +85,19 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 			expectedJSON:   `{"error":{"message":"username: cannot be blank."}}`,
 		},
 		{
+			description: "ShouldBeBadRequestWhenPasswordInteger",
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
+					"username": "test",
+					"password": 34,
+				})
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(
+				api.NewUnmarshalError("password", "string"),
+			)),
+		},
+		{
 			description: "ShouldBeUnauthorizedWhenInvalidCredential",
 			req: auth.LoginRequest{
 				Username: "test",
