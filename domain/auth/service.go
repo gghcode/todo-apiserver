@@ -6,26 +6,22 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/user"
 )
 
-// CreateAccessTokenHandler godoc
-type CreateAccessTokenHandler func(userID int64) (string, error)
+type (
+	// AccessTokenGeneratorFunc generate access token
+	AccessTokenGeneratorFunc func(userID int64) (string, error)
 
-// CreateAccessTokenHandlerFactory is factory that return CreateAccessTokenHandler
-type CreateAccessTokenHandlerFactory func(config.Configuration) CreateAccessTokenHandler
+	// RefreshTokenGeneratorFunc generate refresh token
+	RefreshTokenGeneratorFunc func(userID int64) (string, error)
 
-// CreateRefreshTokenHandler godoc
-type CreateRefreshTokenHandler func(userID int64) (string, error)
-
-// CreateRefreshTokenHandlerFactory is factory that return CreateRefreshTokenHandler
-type CreateRefreshTokenHandlerFactory func(config.Configuration, TokenRepository) CreateRefreshTokenHandler
-
-type authService struct {
-	cfg                       config.JwtConfig
-	tokenRepo                 TokenRepository
-	userRepo                  user.Repository
-	passport                  security.Passport
-	createAccessTokenHandler  CreateAccessTokenHandler
-	createRefreshTokenHandler CreateRefreshTokenHandler
-}
+	authService struct {
+		cfg                  config.JwtConfig
+		tokenRepo            TokenRepository
+		userRepo             user.Repository
+		passport             security.Passport
+		generateAccessToken  AccessTokenGeneratorFunc
+		generateRefreshToken RefreshTokenGeneratorFunc
+	}
+)
 
 // NewService return new auth authService instance.
 func NewService(
@@ -33,20 +29,19 @@ func NewService(
 	passport security.Passport,
 	tokenRepo TokenRepository,
 	userRepo user.Repository,
-	accessTokenHandlerFactory CreateAccessTokenHandlerFactory,
-	refreshTokenHandlerFactory CreateRefreshTokenHandlerFactory) UsecaseInteractor {
+	accessTokenGeneratorFunc AccessTokenGeneratorFunc,
+	refreshTokenGeneratorFunc RefreshTokenGeneratorFunc) UsecaseInteractor {
 
 	return &authService{
-		cfg:                       cfg.Jwt,
-		userRepo:                  userRepo,
-		tokenRepo:                 tokenRepo,
-		passport:                  passport,
-		createAccessTokenHandler:  accessTokenHandlerFactory(cfg),
-		createRefreshTokenHandler: refreshTokenHandlerFactory(cfg, tokenRepo),
+		cfg:                  cfg.Jwt,
+		userRepo:             userRepo,
+		tokenRepo:            tokenRepo,
+		passport:             passport,
+		generateAccessToken:  accessTokenGeneratorFunc,
+		generateRefreshToken: refreshTokenGeneratorFunc,
 	}
 }
 
-// IssueToken godoc
 func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
 	var res TokenResponse
 
@@ -55,12 +50,12 @@ func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) 
 		return res, err
 	}
 
-	accessToken, err := service.createAccessTokenHandler(userID)
+	accessToken, err := service.generateAccessToken(userID)
 	if err != nil {
 		return res, err
 	}
 
-	refreshToken, err := service.createRefreshTokenHandler(userID)
+	refreshToken, err := service.generateRefreshToken(userID)
 	if err != nil {
 		return res, err
 	}
@@ -83,7 +78,7 @@ func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (Token
 		return res, err
 	}
 
-	accessToken, err := service.createAccessTokenHandler(userID)
+	accessToken, err := service.generateAccessToken(userID)
 	if err != nil {
 		return res, err
 	}

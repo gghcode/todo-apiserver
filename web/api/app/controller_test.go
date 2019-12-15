@@ -63,7 +63,7 @@ func (suite *ControllerUnitTestSuite) TestVersion() {
 
 			suite.Equal(tc.expectedStatus, actualRes.StatusCode)
 
-			actual := testutil.JSONStringFromResBody(suite.T(), actualRes.Body)
+			actual := testutil.StringFromIOReader(suite.T(), actualRes.Body)
 
 			suite.Equal(tc.expectedResponse, actual)
 		})

@@ -30,7 +30,6 @@ func (suite *RepositoryIntegration) SetupTest() {
 	cfg, err := config.NewViperBuilder().
 		BindEnvs("TEST").
 		Build()
-
 	suite.NoError(err)
 
 	suite.redisConn = db.NewRedisConn(cfg)
@@ -91,7 +90,7 @@ func (suite *RepositoryIntegration) TestUserIDByRefreshToken() {
 		{
 			description:     "ShouldReturnErrNotStoredToken",
 			argRefreshToken: "",
-			expected:        0,
+			expected:        -1,
 			expectedErr:     auth.ErrNotStoredToken,
 		},
 	}

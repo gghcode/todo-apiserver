@@ -1,43 +1,130 @@
 package middleware_test
 
 import (
+	"net/http"
+	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
+	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
+	"github.com/gghcode/apas-todo-apiserver/web/api"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-type JwtAuthMiddlewareUnit struct {
-	suite.Suite
+type (
+	fakeAccessTokenHandlerFactory struct {
+		stubHandler *fakeHandler
+	}
+	fakeHandler struct {
+		mock.Mock
+	}
+)
 
-	fakeUserID      int64
-	fakeAccessToken string
+func (f *fakeAccessTokenHandlerFactory) Create() middleware.AccessTokenHandlerFunc {
+	return func(token string) (middleware.TokenClaims, error) {
+		return f.stubHandler.Pass()
+	}
 }
 
-func TestJwtAuthMiddlewareUnit(t *testing.T) {
-	suite.Run(t, new(JwtAuthMiddlewareUnit))
+func (h *fakeHandler) Pass() (middleware.TokenClaims, error) {
+	args := h.Called()
+	return args.Get(0).(middleware.TokenClaims), args.Error(1)
 }
 
-func (suite *JwtAuthMiddlewareUnit) SetupTest() {
-	suite.fakeUserID = 10
+func TestRequiredAccessToken(t *testing.T) {
+	testCases := []struct {
+		description     string
+		stubTokenClaims middleware.TokenClaims
+		stubErr         error
+		expectedStatus  int
+		expectedJSON    string
+	}{
+		{
+			description: "ShouldReturnOK",
+			stubTokenClaims: middleware.TokenClaims{
+				UserID: 5,
+			},
+			stubErr:        nil,
+			expectedStatus: http.StatusOK,
+			expectedJSON:   "5",
+		},
+		{
+			description:    "ShouldReturnUnauthorized",
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusUnauthorized,
+			expectedJSON: testutil.JSONStringFromInterface(t,
+				api.MakeErrorResponse(fake.ErrStub),
+			),
+		},
+	}
 
+	for _, tc := range testCases {
+		t.Run(tc.description, func(t *testing.T) {
+			gin.SetMode(gin.TestMode)
+
+			errorHolder := &fakeHandler{}
+			errorHolder.On("Pass").Return(tc.stubTokenClaims, tc.stubErr)
+
+			accessTokenHandler := &fakeAccessTokenHandlerFactory{
+				stubHandler: errorHolder,
+			}
+
+			ginRouter := gin.New()
+			ginRouter.Use(middleware.AddAccessTokenHandler(accessTokenHandler))
+			ginRouter.Use(middleware.RequiredAccessToken())
+			ginRouter.GET("", func(ctx *gin.Context) {
+				ctx.String(http.StatusOK, strconv.FormatInt(
+					middleware.AuthUserID(ctx),
+					10,
+				))
+			})
+
+			actual := testutil.Response(
+				t,
+				ginRouter,
+				"GET",
+				"",
+				nil,
+			)
+
+			assert.Equal(t, tc.expectedStatus, actual.StatusCode)
+
+			actualJSON := testutil.StringFromIOReader(t, actual.Body)
+
+			assert.Equal(t, tc.expectedJSON, actualJSON)
+		})
+	}
 }
 
-// func (suite *JwtAuthMiddlewareUnit) TestVerifyAccessToken() {
-// 	testCases := []struct {
-// 		description    string
-// 		argSecret      string
-// 		argAccessToken string
-// 		expected       jwt.MapClaims
-// 		expectedErr    error
-// 	}{
-// 		{
-// 			description: "ShouldVerificationSuccess",
-// 		},
-// 	}
+// func TestAuthUserID(t *testing.T) {
+// 	var stubUserID int64 = 5
 
-// 	for _, tc := range testCases {
-// 		suite.Run(tc.description, func() {
-// 			actual, actualErr :=
-// 		})
-// 	}
+// 	expectedUserID := strconv.FormatInt(stubUserID, 10)
+
+// 	ginRouter := gin.New()
+// 	ginRouter.GET("", func(ctx *gin.Context) {
+// 		middleware.SetAuthUserID(ctx, stubUserID)
+
+// 		userID := middleware.AuthUserID(ctx)
+
+// 		ctx.String(http.StatusOK, strconv.FormatInt(userID, 10))
+// 	})
+
+// 	actual := testutil.Response(
+// 		t,
+// 		ginRouter,
+// 		"GET",
+// 		"",
+// 		nil,
+// 	)
+
+// 	assert.Equal(t, http.StatusOK, actual.StatusCode)
+
+// 	actualUserID := testutil.StringFromIOReader(t, actual.Body)
+
+// 	assert.Equal(t, expectedUserID, actualUserID)
 // }

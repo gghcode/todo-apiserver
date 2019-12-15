@@ -41,8 +41,8 @@ func JSONStringFromInterface(t *testing.T, res interface{}) string {
 	return string(bytes)
 }
 
-// JSONStringFromResBody return json string by http response body
-func JSONStringFromResBody(t *testing.T, body io.Reader) string {
+// StringFromIOReader return json string by http response body
+func StringFromIOReader(t *testing.T, body io.Reader) string {
 	bytes, err := ioutil.ReadAll(body)
 	require.NoError(t, err)
 

@@ -2,6 +2,8 @@ package db
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/todo"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
@@ -26,6 +28,11 @@ func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "db connect failed...")
 	}
+
+	gormDB.AutoMigrate(
+		&todo.Todo{},
+		&user.User{},
+	)
 
 	return &PostgresConn{
 		db: gormDB,

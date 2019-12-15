@@ -15,8 +15,6 @@ type repository struct {
 
 // NewUserRepository godoc
 func NewUserRepository(dbConn db.GormConnection) user.Repository {
-	dbConn.DB().AutoMigrate(user.User{})
-
 	return &repository{
 		dbConn: dbConn,
 	}
@@ -29,12 +27,8 @@ func (repo *repository) CreateUser(usr user.User) (user.User, error) {
 		Create(&usr).
 		Error
 
-	if pgErr, ok := err.(*pg.Error); ok {
-		if pgErr.Code == "23505" {
-			return user.User{}, user.ErrAlreadyExistUser
-		}
-
-		return user.User{}, err
+	if pgErr, ok := err.(*pg.Error); ok && pgErr.Code == "23505" {
+		return user.User{}, user.ErrAlreadyExistUser
 	} else if err != nil {
 		return user.User{}, err
 	}

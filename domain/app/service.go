@@ -5,14 +5,16 @@ import (
 	"path/filepath"
 )
 
-// FileReader read file
-type FileReader interface {
-	ReadString(path string) (string, error)
-}
+type (
+	// FileReader read file
+	FileReader interface {
+		ReadString(path string) (string, error)
+	}
 
-type appService struct {
-	reader FileReader
-}
+	appService struct {
+		reader FileReader
+	}
+)
 
 // NewService return appService
 func NewService(reader FileReader) UsecaseInteractor {

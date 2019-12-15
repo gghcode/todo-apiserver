@@ -7,18 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type appController struct {
+// Controller is app controller
+type Controller struct {
 	appService app.UsecaseInteractor
 }
 
 // NewController return new app controller
-func NewController(appService app.UsecaseInteractor) *appController {
-	return &appController{
+func NewController(appService app.UsecaseInteractor) *Controller {
+	return &Controller{
 		appService: appService,
 	}
 }
 
-func (c *appController) RegisterRoutes(router gin.IRouter) {
+// RegisterRoutes register handler routes.
+func (c *Controller) RegisterRoutes(router gin.IRouter) {
 	router.GET("/api/healthy", c.Healthy)
 	router.GET("/api/version", c.AppVersion)
 }
@@ -28,13 +30,13 @@ func (c *appController) RegisterRoutes(router gin.IRouter) {
 // @Success 200 {string} string OK
 // @Tags App API
 // @Router /api/healthy [get]
-func (c *appController) Healthy(ctx *gin.Context) {}
+func (c *Controller) Healthy(ctx *gin.Context) {}
 
-// Version godoc
+// AppVersion godoc
 // @Description Get server version
 // @Success 200 {string} string OK
 // @Tags App API
 // @Router /api/version [get]
-func (c *appController) AppVersion(ctx *gin.Context) {
+func (c *Controller) AppVersion(ctx *gin.Context) {
 	ctx.String(http.StatusOK, c.appService.Version())
 }

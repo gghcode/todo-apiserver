@@ -1,7 +1,7 @@
 package auth_test
 
 import (
-	"io"
+	"bytes"
 	"net/http"
 	"testing"
 
@@ -12,7 +12,6 @@ import (
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
 
 	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -30,24 +29,18 @@ func TestAuthControllerUnitTests(t *testing.T) {
 func (suite *ControllerUnitTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
-	suite.router = gin.New()
 	suite.fakeAuthService = fake.NewAuthService()
+	suite.router = gin.New()
 
 	c := webAuth.NewController(suite.fakeAuthService)
 	c.RegisterRoutes(suite.router)
 }
 
 func (suite *ControllerUnitTestSuite) TestIssueToken() {
-	fakeTokenRes := auth.TokenResponse{
-		Type:         "Bearer",
-		AccessToken:  "fasdf",
-		RefreshToken: "fasdf",
-		ExpiresIn:    123,
-	}
-
 	testCases := []struct {
 		description    string
-		reqPayload     io.Reader
+		req            auth.LoginRequest
+		reqPayload     func(req auth.LoginRequest) *bytes.Buffer
 		stubTokenRes   auth.TokenResponse
 		stubErr        error
 		expectedStatus int
@@ -55,36 +48,94 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 	}{
 		{
 			description: "ShouldGenerateToken",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				auth.LoginRequest{
-					Username: "test",
-					Password: "testtest",
-				},
-			),
-			stubTokenRes:   fakeTokenRes,
+			req: auth.LoginRequest{
+				Username: "test",
+				Password: "testtest",
+			},
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), req)
+			},
+			stubTokenRes: auth.TokenResponse{
+				Type:         "Bearer",
+				AccessToken:  "fasdf",
+				RefreshToken: "fasdf",
+				ExpiresIn:    123,
+			},
 			stubErr:        nil,
 			expectedStatus: http.StatusOK,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), fakeTokenRes),
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), map[string]interface{}{
+				"type":          "Bearer",
+				"access_token":  "fasdf",
+				"refresh_token": "fasdf",
+				"expires_in":    123,
+			}),
 		},
 		{
 			description: "ShouldBeBadRequestWhenEmptyUsername",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				auth.LoginRequest{
-					Username: "",
-					Password: "testtest",
-				},
-			),
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					auth.LoginRequest{
+						Username: "",
+						Password: "testtest",
+					},
+				)
+			},
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON:   `{"error":{"message":"username: cannot be blank."}}`,
+		},
+		{
+			description: "ShouldBeBadRequestWhenPasswordInteger",
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
+					"username": "test",
+					"password": 34,
+				})
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(
+				api.NewUnmarshalError("password", "string"),
+			)),
+		},
+		{
+			description: "ShouldBeUnauthorizedWhenInvalidCredential",
+			req: auth.LoginRequest{
+				Username: "test",
+				Password: "testtest",
+			},
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), req)
+			},
+			stubTokenRes:   auth.TokenResponse{},
+			stubErr:        auth.ErrInvalidCredential,
+			expectedStatus: http.StatusUnauthorized,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.MakeErrorResponse(
+					auth.ErrInvalidCredential,
+				),
+			),
+		},
+		{
+			description: "ShouldReturnServerInternalError",
+			req: auth.LoginRequest{
+				Username: "test",
+				Password: "testtest",
+			},
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), req)
+			},
+			stubTokenRes:   auth.TokenResponse{},
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusInternalServerError,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
 		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
 			suite.fakeAuthService.
-				On("IssueToken", mock.Anything).
+				On("IssueToken", tc.req).
 				Once().
 				Return(tc.stubTokenRes, tc.stubErr)
 
@@ -93,28 +144,23 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 				suite.router,
 				"POST",
 				"api/auth/token",
-				tc.reqPayload,
+				tc.reqPayload(tc.req),
 			)
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
-			suite.Equal(tc.expectedJSON, actualJSON)
+			suite.JSONEq(tc.expectedJSON, actualJSON)
 		})
 	}
 }
 
 func (suite *ControllerUnitTestSuite) TestRefreshToken() {
-	fakeTokenResponse := auth.TokenResponse{
-		Type:        "Bearer",
-		AccessToken: "abadfasdf",
-		ExpiresIn:   3600,
-	}
-
 	testCases := []struct {
 		description    string
-		reqPayload     io.Reader
+		req            auth.AccessTokenByRefreshRequest
+		reqPayload     func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer
 		stubToken      auth.TokenResponse
 		stubErr        error
 		expectedStatus int
@@ -122,44 +168,58 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 	}{
 		{
 			description: "ShouldRefreshToken",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				auth.AccessTokenByRefreshRequest{Token: "fasdfasdf"},
-			),
-			stubToken:      fakeTokenResponse,
+			req:         auth.AccessTokenByRefreshRequest{Token: "fasdfasdf"},
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), req)
+			},
+			stubToken: auth.TokenResponse{
+				Type:        "Bearer",
+				AccessToken: "abadfasdf",
+				ExpiresIn:   3600,
+			},
 			stubErr:        nil,
 			expectedStatus: http.StatusOK,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				fakeTokenResponse,
+				map[string]interface{}{
+					"type":         "Bearer",
+					"access_token": "abadfasdf",
+					"expires_in":   3600,
+				},
 			),
 		},
 		{
 			description: "ShouldReturnBadRequestWhenEmptyToken",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				auth.AccessTokenByRefreshRequest{Token: ""},
-			),
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					auth.AccessTokenByRefreshRequest{Token: ""},
+				)
+			},
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON:   `{"error":{"message":"token: cannot be blank."}}`,
 		},
 		{
 			description: "ShouldReturnBadRequestWhenNotContainToken",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				map[string]interface{}{},
-			),
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					map[string]interface{}{},
+				)
+			},
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON:   `{"error":{"message":"token: cannot be blank."}}`,
 		},
 		{
 			description: "ShouldReturnBadRequestWhenTokenTypeInteger",
-			reqPayload: testutil.ReqBodyFromInterface(
-				suite.T(),
-				map[string]interface{}{
-					"token": 3,
-				},
-			),
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					map[string]interface{}{
+						"token": 3,
+					},
+				)
+			},
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
@@ -168,12 +228,45 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 				),
 			),
 		},
+		{
+			description: "ShouldReturnUnauthrizedWhenErrNotStoredToken",
+			req:         auth.AccessTokenByRefreshRequest{Token: "abcd"},
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					req,
+				)
+			},
+			stubToken:      auth.TokenResponse{},
+			stubErr:        auth.ErrNotStoredToken,
+			expectedStatus: http.StatusUnauthorized,
+			expectedJSON: testutil.JSONStringFromInterface(
+				suite.T(),
+				api.MakeErrorResponse(
+					auth.ErrNotStoredToken,
+				),
+			),
+		},
+		{
+			description: "ShouldReturnServerInternalError",
+			req:         auth.AccessTokenByRefreshRequest{Token: "abcdabcd"},
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					req,
+				)
+			},
+			stubToken:      auth.TokenResponse{},
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusInternalServerError,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
 			suite.fakeAuthService.
-				On("RefreshToken", mock.Anything).
+				On("RefreshToken", tc.req).
 				Once().
 				Return(tc.stubToken, tc.stubErr)
 
@@ -182,14 +275,14 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 				suite.router,
 				"POST",
 				"api/auth/refresh",
-				tc.reqPayload,
+				tc.reqPayload(tc.req),
 			)
 
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
-			actualJSON := testutil.JSONStringFromResBody(suite.T(), actual.Body)
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
 
-			suite.Equal(tc.expectedJSON, actualJSON)
+			suite.JSONEq(tc.expectedJSON, actualJSON)
 		})
 	}
 }

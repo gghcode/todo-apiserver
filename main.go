@@ -6,6 +6,8 @@ import (
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
 	"github.com/gghcode/apas-todo-apiserver/domain/app"
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
@@ -13,8 +15,11 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
+	webTodo "github.com/gghcode/apas-todo-apiserver/web/api/todo"
+	webUser "github.com/gghcode/apas-todo-apiserver/web/api/user"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
+	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"github.com/defval/inject"
 	"github.com/gin-gonic/gin"
@@ -67,26 +72,45 @@ func setupContainer(cfg config.Configuration) *inject.Container {
 		inject.Provide(afero.NewOsFs),
 		inject.Provide(file.NewAferoFileReader),
 		inject.Provide(app.NewService),
-		inject.Provide(webApp.NewController, inject.As(new(api.GinController))),
+		inject.Provide(webApp.NewController, injectAsGinController()),
 
 		inject.Provide(repository.NewRedisTokenRepository),
 		inject.Provide(repository.NewUserRepository),
 		inject.Provide(auth.NewService),
-		inject.Provide(jwt.NewJwtAccessTokenHandlerFactory),
-		inject.Provide(jwt.NewJwtRefreshTokenHandlerfactory),
-		inject.Provide(webAuth.NewController, inject.As(new(api.GinController))),
+		inject.Provide(jwt.NewJwtAccessTokenGeneratorFunc),
+		inject.Provide(jwt.NewJwtRefreshTokenGeneratorFunc),
+		inject.Provide(webAuth.NewController, injectAsGinController()),
+
+		inject.Provide(user.NewService),
+		inject.Provide(webUser.NewController, injectAsGinController()),
+
+		inject.Provide(repository.NewGormTodoRepository),
+		inject.Provide(todo.NewTodoService),
+		inject.Provide(webTodo.NewController, injectAsGinController()),
+
 		inject.Provide(newGinRouter),
 	)
 
 	return container
 }
 
-func newGinRouter(controllers []api.GinController) *gin.Engine {
+func injectAsGinController() inject.ProvideOption {
+	return inject.As(api.GinControllerToken)
+}
+
+func newGinRouter(cfg config.Configuration, controllers []api.GinController) *gin.Engine {
 	router := gin.New()
+	registerMiddlewares(cfg, router)
 
 	for _, c := range controllers {
 		c.RegisterRoutes(router)
 	}
 
 	return router
+}
+
+func registerMiddlewares(cfg config.Configuration, router gin.IRouter) {
+	router.Use(middleware.AddAccessTokenHandler(
+		jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg),
+	))
 }

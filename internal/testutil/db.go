@@ -19,6 +19,7 @@ func DbCleanupFunc(db *gorm.DB) func() {
 
 	entries := []DbEntity{}
 
+	db.LogMode(false)
 	db.Callback().Create().After("gorm:create").
 		Register(hookName, func(scope *gorm.Scope) {
 			entries = append(entries, DbEntity{
@@ -29,6 +30,7 @@ func DbCleanupFunc(db *gorm.DB) func() {
 		})
 
 	return func() {
+		defer db.Close()
 		defer db.Callback().Create().Remove(hookName)
 
 		_, inTransaction := db.CommonDB().(*sql.Tx)

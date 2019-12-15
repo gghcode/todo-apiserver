@@ -49,6 +49,49 @@ definitions:
       type:
         type: string
     type: object
+  todo.AddTodoRequest:
+    properties:
+      contents:
+        type: string
+      title:
+        type: string
+    required:
+    - contents
+    - title
+    type: object
+  todo.TodoResponse:
+    properties:
+      assignor_id:
+        type: integer
+      contents:
+        type: string
+      created_at:
+        type: string
+      due_date:
+        type: string
+      id:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  user.UserResponse:
+    properties:
+      create_at:
+        type: string
+      id:
+        type: integer
+      username:
+        type: string
+    type: object
+  user.createUserRequestDto:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a apas todo api server.
@@ -126,6 +169,64 @@ paths:
             type: string
       tags:
       - App API
+  /api/todos:
+    post:
+      consumes:
+      - application/json
+      description: Add new todo
+      parameters:
+      - description: payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/todo.AddTodoRequest'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            $ref: '#/definitions/todo.TodoResponse'
+        "400":
+          description: Invalid payload
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Todo API
+  /api/users:
+    post:
+      consumes:
+      - application/json
+      description: Create new user
+      parameters:
+      - description: user payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/user.createUserRequestDto'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.UserResponse'
+        "400":
+          description: Invalid user payload
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+        "409":
+          description: Already exists user
+          schema:
+            $ref: '#/definitions/api.ErrorResponse'
+      tags:
+      - User API
   /api/version:
     get:
       description: Get server version

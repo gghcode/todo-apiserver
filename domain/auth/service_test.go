@@ -7,6 +7,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
@@ -43,86 +44,14 @@ func (suite *ServiceUnit) SetupTest() {
 		&suite.fakePassport,
 		&suite.fakeTokenRepo,
 		&suite.fakeUserRepo,
-		fakeCreateAccessTokenFactory,
-		fakeCreateRefreshTokenFactory,
+		func(userID int64) (string, error) {
+			return stubCreateAccessToken(userID), nil
+		},
+		func(userID int64) (string, error) {
+			return stubCreateRefreshToken(userID), nil
+		},
 	)
 }
-
-func stubCreateAccessToken(userID int64) string {
-	handler := fakeCreateAccessTokenFactory(config.DefaultConfig())
-	token, _ := handler(userID)
-	return token
-}
-
-func fakeCreateAccessTokenFactory(cfg config.Configuration) auth.CreateAccessTokenHandler {
-	return func(userID int64) (string, error) {
-		return "access_token", nil
-	}
-}
-
-func stubCreateRefreshToken(tokenRepo auth.TokenRepository, userID int64) string {
-	handler := fakeCreateRefreshTokenFactory(config.DefaultConfig(), tokenRepo)
-	token, _ := handler(userID)
-	return token
-}
-
-func fakeCreateRefreshTokenFactory(cfg config.Configuration, tokenRepo auth.TokenRepository) auth.CreateRefreshTokenHandler {
-	return func(userID int64) (string, error) {
-		return "refresh_token", nil
-	}
-}
-
-// func (suite *ServiceUnit) TestCreateRefreshToken() {
-// 	argJwtParam := suite.jwtParam
-// 	argUserID := int64(100)
-// 	expectedSub := strconv.FormatInt(argUserID, 10)
-
-// 	suite.fakeTokenRepo.On("SaveRefreshToken",
-// 		argUserID,
-// 		mock.Anything,
-// 		argJwtParam.RefreshExpiresInSec,
-// 	).Return(nil)
-
-// 	createRefreshTokenHandler := auth.CreateRefreshTokenFactory(argJwtParam, &suite.fakeTokenRepo)
-// 	token, err := createRefreshTokenHandler(argUserID)
-// 	suite.NoError(err)
-
-// 	claims, err := auth.ExtractTokenClaims(argJwtParam, token)
-// 	suite.NoError(err)
-
-// 	suite.Equal(expectedSub, claims["sub"])
-// }
-
-// func (suite *ServiceUnit) TestCreateAccessToken() {
-// 	testCases := []struct {
-// 		description string
-// 		argJwtParam auth.JwtParam
-// 		argUserID   int64
-// 	}{
-// 		{
-// 			description: "ShouldBeEqualSubject",
-// 			argUserID:   100,
-// 		},
-// 	}
-
-// 	for _, tc := range testCases {
-// 		suite.Run(tc.description, func() {
-// 			createAccessTokenHandler := auth.CreateAccessTokenFactory(tc.argJwtParam)
-// 			token, err := createAccessTokenHandler(tc.argUserID)
-
-// 			suite.NoError(err)
-
-// 			claims, err := auth.ExtractTokenClaims(tc.argJwtParam, token)
-
-// 			suite.NoError(err)
-
-// 			expected := strconv.FormatInt(tc.argUserID, 10)
-// 			actual := claims["sub"]
-
-// 			suite.Equal(expected, actual)
-// 		})
-// 	}
-// }
 
 func (suite *ServiceUnit) TestIssueToken() {
 	fakeUser := user.User{
@@ -148,7 +77,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 			expected: auth.TokenResponse{
 				Type:         "Bearer",
 				AccessToken:  stubCreateAccessToken(fakeUser.ID),
-				RefreshToken: stubCreateRefreshToken(&suite.fakeTokenRepo, fakeUser.ID),
+				RefreshToken: stubCreateRefreshToken(fakeUser.ID),
 				ExpiresIn:    suite.cfg.Jwt.AccessExpiresInSec,
 			},
 			expectedErr: nil,
@@ -247,4 +176,12 @@ func (suite *ServiceUnit) TestRefreshToken() {
 			suite.Equal(tc.expectedErr, actualErr)
 		})
 	}
+}
+
+func stubCreateAccessToken(userID int64) string {
+	return "access_token"
+}
+
+func stubCreateRefreshToken(userID int64) string {
+	return "refresh_token"
 }
