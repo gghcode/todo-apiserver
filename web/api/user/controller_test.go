@@ -103,6 +103,19 @@ func (suite *ControllerUnitTestSuite) TestCreateUser() {
 				api.MakeErrorResponse(user.ErrAlreadyExistUser),
 			),
 		},
+		{
+			description: "ShouldReturnBadRequestWhenPasswordInteger",
+			reqPayload: func(req user.CreateUserRequest) io.Reader {
+				return testutil.ReqBodyFromInterface(suite.T(), map[string]interface{}{
+					"username": "test",
+					"password": 3,
+				})
+			},
+			expectedStatus: http.StatusBadRequest,
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(
+				api.NewUnmarshalError("password", "string"),
+			)),
+		},
 	}
 
 	for _, tc := range testCases {
