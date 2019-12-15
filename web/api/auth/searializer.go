@@ -2,16 +2,18 @@ package auth
 
 import "github.com/gghcode/apas-todo-apiserver/domain/auth"
 
-type tokenResponse struct {
-	Type         string `json:"type"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token,omitempty"`
-	ExpiresIn    int64  `json:"expires_in"`
-}
+type (
+	tokenResponseDTO struct {
+		Type         string `json:"type"`
+		AccessToken  string `json:"access_token"`
+		RefreshToken string `json:"refresh_token,omitempty"`
+		ExpiresIn    int64  `json:"expires_in"`
+	}
 
-type tokenResponseSerializer struct {
-	model auth.TokenResponse
-}
+	tokenResponseSerializer struct {
+		model auth.TokenResponse
+	}
+)
 
 // newTokenResponseSerializer serialize token response
 func newTokenResponseSerializer(model auth.TokenResponse) *tokenResponseSerializer {
@@ -20,8 +22,8 @@ func newTokenResponseSerializer(model auth.TokenResponse) *tokenResponseSerializ
 	}
 }
 
-func (s *tokenResponseSerializer) Response() tokenResponse {
-	return tokenResponse{
+func (s *tokenResponseSerializer) Response() tokenResponseDTO {
+	return tokenResponseDTO{
 		Type:         s.model.Type,
 		AccessToken:  s.model.AccessToken,
 		RefreshToken: s.model.RefreshToken,

@@ -7,7 +7,7 @@ import (
 )
 
 type (
-	userResponse struct {
+	userResponseDTO struct {
 		ID        int64     `json:"id"`
 		UserName  string    `json:"username"`
 		CreatedAt time.Time `json:"created_at"`
@@ -24,8 +24,8 @@ func newUserResponseSerializer(model user.UserResponse) *userResponseSerializer 
 	}
 }
 
-func (s *userResponseSerializer) Response() userResponse {
-	return userResponse{
+func (s *userResponseSerializer) Response() userResponseDTO {
+	return userResponseDTO{
 		ID:        s.model.ID,
 		UserName:  s.model.UserName,
 		CreatedAt: s.model.CreatedAt,

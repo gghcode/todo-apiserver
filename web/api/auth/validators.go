@@ -12,20 +12,20 @@ import (
 )
 
 type (
-	loginRequestDto struct {
+	loginRequestDTO struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
-	accessTokenByRefreshRequestDto struct {
+	accessTokenByRefreshRequestDTO struct {
 		Token string `json:"token"`
 	}
 )
 
-func validateLoginRequestDto(ctx *gin.Context, req *auth.LoginRequest) error {
+func validateLoginRequestDTO(ctx *gin.Context, req *auth.LoginRequest) error {
 	var jsonError *json.UnmarshalTypeError
 
-	var reqDto loginRequestDto
+	var reqDto loginRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDto); errors.As(err, &jsonError) {
 		return api.NewUnmarshalError(jsonError.Field, jsonError.Type.String())
 	} else if err != nil {
@@ -44,10 +44,10 @@ func validateLoginRequestDto(ctx *gin.Context, req *auth.LoginRequest) error {
 	)
 }
 
-func validateAccessTokenByRefreshRequest(ctx *gin.Context, req *auth.AccessTokenByRefreshRequest) error {
+func validateAccessTokenByRefreshRequestDTO(ctx *gin.Context, req *auth.AccessTokenByRefreshRequest) error {
 	var jsonError *json.UnmarshalTypeError
 
-	var reqDto accessTokenByRefreshRequestDto
+	var reqDto accessTokenByRefreshRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDto); errors.As(err, &jsonError) {
 		return api.NewUnmarshalError(jsonError.Field, jsonError.Type.String())
 	} else if err != nil {

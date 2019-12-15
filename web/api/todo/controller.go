@@ -34,21 +34,21 @@ func (c *Controller) RegisterRoutes(router gin.IRouter) {
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param payload body todo.AddTodoRequest true "payload"
-// @Success 201 {object} todo.TodoResponse "ok"
-// @Failure 400 {object} api.ErrorResponse "Invalid payload"
+// @Param payload body todo.addTodoRequestDTO true "payload"
+// @Success 201 {object} todo.todoResponseDTO "ok"
+// @Failure 400 {object} api.ErrorResponseDTO "Invalid payload"
 // @Tags Todo API
 // @Router /api/todos [post]
 func (c *Controller) AddTodo(ctx *gin.Context) {
 	var req todo.AddTodoRequest
-	if err := validateAddTodoRequestDto(ctx, &req); err != nil {
-		ctx.JSON(http.StatusBadRequest, api.MakeErrorResponse(err))
+	if err := validateAddTodoRequestDTO(ctx, &req); err != nil {
+		ctx.JSON(http.StatusBadRequest, api.MakeErrorResponseDTO(err))
 		return
 	}
 
 	res, err := c.todoService.AddTodo(req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponseDTO(err))
 		return
 	}
 

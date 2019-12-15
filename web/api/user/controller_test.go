@@ -100,7 +100,7 @@ func (suite *ControllerUnitTestSuite) TestCreateUser() {
 			expectedStatus: http.StatusConflict,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				api.MakeErrorResponse(user.ErrAlreadyExistUser),
+				api.MakeErrorResponseDTO(user.ErrAlreadyExistUser),
 			),
 		},
 		{
@@ -112,7 +112,7 @@ func (suite *ControllerUnitTestSuite) TestCreateUser() {
 				})
 			},
 			expectedStatus: http.StatusBadRequest,
-			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(
 				api.NewUnmarshalError("password", "string"),
 			)),
 		},
@@ -128,7 +128,7 @@ func (suite *ControllerUnitTestSuite) TestCreateUser() {
 			stubUserRes:    user.UserResponse{},
 			stubErr:        fake.ErrStub,
 			expectedStatus: http.StatusInternalServerError,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(fake.ErrStub)),
 		},
 	}
 

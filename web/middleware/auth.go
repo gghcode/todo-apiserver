@@ -44,7 +44,7 @@ func RequiredAccessToken() gin.HandlerFunc {
 
 		claims, err := accessTokenHandler(token)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, api.MakeErrorResponse(err))
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, api.MakeErrorResponseDTO(err))
 			return
 		}
 

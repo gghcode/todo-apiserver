@@ -12,16 +12,16 @@ import (
 )
 
 type (
-	addTodoRequestDto struct {
+	addTodoRequestDTO struct {
 		Title    string `json:"title"`
 		Contents string `json:"contents"`
 	}
 )
 
-func validateAddTodoRequestDto(ctx *gin.Context, req *todo.AddTodoRequest) error {
+func validateAddTodoRequestDTO(ctx *gin.Context, req *todo.AddTodoRequest) error {
 	var jsonError *json.UnmarshalTypeError
 
-	var reqDto addTodoRequestDto
+	var reqDto addTodoRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDto); errors.As(err, &jsonError) {
 		return api.NewUnmarshalError(jsonError.Field, jsonError.Type.String())
 	} else if err != nil {

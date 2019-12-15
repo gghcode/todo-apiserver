@@ -6,15 +6,15 @@ type (
 		Message string `json:"message"`
 	}
 
-	// ErrorResponse godoc
-	ErrorResponse struct {
+	// ErrorResponseDTO godoc
+	ErrorResponseDTO struct {
 		Error ErrorMetaData `json:"error"`
 	}
 )
 
-// MakeErrorResponse return error response from error
-func MakeErrorResponse(err error) ErrorResponse {
-	return ErrorResponse{
+// MakeErrorResponseDTO return error response from error
+func MakeErrorResponseDTO(err error) ErrorResponseDTO {
+	return ErrorResponseDTO{
 		Error: ErrorMetaData{
 			Message: err.Error(),
 		},
