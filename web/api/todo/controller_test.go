@@ -116,6 +116,28 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON:   `{"error":{"message":"contents: cannot be blank."}}`,
 		},
+		{
+			description: "ShouldReturnServerInternalError",
+			req: todo.AddTodoRequest{
+				Title:      "title",
+				Contents:   "contents",
+				AssignorID: 10,
+			},
+			reqPayload: func(req todo.AddTodoRequest) io.Reader {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					map[string]interface{}{
+						"title":    req.Title,
+						"contents": req.Contents,
+					},
+				)
+			},
+			stubAuthUserID: 10,
+			stubTodoRes:    todo.TodoResponse{},
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusInternalServerError,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+		},
 	}
 
 	for _, tc := range testCases {

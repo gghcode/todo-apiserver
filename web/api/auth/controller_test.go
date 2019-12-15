@@ -116,6 +116,20 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 				),
 			),
 		},
+		{
+			description: "ShouldReturnServerInternalError",
+			req: auth.LoginRequest{
+				Username: "test",
+				Password: "testtest",
+			},
+			reqPayload: func(req auth.LoginRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(suite.T(), req)
+			},
+			stubTokenRes:   auth.TokenResponse{},
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusInternalServerError,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -233,12 +247,27 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 				),
 			),
 		},
+		{
+			description: "ShouldReturnServerInternalError",
+			req:         auth.AccessTokenByRefreshRequest{Token: "abcdabcd"},
+			reqPayload: func(req auth.AccessTokenByRefreshRequest) *bytes.Buffer {
+				return testutil.ReqBodyFromInterface(
+					suite.T(),
+					req,
+				)
+			},
+			stubToken:      auth.TokenResponse{},
+			stubErr:        fake.ErrStub,
+			expectedStatus: http.StatusInternalServerError,
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
 			suite.fakeAuthService.
 				On("RefreshToken", tc.req).
+				Once().
 				Return(tc.stubToken, tc.stubErr)
 
 			actual := testutil.Response(
