@@ -103,7 +103,7 @@ func newGinRouter(cfg config.Configuration, controllers []api.GinController) *gi
 	registerMiddlewares(cfg, router)
 
 	for _, c := range controllers {
-		c.RegisterRoutes(router)
+		c.RegisterRoutes(router.Group(""))
 	}
 
 	return router

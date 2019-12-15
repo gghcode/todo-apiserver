@@ -11,16 +11,16 @@ import (
 )
 
 type (
-	createUserRequestDto struct {
+	createUserRequestDTO struct {
 		UserName string `json:"username"`
 		Password string `json:"password"`
 	}
 )
 
-func validateCreateUserRequestDto(ctx *gin.Context, req *user.CreateUserRequest) error {
+func validateCreateUserRequestDTO(ctx *gin.Context, req *user.CreateUserRequest) error {
 	var jsonError *json.UnmarshalTypeError
 
-	var reqDto createUserRequestDto
+	var reqDto createUserRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDto); errors.As(err, &jsonError) {
 		return api.NewUnmarshalError(jsonError.Field, jsonError.Type.String())
 	} else if err != nil {

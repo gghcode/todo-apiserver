@@ -28,7 +28,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/auth.AccessTokenByRefreshRequest"
+                            "$ref": "#/definitions/auth.accessTokenByRefreshRequestDTO"
                         }
                     }
                 ],
@@ -36,19 +36,19 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/auth.tokenResponse"
+                            "$ref": "#/definitions/auth.tokenResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     }
                 }
@@ -74,7 +74,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/auth.LoginRequest"
+                            "$ref": "#/definitions/auth.loginRequestDTO"
                         }
                     }
                 ],
@@ -82,19 +82,19 @@
                     "200": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/auth.TokenResponse"
+                            "$ref": "#/definitions/auth.tokenResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     },
                     "401": {
                         "description": "Invalid credential",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     }
                 }
@@ -141,7 +141,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/todo.AddTodoRequest"
+                            "$ref": "#/definitions/todo.addTodoRequestDTO"
                         }
                     }
                 ],
@@ -149,13 +149,13 @@
                     "201": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/todo.TodoResponse"
+                            "$ref": "#/definitions/todo.todoResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid payload",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     }
                 }
@@ -181,7 +181,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/user.createUserRequestDto"
+                            "$ref": "#/definitions/user.createUserRequestDTO"
                         }
                     }
                 ],
@@ -189,19 +189,19 @@
                     "201": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/user.UserResponse"
+                            "$ref": "#/definitions/user.userResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Invalid user payload",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     },
                     "409": {
                         "description": "Already exists user",
                         "schema": {
-                            "$ref": "#/definitions/api.ErrorResponse"
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
                         }
                     }
                 }
@@ -233,7 +233,7 @@
                 }
             }
         },
-        "api.ErrorResponse": {
+        "api.ErrorResponseDTO": {
             "type": "object",
             "properties": {
                 "error": {
@@ -242,23 +242,16 @@
                 }
             }
         },
-        "auth.AccessTokenByRefreshRequest": {
+        "auth.accessTokenByRefreshRequestDTO": {
             "type": "object",
-            "required": [
-                "token"
-            ],
             "properties": {
                 "token": {
                     "type": "string"
                 }
             }
         },
-        "auth.LoginRequest": {
+        "auth.loginRequestDTO": {
             "type": "object",
-            "required": [
-                "password",
-                "username"
-            ],
             "properties": {
                 "password": {
                     "type": "string"
@@ -268,7 +261,7 @@
                 }
             }
         },
-        "auth.TokenResponse": {
+        "auth.tokenResponseDTO": {
             "type": "object",
             "properties": {
                 "access_token": {
@@ -285,29 +278,8 @@
                 }
             }
         },
-        "auth.tokenResponse": {
+        "todo.addTodoRequestDTO": {
             "type": "object",
-            "properties": {
-                "access_token": {
-                    "type": "string"
-                },
-                "expires_in": {
-                    "type": "integer"
-                },
-                "refresh_token": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
-        },
-        "todo.AddTodoRequest": {
-            "type": "object",
-            "required": [
-                "contents",
-                "title"
-            ],
             "properties": {
                 "contents": {
                     "type": "string"
@@ -317,51 +289,39 @@
                 }
             }
         },
-        "todo.TodoResponse": {
+        "todo.todoResponseDTO": {
             "type": "object",
             "properties": {
-                "assignor_id": {
-                    "type": "integer"
-                },
                 "contents": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.createUserRequestDTO": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.userResponseDTO": {
+            "type": "object",
+            "properties": {
                 "created_at": {
                     "type": "string"
                 },
-                "due_date": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.UserResponse": {
-            "type": "object",
-            "properties": {
-                "create_at": {
-                    "type": "string"
-                },
                 "id": {
                     "type": "integer"
-                },
-                "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "user.createUserRequestDto": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "type": "string"
                 },
                 "username": {
                     "type": "string"

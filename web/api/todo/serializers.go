@@ -3,7 +3,7 @@ package todo
 import "github.com/gghcode/apas-todo-apiserver/domain/todo"
 
 type (
-	todoResponse struct {
+	todoResponseDTO struct {
 		ID       string `json:"id"`
 		Title    string `json:"title"`
 		Contents string `json:"contents"`
@@ -20,8 +20,8 @@ func newTodoResponseSerializer(model todo.TodoResponse) *todoResponseSerializer 
 	}
 }
 
-func (s *todoResponseSerializer) Response() todoResponse {
-	return todoResponse{
+func (s *todoResponseSerializer) Response() todoResponseDTO {
+	return todoResponseDTO{
 		ID:       s.model.ID,
 		Title:    s.model.Title,
 		Contents: s.model.Contents,

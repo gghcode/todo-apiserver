@@ -93,7 +93,7 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 				})
 			},
 			expectedStatus: http.StatusBadRequest,
-			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(
 				api.NewUnmarshalError("password", "string"),
 			)),
 		},
@@ -111,7 +111,7 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 			expectedStatus: http.StatusUnauthorized,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				api.MakeErrorResponse(
+				api.MakeErrorResponseDTO(
 					auth.ErrInvalidCredential,
 				),
 			),
@@ -128,7 +128,7 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 			stubTokenRes:   auth.TokenResponse{},
 			stubErr:        fake.ErrStub,
 			expectedStatus: http.StatusInternalServerError,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(fake.ErrStub)),
 		},
 	}
 
@@ -223,7 +223,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				api.MakeErrorResponse(
+				api.MakeErrorResponseDTO(
 					api.NewUnmarshalError("token", "string"),
 				),
 			),
@@ -242,7 +242,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 			expectedStatus: http.StatusUnauthorized,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				api.MakeErrorResponse(
+				api.MakeErrorResponseDTO(
 					auth.ErrNotStoredToken,
 				),
 			),
@@ -259,7 +259,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 			stubToken:      auth.TokenResponse{},
 			stubErr:        fake.ErrStub,
 			expectedStatus: http.StatusInternalServerError,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(fake.ErrStub)),
 		},
 	}
 

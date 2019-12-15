@@ -57,7 +57,7 @@ func TestRequiredAccessToken(t *testing.T) {
 			stubErr:        fake.ErrStub,
 			expectedStatus: http.StatusUnauthorized,
 			expectedJSON: testutil.JSONStringFromInterface(t,
-				api.MakeErrorResponse(fake.ErrStub),
+				api.MakeErrorResponseDTO(fake.ErrStub),
 			),
 		},
 	}

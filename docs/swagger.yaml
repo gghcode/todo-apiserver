@@ -4,30 +4,25 @@ definitions:
       message:
         type: string
     type: object
-  api.ErrorResponse:
+  api.ErrorResponseDTO:
     properties:
       error:
         $ref: '#/definitions/api.ErrorMetaData'
         type: object
     type: object
-  auth.AccessTokenByRefreshRequest:
+  auth.accessTokenByRefreshRequestDTO:
     properties:
       token:
         type: string
-    required:
-    - token
     type: object
-  auth.LoginRequest:
+  auth.loginRequestDTO:
     properties:
       password:
         type: string
       username:
         type: string
-    required:
-    - password
-    - username
     type: object
-  auth.TokenResponse:
+  auth.tokenResponseDTO:
     properties:
       access_token:
         type: string
@@ -38,57 +33,35 @@ definitions:
       type:
         type: string
     type: object
-  auth.tokenResponse:
-    properties:
-      access_token:
-        type: string
-      expires_in:
-        type: integer
-      refresh_token:
-        type: string
-      type:
-        type: string
-    type: object
-  todo.AddTodoRequest:
+  todo.addTodoRequestDTO:
     properties:
       contents:
         type: string
       title:
         type: string
-    required:
-    - contents
-    - title
     type: object
-  todo.TodoResponse:
+  todo.todoResponseDTO:
     properties:
-      assignor_id:
-        type: integer
       contents:
         type: string
+      id:
+        type: string
+      title:
+        type: string
+    type: object
+  user.createUserRequestDTO:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  user.userResponseDTO:
+    properties:
       created_at:
         type: string
-      due_date:
-        type: string
-      id:
-        type: string
-      title:
-        type: string
-      updated_at:
-        type: string
-    type: object
-  user.UserResponse:
-    properties:
-      create_at:
-        type: string
       id:
         type: integer
-      username:
-        type: string
-    type: object
-  user.createUserRequestDto:
-    properties:
-      password:
-        type: string
       username:
         type: string
     type: object
@@ -110,7 +83,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/auth.AccessTokenByRefreshRequest'
+          $ref: '#/definitions/auth.accessTokenByRefreshRequestDTO'
           type: object
       produces:
       - application/json
@@ -118,15 +91,15 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/auth.tokenResponse'
+            $ref: '#/definitions/auth.tokenResponseDTO'
         "400":
           description: Invalid payload
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
         "401":
           description: Invalid credential
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
       tags:
       - Auth API
   /api/auth/token:
@@ -140,7 +113,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/auth.LoginRequest'
+          $ref: '#/definitions/auth.loginRequestDTO'
           type: object
       produces:
       - application/json
@@ -148,15 +121,15 @@ paths:
         "200":
           description: ok
           schema:
-            $ref: '#/definitions/auth.TokenResponse'
+            $ref: '#/definitions/auth.tokenResponseDTO'
         "400":
           description: Invalid payload
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
         "401":
           description: Invalid credential
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
       tags:
       - Auth API
   /api/healthy:
@@ -180,7 +153,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/todo.AddTodoRequest'
+          $ref: '#/definitions/todo.addTodoRequestDTO'
           type: object
       produces:
       - application/json
@@ -188,11 +161,11 @@ paths:
         "201":
           description: ok
           schema:
-            $ref: '#/definitions/todo.TodoResponse'
+            $ref: '#/definitions/todo.todoResponseDTO'
         "400":
           description: Invalid payload
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
       security:
       - ApiKeyAuth: []
       tags:
@@ -208,7 +181,7 @@ paths:
         name: payload
         required: true
         schema:
-          $ref: '#/definitions/user.createUserRequestDto'
+          $ref: '#/definitions/user.createUserRequestDTO'
           type: object
       produces:
       - application/json
@@ -216,15 +189,15 @@ paths:
         "201":
           description: ok
           schema:
-            $ref: '#/definitions/user.UserResponse'
+            $ref: '#/definitions/user.userResponseDTO'
         "400":
           description: Invalid user payload
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
         "409":
           description: Already exists user
           schema:
-            $ref: '#/definitions/api.ErrorResponse'
+            $ref: '#/definitions/api.ErrorResponseDTO'
       tags:
       - User API
   /api/version:

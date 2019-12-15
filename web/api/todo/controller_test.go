@@ -100,7 +100,7 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 			expectedStatus: http.StatusBadRequest,
 			expectedJSON: testutil.JSONStringFromInterface(
 				suite.T(),
-				api.MakeErrorResponse(api.NewUnmarshalError("title", "string")),
+				api.MakeErrorResponseDTO(api.NewUnmarshalError("title", "string")),
 			),
 		},
 		{
@@ -136,7 +136,7 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 			stubTodoRes:    todo.TodoResponse{},
 			stubErr:        fake.ErrStub,
 			expectedStatus: http.StatusInternalServerError,
-			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponse(fake.ErrStub)),
+			expectedJSON:   testutil.JSONStringFromInterface(suite.T(), api.MakeErrorResponseDTO(fake.ErrStub)),
 		},
 	}
 

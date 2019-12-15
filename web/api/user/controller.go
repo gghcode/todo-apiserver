@@ -29,25 +29,25 @@ func (c *Controller) RegisterRoutes(router gin.IRouter) {
 // @Description Create new user
 // @Accept json
 // @Produce json
-// @Param payload body user.createUserRequestDto true "user payload"
-// @Success 201 {object} user.UserResponse "ok"
-// @Failure 400 {object} api.ErrorResponse "Invalid user payload"
-// @Failure 409 {object} api.ErrorResponse "Already exists user"
+// @Param payload body user.createUserRequestDTO true "user payload"
+// @Success 201 {object} user.userResponseDTO "ok"
+// @Failure 400 {object} api.ErrorResponseDTO "Invalid user payload"
+// @Failure 409 {object} api.ErrorResponseDTO "Already exists user"
 // @Tags User API
 // @Router /api/users [post]
 func (c *Controller) CreateUser(ctx *gin.Context) {
 	var req user.CreateUserRequest
-	if err := validateCreateUserRequestDto(ctx, &req); err != nil {
-		ctx.JSON(http.StatusBadRequest, api.MakeErrorResponse(err))
+	if err := validateCreateUserRequestDTO(ctx, &req); err != nil {
+		ctx.JSON(http.StatusBadRequest, api.MakeErrorResponseDTO(err))
 		return
 	}
 
 	res, err := c.userService.CreateUser(req)
 	if err == user.ErrAlreadyExistUser {
-		ctx.JSON(http.StatusConflict, api.MakeErrorResponse(err))
+		ctx.JSON(http.StatusConflict, api.MakeErrorResponseDTO(err))
 		return
 	} else if err != nil {
-		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponse(err))
+		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponseDTO(err))
 		return
 	}
 
