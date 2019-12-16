@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/gghcode/apas-todo-apiserver/domain/user"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
+	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,11 @@ func NewController(userService user.UsecaseInteractor) *Controller {
 // RegisterRoutes register handler routes.
 func (c *Controller) RegisterRoutes(router gin.IRouter) {
 	router.POST("api/users", c.CreateUser)
+
+	authorized := router.Use(middleware.RequiredAccessToken())
+	{
+		authorized.GET("api/user", c.User)
+	}
 }
 
 // CreateUser is api that create user
@@ -54,4 +60,17 @@ func (c *Controller) CreateUser(ctx *gin.Context) {
 	serializer := newUserResponseSerializer(res)
 
 	ctx.JSON(http.StatusCreated, serializer.Response())
+}
+
+// User godoc
+// @Description Fetch user itself by access_token
+// @Security ApiKeyAuth
+// @Accept json
+// @Produce json
+// @Success 200 {object} user.userResponseDTO "ok"
+// @Failure 404 {object} api.ErrorResponseDTO "User Not Found"
+// @Tags User API
+// @Router /api/user [get]
+func (c *Controller) User(ctx *gin.Context) {
+
 }

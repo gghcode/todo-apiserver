@@ -155,3 +155,39 @@ func (suite *ControllerUnitTestSuite) TestCreateUser() {
 		})
 	}
 }
+
+func (suite *ControllerUnitTestSuite) TestUser() {
+	testCases := []struct {
+		description    string
+		expectedStatus int
+		expectedJSON   string
+	}{
+		{
+			description:    "ShouldReturnUser",
+			expectedStatus: http.StatusOK,
+			expectedJSON: testutil.JSONStringFromInterface(suite.T(),
+				map[string]interface{}{
+					"id":       3,
+					"username": "hello",
+				}),
+		},
+	}
+
+	for _, tc := range testCases {
+		suite.Run(tc.description, func() {
+			actual := testutil.Response(
+				suite.T(),
+				suite.router,
+				"GET",
+				"api/user",
+				nil,
+			)
+
+			suite.Equal(tc.expectedStatus, actual.StatusCode)
+
+			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
+
+			suite.JSONEq(tc.expectedJSON, actualJSON)
+		})
+	}
+}
