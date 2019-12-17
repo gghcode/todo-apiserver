@@ -193,6 +193,32 @@ paths:
       - ApiKeyAuth: []
       tags:
       - Todo API
+  /api/todos/{todo_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove todo by todo id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            $ref: '#/definitions/todo.todoResponseDTO'
+        "404":
+          description: Todo Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Todo API
   /api/user:
     get:
       consumes:

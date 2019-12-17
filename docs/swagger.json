@@ -195,6 +195,48 @@
                 }
             }
         },
+        "/api/todos/{todo_id}": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Remove todo by todo id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo API"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Todo ID",
+                        "name": "todo_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/todo.todoResponseDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "Todo Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/api/user": {
             "get": {
                 "security": [

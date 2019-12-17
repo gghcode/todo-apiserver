@@ -27,6 +27,7 @@ func (c *Controller) RegisterRoutes(router gin.IRouter) {
 	{
 		authorized.POST("api/todos", c.AddTodo)
 		authorized.GET("api/todos", c.Todos)
+		authorized.DELETE("api/todos/:todo_id", c.RemoveTodoByTodoID)
 	}
 }
 
@@ -80,4 +81,28 @@ func (c *Controller) Todos(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, resArr)
+}
+
+// RemoveTodoByTodoID godoc
+// @Description Remove todo by todo id
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param todo_id path string true "Todo ID"
+// @Success 204 {object} todo.todoResponseDTO "ok"
+// @Failure 404 {object} api.ErrorResponseDTO "Todo Not Found"
+// @Tags Todo API
+// @Router /api/todos/{todo_id} [delete]
+func (c *Controller) RemoveTodoByTodoID(ctx *gin.Context) {
+	todoID := ctx.Param("todo_id")
+
+	if err := c.todoService.RemoveTodo(todoID); err == todo.ErrNotFoundTodo {
+		ctx.JSON(http.StatusNotFound, api.MakeErrorResponseDTO(err))
+		return
+	} else if err != nil {
+		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponseDTO(err))
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
 }
