@@ -117,6 +117,40 @@
             }
         },
         "/api/todos": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetch todos of authenticated user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Todo API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/todo.todoResponseDTO"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
+                        }
+                    }
+                }
+            },
             "post": {
                 "security": [
                     {
@@ -325,6 +359,9 @@
         "todo.todoResponseDTO": {
             "type": "object",
             "properties": {
+                "assignor_id": {
+                    "type": "integer"
+                },
                 "contents": {
                     "type": "string"
                 },
