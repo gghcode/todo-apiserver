@@ -161,6 +161,39 @@
                 }
             }
         },
+        "/api/user": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetch user itself by access_token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User API"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/user.userResponseDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "User Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/api.ErrorResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
         "/api/users": {
             "post": {
                 "description": "Create new user",

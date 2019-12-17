@@ -72,5 +72,16 @@ func (c *Controller) CreateUser(ctx *gin.Context) {
 // @Tags User API
 // @Router /api/user [get]
 func (c *Controller) User(ctx *gin.Context) {
+	res, err := c.userService.GetUserByUserID(middleware.AuthUserID(ctx))
+	if err == user.ErrUserNotFound {
+		ctx.JSON(http.StatusNotFound, api.MakeErrorResponseDTO(err))
+		return
+	} else if err != nil {
+		ctx.JSON(http.StatusInternalServerError, api.MakeErrorResponseDTO(err))
+		return
+	}
 
+	serializer := newUserResponseSerializer(res)
+
+	ctx.JSON(http.StatusOK, serializer.Response())
 }
