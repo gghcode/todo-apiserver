@@ -170,6 +170,26 @@ paths:
       - ApiKeyAuth: []
       tags:
       - Todo API
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: Fetch user itself by access_token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/user.userResponseDTO'
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - User API
   /api/users:
     post:
       consumes:
