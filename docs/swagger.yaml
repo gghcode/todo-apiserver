@@ -42,6 +42,8 @@ definitions:
     type: object
   todo.todoResponseDTO:
     properties:
+      assignor_id:
+        type: integer
       contents:
         type: string
       id:
@@ -143,6 +145,27 @@ paths:
       tags:
       - App API
   /api/todos:
+    get:
+      consumes:
+      - application/json
+      description: Fetch todos of authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            items:
+              $ref: '#/definitions/todo.todoResponseDTO'
+            type: array
+        "404":
+          description: User Not Found
+          schema:
+            $ref: '#/definitions/api.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Todo API
     post:
       consumes:
       - application/json
@@ -164,6 +187,32 @@ paths:
             $ref: '#/definitions/todo.todoResponseDTO'
         "400":
           description: Invalid payload
+          schema:
+            $ref: '#/definitions/api.ErrorResponseDTO'
+      security:
+      - ApiKeyAuth: []
+      tags:
+      - Todo API
+  /api/todos/{todo_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove todo by todo id
+      parameters:
+      - description: Todo ID
+        in: path
+        name: todo_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            $ref: '#/definitions/todo.todoResponseDTO'
+        "404":
+          description: Todo Not Found
           schema:
             $ref: '#/definitions/api.ErrorResponseDTO'
       security:
