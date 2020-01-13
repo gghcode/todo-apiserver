@@ -95,36 +95,7 @@ func TestRequiredAccessToken(t *testing.T) {
 
 			actualJSON := testutil.StringFromIOReader(t, actual.Body)
 
-			assert.Equal(t, tc.expectedJSON, actualJSON)
+			assert.JSONEq(t, tc.expectedJSON, actualJSON)
 		})
 	}
 }
-
-// func TestAuthUserID(t *testing.T) {
-// 	var stubUserID int64 = 5
-
-// 	expectedUserID := strconv.FormatInt(stubUserID, 10)
-
-// 	ginRouter := gin.New()
-// 	ginRouter.GET("", func(ctx *gin.Context) {
-// 		middleware.SetAuthUserID(ctx, stubUserID)
-
-// 		userID := middleware.AuthUserID(ctx)
-
-// 		ctx.String(http.StatusOK, strconv.FormatInt(userID, 10))
-// 	})
-
-// 	actual := testutil.Response(
-// 		t,
-// 		ginRouter,
-// 		"GET",
-// 		"",
-// 		nil,
-// 	)
-
-// 	assert.Equal(t, http.StatusOK, actual.StatusCode)
-
-// 	actualUserID := testutil.StringFromIOReader(t, actual.Body)
-
-// 	assert.Equal(t, expectedUserID, actualUserID)
-// }

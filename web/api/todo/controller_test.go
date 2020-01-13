@@ -321,8 +321,11 @@ func (suite *ControllerUnitTestSuite) TestRemoveTodoByTodoID() {
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
 			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
-
-			suite.Equal(tc.expectedJSON, actualJSON)
+			if tc.expectedJSON == "" {
+				suite.Equal(tc.expectedJSON, actualJSON)
+			} else {
+				suite.JSONEq(tc.expectedJSON, actualJSON)
+			}
 		})
 	}
 }
