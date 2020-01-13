@@ -11,11 +11,16 @@ require (
 	github.com/go-openapi/spec v0.19.3 // indirect
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
 	github.com/go-redis/redis v6.15.6+incompatible
+<<<<<<< HEAD
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.7 // indirect
 	github.com/lib/pq v1.3.0
 	github.com/magiconair/properties v1.8.1 // indirect
+=======
+	github.com/jinzhu/gorm v1.9.11
+	github.com/lib/pq v1.2.0
+>>>>>>> Update go.mod
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/pelletier/go-toml v1.5.0 // indirect
@@ -27,8 +32,12 @@ require (
 	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.4.0
 	github.com/swaggo/gin-swagger v1.2.0
+<<<<<<< HEAD
 	github.com/swaggo/swag v1.6.5
 	github.com/ugorji/go v1.1.7 // indirect
+=======
+	github.com/swaggo/swag v1.6.3
+>>>>>>> Update go.mod
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550
 	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
 	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
