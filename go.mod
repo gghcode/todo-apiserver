@@ -10,7 +10,7 @@ require (
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
 	github.com/go-openapi/spec v0.19.3 // indirect
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
-	github.com/go-redis/redis v6.15.6+incompatible
+	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/golang/protobuf v1.3.2 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/json-iterator/go v1.1.7 // indirect
