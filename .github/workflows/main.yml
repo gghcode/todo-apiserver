@@ -21,6 +21,23 @@ jobs:
 
       - name: Build
         run: go build ./...
+  "Integration-Test":
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v2-beta
+        with:
+          go-version: "^1.13.1"
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Test
+        run: make integration_ci
   "Unit-Test":
     runs-on: ubuntu-latest
     steps:
