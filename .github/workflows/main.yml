@@ -1,0 +1,14 @@
+on: [push, pull_request]
+name: My Workflows
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v1
+
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: go build ./...
