@@ -21,7 +21,7 @@ jobs:
 
       - name: Build
         run: go build ./...
-  "Build Docker Image":
+  "Build-Docker-Image":
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
