@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker Image
-        run: docker build -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
+        run: DOCKER_BUILDKIT=1 docker build -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app .
 
       - name: Export Docker Image
         run: docker save docker.pkg.github.com/gghcode/apas-todo-apiserver/app > image.tar
