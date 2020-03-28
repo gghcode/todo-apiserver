@@ -41,6 +41,11 @@ jobs:
 
       - name: Test
         run: make integration_ci
+
+      - name: Upload codecov
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F integration ||
+            echo 'Codecov failed to upload'
   "Unit-Test":
     runs-on: ubuntu-latest
     steps:
@@ -61,3 +66,8 @@ jobs:
 
       - name: Test
         run: make unit_ci
+
+      - name: Upload codecov
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F unittests || 
+            echo 'Codecov failed to upload'
