@@ -76,6 +76,7 @@ jobs:
             echo 'Codecov failed to upload'
 
   "Push-Docker-Image":
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     needs:
       - "Build"
