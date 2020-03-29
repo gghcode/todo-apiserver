@@ -7,11 +7,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # - name: Export BUILD_VERSION env
-      #   run: export BUILD_VERSION=dev
-
       - name: Build Docker Image
-        run: BUILD_VERSION=dev DOCKER_BUILDKIT=1 docker build
+        env:
+          BUILD_VERSION: alpha-b${{ github.run_id }}
+        run:
+          # BUILD_VERSION=$([ "$GITHUB_REF" == "refs/heads/master" ] && echo "alpha-b$GITHUB_RUN_ID" || echo "production-b$GITHUB_RUN_ID");
+          DOCKER_BUILDKIT=1 docker build
           --build-arg BUILD_APP_VERSION=$BUILD_VERSION
           -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app
           "."
