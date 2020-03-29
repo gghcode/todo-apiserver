@@ -82,6 +82,8 @@ jobs:
       - "Build"
       - "Integration-Test"
       - "Unit-Test"
+    env:
+      BUILD_VERSION: alpha-b${{ github.run_id }}
     steps:
       - uses: actions/download-artifact@v1
         with:
@@ -98,7 +100,9 @@ jobs:
       - name: Tag docker image
         run: docker tag
           docker.pkg.github.com/gghcode/apas-todo-apiserver/app:latest
-          docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$GITHUB_RUN_ID
+          docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$BUILD_VERSION
 
       - name: Push docker image
-        run: docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app
+        run: |
+          docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:latest
+          docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$BUILD_VERSION
