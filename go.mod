@@ -10,7 +10,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/jinzhu/gorm v1.9.12
-	github.com/lib/pq v1.3.0
+	github.com/lib/pq v1.4.0
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
 	github.com/pelletier/go-toml v1.5.0 // indirect
