@@ -1,5 +1,7 @@
 on: [push, pull_request]
 name: Actions CI Workflow
+env:
+  BUILD_VERSION: b${{ github.run_id }}
 jobs:
   "Build":
     runs-on: ubuntu-latest
@@ -8,11 +10,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Docker Image
-        env:
-          BUILD_VERSION: alpha-b${{ github.run_id }}
-        run:
-          # BUILD_VERSION=$([ "$GITHUB_REF" == "refs/heads/master" ] && echo "alpha-b$GITHUB_RUN_ID" || echo "production-b$GITHUB_RUN_ID");
-          DOCKER_BUILDKIT=1 docker build
+        run: DOCKER_BUILDKIT=1 docker build
           --build-arg BUILD_APP_VERSION=$BUILD_VERSION
           -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app
           "."
@@ -82,8 +80,6 @@ jobs:
       - "Build"
       - "Integration-Test"
       - "Unit-Test"
-    env:
-      BUILD_VERSION: alpha-b${{ github.run_id }}
     steps:
       - uses: actions/download-artifact@v1
         with:
