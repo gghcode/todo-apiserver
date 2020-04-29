@@ -1,27 +1,8 @@
-<h1 align="center">Welcome to APAS Todo API 👋</h1>
-<p>
-  <a href="https://circleci.com/gh/gghcode/apas-todo-apiserver/tree/master">
-    <img src="https://circleci.com/gh/gghcode/apas-todo-apiserver.svg?style=svg&circle-token=8838c75938b2cefd737e120f2897d4f74ac0d6c2" />
-  </a>
+<!-- <h1 align="center">Welcome to APAS Todo API 👋</h1> -->
 
-  <a href="https://codecov.io/gh/gghcode/apas-todo-apiserver">
-    <img src="https://codecov.io/gh/gghcode/apas-todo-apiserver/branch/master/graph/badge.svg?token=lzuStL8dKU" />
-  </a>
-
-  <img alt="Version" src="https://img.shields.io/badge/version-v0.1.0-blue.svg?cacheSeconds=2592000" />
-
-  <a href="https://opensource.org/licenses/MIT" target="_blank">
-    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
-  </a>
-</p>
+# Todo API ![Actions CI Workflow](https://github.com/gghcode/apas-todo-apiserver/workflows/Actions%20CI%20Workflow/badge.svg?branch=master) [![codecov](https://codecov.io/gh/gghcode/apas-todo-apiserver/branch/master/graph/badge.svg?token=lzuStL8dKU)](https://codecov.io/gh/gghcode/apas-todo-apiserver) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > Todo API Server for APAS
-
-## Install
-
-```sh
-go get github.com/gghcode/apas-todo-apiserver
-```
 
 ## Usage
 
@@ -29,10 +10,16 @@ go get github.com/gghcode/apas-todo-apiserver
 go run .
 ```
 
-## Run tests
+## Run unit tests
 
 ```sh
 make unit
+```
+
+## Run integration tests
+
+```sh
+make integration
 ```
 
 ## Author
