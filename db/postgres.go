@@ -2,8 +2,7 @@ package db
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 
@@ -30,8 +29,8 @@ func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 	}
 
 	gormDB.AutoMigrate(
-		&todo.Todo{},
-		&user.User{},
+		&model.Todo{},
+		&model.User{},
 	)
 
 	return &PostgresConn{

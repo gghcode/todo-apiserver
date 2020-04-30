@@ -3,10 +3,10 @@ package repository_test
 import (
 	"testing"
 
-	// "github.com/gghcode/apas-todo-apiserver/app/api/user"
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/stretchr/testify/suite"
@@ -18,7 +18,7 @@ type userRepositoryIntegrationTestSuite struct {
 	repo      user.Repository
 	dbCleanup func()
 
-	testUsers []user.User
+	testUsers []model.User
 }
 
 func TestUserRepositoryIntegrationTests(t *testing.T) {
@@ -40,7 +40,7 @@ func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
 
 	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())
 	suite.repo = repository.NewUserRepository(dbConn)
-	suite.testUsers = []user.User{
+	suite.testUsers = []model.User{
 		{UserName: "fakeUser1", PasswordHash: []byte("password")},
 		{UserName: "fakeUser2", PasswordHash: []byte("password")},
 	}
@@ -86,29 +86,6 @@ func (suite *userRepositoryIntegrationTestSuite) TestCreateUser() {
 	}
 }
 
-func (suite *userRepositoryIntegrationTestSuite) TestAllUsers() {
-	testCases := []struct {
-		description string
-		expected    []user.User
-		expectedErr error
-	}{
-		{
-			description: "ShouldGetAllUsers",
-			expected:    suite.testUsers,
-			expectedErr: nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		suite.Run(tc.description, func() {
-			actual, actualErr := suite.repo.AllUsers()
-
-			suite.Equal(tc.expected, actual)
-			suite.Equal(tc.expectedErr, actualErr)
-		})
-	}
-}
-
 func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 	testCases := []struct {
 		description string
@@ -119,7 +96,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 		{
 			description: "ShouldGetUser",
 			argUserID:   suite.testUsers[0].ID,
-			expected:    suite.testUsers[0],
+			expected:    model.ToUserEntity(suite.testUsers[0]),
 			expectedErr: nil,
 		},
 		{
@@ -150,7 +127,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByUserName() {
 		{
 			description: "ShouldGetUser",
 			argUserName: suite.testUsers[0].UserName,
-			expected:    suite.testUsers[0],
+			expected:    model.ToUserEntity(suite.testUsers[0]),
 			expectedErr: nil,
 		},
 		{
@@ -222,7 +199,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestRemoveUserByID() {
 		{
 			description: "ShouldRemoveUser",
 			argUserID:   suite.testUsers[0].ID,
-			expected:    suite.testUsers[0],
+			expected:    model.ToUserEntity(suite.testUsers[0]),
 			expectedErr: nil,
 		},
 		{

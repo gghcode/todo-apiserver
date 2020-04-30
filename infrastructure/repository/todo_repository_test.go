@@ -6,6 +6,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	uuid "github.com/satori/go.uuid"
@@ -18,7 +19,7 @@ type todoRepositoryIntegrationTestSuite struct {
 	repo      todo.Repository
 	dbCleanup func()
 
-	testTodos []todo.Todo
+	testTodos []model.Todo
 }
 
 func TestTodoRepositoryIntegrationTests(t *testing.T) {
@@ -40,7 +41,7 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 
 	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())
 	suite.repo = repository.NewGormTodoRepository(dbConn)
-	suite.testTodos = []todo.Todo{
+	suite.testTodos = []model.Todo{
 		{ID: uuid.NewV4(), Title: "test title 1", Contents: "test contents 2", AssignorID: 4},
 		{ID: uuid.NewV4(), Title: "test title 2", Contents: "test contents 3", AssignorID: 4},
 	}
@@ -70,7 +71,7 @@ func (suite *todoRepositoryIntegrationTestSuite) TestAddTodo() {
 		{
 			description: "ShouldAddTodo",
 			argTodo: todo.Todo{
-				ID:         uuid.NewV4(),
+				ID:         uuid.NewV4().String(),
 				Title:      "test title",
 				Contents:   "test contents",
 				AssignorID: 1,
@@ -109,13 +110,13 @@ func (suite *todoRepositoryIntegrationTestSuite) TestAllTodosByUserID() {
 		{
 			description:   "ShouldReturnTodo",
 			argUserID:     4,
-			expectedTodos: suite.testTodos,
+			expectedTodos: model.ToTodoEntityArray(suite.testTodos),
 			expectedErr:   nil,
 		},
 		{
 			description:   "ShouldFetchEmpty",
 			argUserID:     5,
-			expectedTodos: []todo.Todo{},
+			expectedTodos: nil,
 			expectedErr:   nil,
 		},
 	}
@@ -140,7 +141,7 @@ func (suite *todoRepositoryIntegrationTestSuite) TestTodoByTodoID() {
 		{
 			description:  "ShouldReturnTodo",
 			argTodoID:    suite.testTodos[0].ID.String(),
-			expectedTodo: suite.testTodos[0],
+			expectedTodo: model.ToTodoEntity(suite.testTodos[0]),
 			expectedErr:  nil,
 		},
 		{
@@ -180,7 +181,7 @@ func (suite *todoRepositoryIntegrationTestSuite) TestUpdateTodo() {
 				return todo.Todo{
 					Title:      args["Title"].(string),
 					Contents:   args["Contents"].(string),
-					ID:         suite.testTodos[0].ID,
+					ID:         suite.testTodos[0].ID.String(),
 					AssignorID: suite.testTodos[0].AssignorID,
 					CreatedAt:  suite.testTodos[0].CreatedAt,
 					UpdatedAt:  suite.testTodos[0].UpdatedAt,
@@ -198,8 +199,7 @@ func (suite *todoRepositoryIntegrationTestSuite) TestUpdateTodo() {
 				return todo.Todo{
 					Title:      args["Title"].(string),
 					Contents:   suite.testTodos[1].Contents,
-					DueDate:    suite.testTodos[1].DueDate,
-					ID:         suite.testTodos[1].ID,
+					ID:         suite.testTodos[1].ID.String(),
 					AssignorID: suite.testTodos[1].AssignorID,
 					CreatedAt:  suite.testTodos[1].CreatedAt,
 					UpdatedAt:  suite.testTodos[1].UpdatedAt,

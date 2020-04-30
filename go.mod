@@ -13,6 +13,8 @@ require (
 	github.com/lib/pq v1.4.0
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
+	github.com/onsi/ginkgo v1.12.0 // indirect
+	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/pelletier/go-toml v1.5.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0
@@ -25,7 +27,6 @@ require (
 	github.com/swaggo/swag v1.6.5
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/net v0.0.0-20191014212845-da9a3fd4c582 // indirect
-	golang.org/x/sys v0.0.0-20191010194322-b09406accb47 // indirect
 	golang.org/x/tools v0.0.0-20191114200427-caa0b0f7d508 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/yaml.v2 v2.2.7 // indirect

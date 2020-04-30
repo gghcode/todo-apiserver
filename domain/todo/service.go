@@ -15,7 +15,7 @@ func NewTodoService(todoRepo Repository) UsecaseInteractor {
 
 func (srv *todoService) AddTodo(req AddTodoRequest) (TodoResponse, error) {
 	todo := Todo{
-		ID:         uuid.NewV4(),
+		ID:         uuid.NewV4().String(),
 		Title:      req.Title,
 		Contents:   req.Contents,
 		AssignorID: req.AssignorID,
@@ -27,11 +27,10 @@ func (srv *todoService) AddTodo(req AddTodoRequest) (TodoResponse, error) {
 	}
 
 	return TodoResponse{
-		ID:         insertedTodo.ID.String(),
+		ID:         insertedTodo.ID,
 		Title:      insertedTodo.Title,
 		Contents:   insertedTodo.Contents,
 		AssignorID: insertedTodo.AssignorID,
-		// DueDate:    insertedTodo.DueDate,
 	}, nil
 }
 
@@ -44,7 +43,7 @@ func (srv *todoService) GetTodosByUserID(userID int64) ([]TodoResponse, error) {
 	var res []TodoResponse
 	for _, todo := range todos {
 		res = append(res, TodoResponse{
-			ID:         todo.ID.String(),
+			ID:         todo.ID,
 			Title:      todo.Title,
 			Contents:   todo.Contents,
 			AssignorID: todo.AssignorID,

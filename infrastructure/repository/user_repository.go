@@ -5,6 +5,7 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/jinzhu/gorm"
 	pg "github.com/lib/pq"
 )
@@ -21,10 +22,11 @@ func NewUserRepository(dbConn db.GormConnection) user.Repository {
 }
 
 func (repo *repository) CreateUser(usr user.User) (user.User, error) {
-	usr.CreatedAt = time.Now().Unix()
+	newUser := model.FromUserEntity(usr)
+	newUser.CreatedAt = time.Now().Unix()
 
 	err := repo.dbConn.DB().
-		Create(&usr).
+		Create(&newUser).
 		Error
 
 	if pgErr, ok := err.(*pg.Error); ok && pgErr.Code == "23505" {
@@ -33,88 +35,91 @@ func (repo *repository) CreateUser(usr user.User) (user.User, error) {
 		return user.User{}, err
 	}
 
-	return usr, nil
-}
-
-func (repo *repository) AllUsers() ([]user.User, error) {
-	var result []user.User
-
-	err := repo.dbConn.DB().
-		Find(&result).
-		Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return result, err
+	return model.ToUserEntity(newUser), nil
 }
 
 func (repo *repository) UserByID(userID int64) (user.User, error) {
-	var result user.User
+	var u model.User
 
 	err := repo.dbConn.DB().
 		Where("id=?", userID).
-		First(&result).
+		First(&u).
 		Error
 
 	if err == gorm.ErrRecordNotFound {
-		return result, user.ErrUserNotFound
+		return user.User{}, user.ErrUserNotFound
 	} else if err != nil {
-		return result, err
+		return user.User{}, err
 	}
 
-	return result, nil
+	return model.ToUserEntity(u), nil
 }
 
 func (repo *repository) UserByUserName(username string) (user.User, error) {
-	var result user.User
+	var u model.User
 
 	err := repo.dbConn.DB().
 		Where("user_name=?", username).
-		First(&result).
+		First(&u).
 		Error
 
 	if err == gorm.ErrRecordNotFound {
-		return result, user.ErrUserNotFound
+		return user.User{}, user.ErrUserNotFound
 	} else if err != nil {
-		return result, err
+		return user.User{}, err
 	}
 
-	return result, nil
+	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) UpdateUserByID(user user.User) (user.User, error) {
-	entity, err := repo.UserByID(user.ID)
+func (repo *repository) UpdateUserByID(usr user.User) (user.User, error) {
+	u, err := repo.userByID(usr.ID)
 	if err != nil {
-		return entity, err
+		return user.User{}, err
 	}
 
 	err = repo.dbConn.DB().
-		Model(&entity).
-		Updates(&user).
+		Model(&u).
+		Updates(model.FromUserEntity(usr)).
 		Error
 
 	if err != nil {
-		return entity, err
+		return user.User{}, err
 	}
 
-	return entity, nil
+	return model.ToUserEntity(u), nil
 }
 
 func (repo *repository) RemoveUserByID(userID int64) (user.User, error) {
-	entity, err := repo.UserByID(userID)
+	u, err := repo.userByID(userID)
 	if err != nil {
-		return entity, err
+		return user.User{}, err
 	}
 
 	err = repo.dbConn.DB().
-		Delete(&entity).
+		Delete(&u).
 		Error
 
 	if err != nil {
-		return entity, err
+		return user.User{}, err
 	}
 
-	return entity, nil
+	return model.ToUserEntity(u), nil
+}
+
+func (repo *repository) userByID(userID int64) (model.User, error) {
+	var u model.User
+
+	err := repo.dbConn.DB().
+		Where("id=?", userID).
+		First(&u).
+		Error
+
+	if err == gorm.ErrRecordNotFound {
+		return u, user.ErrUserNotFound
+	} else if err != nil {
+		return u, err
+	}
+
+	return u, nil
 }
