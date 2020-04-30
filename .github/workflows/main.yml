@@ -84,6 +84,11 @@ jobs:
         with:
           name: docker-image-tar
 
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'      
+
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: '285.0.0'
