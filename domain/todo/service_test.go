@@ -118,12 +118,12 @@ func TestTodoService_GetTodosByUserID(t *testing.T) {
 			argUserID:   1,
 			stubTodosRes: []todo.Todo{
 				{
-					ID:       uuid.Nil,
+					ID:       uuid.Nil.String(),
 					Title:    "test title1",
 					Contents: "test contents1",
 				},
 				{
-					ID:       uuid.Nil,
+					ID:       uuid.Nil.String(),
 					Title:    "test title2",
 					Contents: "test contents2",
 				},

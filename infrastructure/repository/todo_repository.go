@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/jinzhu/gorm"
 )
 
@@ -18,45 +19,47 @@ func NewGormTodoRepository(dbConn db.GormConnection) todo.Repository {
 }
 
 func (r *gormTodoRepository) AddTodo(t todo.Todo) (todo.Todo, error) {
+	newTodo := model.FromTodoEntity(t)
+
 	err := r.dbConn.DB().
-		Create(&t).
+		Create(&newTodo).
 		Error
 
 	if err != nil {
 		return todo.Todo{}, err
 	}
 
-	return t, nil
+	return model.ToTodoEntity(newTodo), nil
 }
 func (r *gormTodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error) {
-	var result []todo.Todo
+	var t []model.Todo
 
 	err := r.dbConn.DB().
 		Where("assignor_id = ?", userID).
-		Find(&result).
+		Find(&t).
 		Error
 
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
+	return model.ToTodoEntityArray(t), nil
 }
 
 func (r *gormTodoRepository) TodoByTodoID(todoID string) (todo.Todo, error) {
-	var result todo.Todo
+	var t model.Todo
 
 	err := r.dbConn.DB().
 		Where("id=?", todoID).
-		First(&result).Error
+		First(&t).Error
 
 	if err == gorm.ErrRecordNotFound {
-		return result, todo.ErrNotFoundTodo
+		return todo.Todo{}, todo.ErrNotFoundTodo
 	} else if err != nil {
-		return result, err
+		return todo.Todo{}, err
 	}
 
-	return result, nil
+	return model.ToTodoEntity(t), nil
 }
 
 func (r *gormTodoRepository) UpdateTodo(todoID string, data map[string]interface{}) (todo.Todo, error) {
