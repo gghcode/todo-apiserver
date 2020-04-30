@@ -73,7 +73,8 @@ jobs:
           bash <(curl -s https://codecov.io/bash) -F unittests || 
             echo 'Codecov failed to upload'
 
-  "Push-Docker-Image-GCR":
+  "Push-Docker-Image":
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     needs:
       - "Build"
@@ -86,7 +87,7 @@ jobs:
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          version: '286.0.0'
+          version: "286.0.0"
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -106,33 +107,13 @@ jobs:
         run: |
           docker push gcr.io/vapias/todo-apiserver:latest
           docker push gcr.io/vapias/todo-apiserver:$BUILD_VERSION
-
-  "Push-Docker-Image":
-    if: ${{ github.ref == 'refs/heads/master' }}
+  "Plan-Terraform":
     runs-on: ubuntu-latest
-    needs:
-      - "Build"
-      - "Integration-Test"
-      - "Unit-Test"
     steps:
-      - uses: actions/download-artifact@v1
+      - name: Install Go
+        uses: actions/setup-go@v2-beta
         with:
-          name: docker-image-tar
+          go-version: "^1.13.1"
 
-      - name: Github package registry login
-        run: docker login docker.pkg.github.com -u $GITHUB_ACTOR -p $GITHUB_TOKEN
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: Load docker image
-        run: docker load --input docker-image-tar/image.tar
-
-      - name: Tag docker image
-        run: docker tag
-          docker.pkg.github.com/gghcode/apas-todo-apiserver/app:latest
-          docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$BUILD_VERSION
-
-      - name: Push docker image
-        run: |
-          docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:latest
-          docker push docker.pkg.github.com/gghcode/apas-todo-apiserver/app:$BUILD_VERSION
+      - name: Checkout code
+        uses: actions/checkout@v2
