@@ -86,29 +86,6 @@ func (suite *userRepositoryIntegrationTestSuite) TestCreateUser() {
 	}
 }
 
-func (suite *userRepositoryIntegrationTestSuite) TestAllUsers() {
-	testCases := []struct {
-		description string
-		expected    []user.User
-		expectedErr error
-	}{
-		{
-			description: "ShouldGetAllUsers",
-			expected:    suite.testUsers,
-			expectedErr: nil,
-		},
-	}
-
-	for _, tc := range testCases {
-		suite.Run(tc.description, func() {
-			actual, actualErr := suite.repo.AllUsers()
-
-			suite.Equal(tc.expected, actual)
-			suite.Equal(tc.expectedErr, actualErr)
-		})
-	}
-}
-
 func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 	testCases := []struct {
 		description string

@@ -38,20 +38,6 @@ func (repo *repository) CreateUser(usr user.User) (user.User, error) {
 	return model.ToUserEntity(newUser), nil
 }
 
-func (repo *repository) AllUsers() ([]user.User, error) {
-	var u []model.User
-
-	err := repo.dbConn.DB().
-		Find(&u).
-		Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return nil, err
-}
-
 func (repo *repository) UserByID(userID int64) (user.User, error) {
 	var u model.User
 
