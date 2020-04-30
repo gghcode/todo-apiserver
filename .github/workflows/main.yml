@@ -12,11 +12,11 @@ jobs:
       - name: Build Docker Image
         run: DOCKER_BUILDKIT=1 docker build
           --build-arg BUILD_APP_VERSION=$BUILD_VERSION
-          -t docker.pkg.github.com/gghcode/apas-todo-apiserver/app
+          -t gcr.io/vapias/todo-apiserver:latest
           "."
 
       - name: Export Docker Image
-        run: docker save docker.pkg.github.com/gghcode/apas-todo-apiserver/app > image.tar
+        run: docker save gcr.io/vapias/todo-apiserver:latest > image.tar
 
       - uses: actions/upload-artifact@v1
         with:
