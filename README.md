@@ -1,6 +1,6 @@
 <!-- <h1 align="center">Welcome to APAS Todo API 👋</h1> -->
 
-# Todo API ![Actions CI Workflow](https://github.com/gghcode/apas-todo-apiserver/workflows/Actions%20CI%20Workflow/badge.svg?branch=master) [![codecov](https://codecov.io/gh/gghcode/apas-todo-apiserver/branch/master/graph/badge.svg?token=lzuStL8dKU)](https://codecov.io/gh/gghcode/apas-todo-apiserver) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+# Todo API ![Actions CI Workflow](https://github.com/gghcode/apas-todo-apiserver/workflows/Actions%20CI%20Workflow/badge.svg?branch=master) [![codecov](https://codecov.io/gh/gghcode/todo-apiserver/branch/master/graph/badge.svg)](https://codecov.io/gh/gghcode/todo-apiserver) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 > Todo API Server for APAS
 
