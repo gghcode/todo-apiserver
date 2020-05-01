@@ -143,7 +143,7 @@ func (suite *ControllerUnitTestSuite) TestIssueToken() {
 				suite.T(),
 				suite.router,
 				"POST",
-				"api/auth/token",
+				"/api/auth/token",
 				tc.reqPayload(tc.req),
 			)
 
@@ -274,7 +274,7 @@ func (suite *ControllerUnitTestSuite) TestRefreshToken() {
 				suite.T(),
 				suite.router,
 				"POST",
-				"api/auth/refresh",
+				"/api/auth/refresh",
 				tc.reqPayload(tc.req),
 			)
 

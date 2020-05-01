@@ -158,7 +158,7 @@ func (suite *ControllerUnitTestSuite) TestAddTodo() {
 				suite.T(),
 				suite.router,
 				"POST",
-				"api/todos",
+				"/api/todos",
 				tc.reqPayload(tc.req),
 			)
 
@@ -250,7 +250,7 @@ func (suite *ControllerUnitTestSuite) TestTodos() {
 				Once().
 				Return(tc.stubTodoResArr, tc.stubTodoResErr)
 
-			actual := testutil.Response(suite.T(), suite.router, "GET", "api/todos", nil)
+			actual := testutil.Response(suite.T(), suite.router, "GET", "/api/todos", nil)
 			suite.Equal(tc.expectedStatus, actual.StatusCode)
 
 			actualJSON := testutil.StringFromIOReader(suite.T(), actual.Body)
@@ -314,7 +314,7 @@ func (suite *ControllerUnitTestSuite) TestRemoveTodoByTodoID() {
 				suite.T(),
 				suite.router,
 				"DELETE",
-				"api/todos/"+tc.queryTodoID,
+				"/api/todos/"+tc.queryTodoID,
 				nil,
 			)
 
