@@ -38,6 +38,11 @@ func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 	}, nil
 }
 
+// Healthy return database connection status if connection connected, method return true
+func (conn *PostgresConn) Healthy() bool {
+	return conn.db.DB().Ping() == nil
+}
+
 // DB return database connection.
 func (conn *PostgresConn) DB() *gorm.DB {
 	return conn.db
