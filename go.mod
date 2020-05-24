@@ -8,7 +8,7 @@ require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
-	github.com/go-redis/redis v6.15.7+incompatible
+	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.5.2
 	github.com/mailru/easyjson v0.7.0 // indirect
