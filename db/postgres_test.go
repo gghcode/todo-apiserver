@@ -21,9 +21,13 @@ func TestPostgresConnIntegration(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err := postgresConn.DB().DB().Ping(); err != nil {
-		t.Error(err)
+	if !postgresConn.Healthy() {
+		t.Error("Postgres connection must be healthy")
 	}
 
 	postgresConn.Close()
+
+	if postgresConn.Healthy() {
+		t.Error("Postgres connection must be unhealthy after close connection")
+	}
 }

@@ -6,6 +6,8 @@ import (
 
 // GormConnection connection
 type GormConnection interface {
+	Healthy() bool
 	DB() *gorm.DB
+
 	Close()
 }

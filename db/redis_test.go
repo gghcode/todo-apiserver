@@ -33,9 +33,19 @@ func TestRedisConnIntegration(t *testing.T) {
 }
 
 func (suite *RedisIntegration) TestNewRedisConn() {
-	conn := db.NewRedisConn(suite.cfg)
-	pong, err := conn.Client().Ping().Result()
+	expectedHealthy := true
+	expectedHealthyAfterClose := false
+	expectedPong := "ping: PONG"
 
-	suite.Equal(pong, "PONG")
-	suite.NoError(err)
+	conn := db.NewRedisConn(suite.cfg)
+
+	actualHealthy := conn.Healthy()
+	suite.Equal(expectedHealthy, actualHealthy)
+
+	actualPong := conn.Client().Ping().String()
+	suite.Equal(expectedPong, actualPong)
+
+	suite.NoError(conn.Close())
+	actualHealthyAfterClose := conn.Healthy()
+	suite.Equal(expectedHealthyAfterClose, actualHealthyAfterClose)
 }

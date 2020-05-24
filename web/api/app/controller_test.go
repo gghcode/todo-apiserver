@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -11,28 +13,40 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type ControllerUnitTestSuite struct {
+type ControllerIntegrationTestSuite struct {
 	suite.Suite
 
 	fakeAppService *fake.AppService
-	router         *gin.Engine
+	postgresConn   db.GormConnection
+	redisConn      db.RedisConnection
+
+	router *gin.Engine
 }
 
-func TestAppControllerUnitTests(t *testing.T) {
-	suite.Run(t, new(ControllerUnitTestSuite))
+func TestAppControllerIntegrationTests(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
+	suite.Run(t, new(ControllerIntegrationTestSuite))
 }
 
-func (suite *ControllerUnitTestSuite) SetupTest() {
+func (suite *ControllerIntegrationTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
+
+	cfg, err := config.NewViperBuilder().BindEnvs("TEST").Build()
+	suite.NoError(err)
 
 	suite.router = gin.New()
 	suite.fakeAppService = fake.NewAppService()
+	suite.postgresConn, _ = db.NewPostgresConn(cfg)
+	suite.redisConn = db.NewRedisConn(cfg)
 
-	c := app.NewController(suite.fakeAppService)
+	c := app.NewController(suite.fakeAppService, suite.postgresConn, suite.redisConn)
 	c.RegisterRoutes(suite.router)
 }
 
-func (suite *ControllerUnitTestSuite) TestVersion() {
+func (suite *ControllerIntegrationTestSuite) TestVersion() {
 	testCases := []struct {
 		description      string
 		stubVersion      string
@@ -70,19 +84,37 @@ func (suite *ControllerUnitTestSuite) TestVersion() {
 	}
 }
 
-func (suite *ControllerUnitTestSuite) TestHealthy() {
+func (suite *ControllerIntegrationTestSuite) TestHealthy() {
 	testCases := []struct {
 		description    string
+		beforeFunc     func()
 		expectedStatus int
 	}{
 		{
 			description:    "ShouldBeOK",
+			beforeFunc:     func() {},
 			expectedStatus: http.StatusOK,
+		},
+		{
+			description: "ShouldBeServiceUnavailableWhenDownRedis",
+			beforeFunc: func() {
+				suite.redisConn.Close()
+			},
+			expectedStatus: http.StatusServiceUnavailable,
+		},
+		{
+			description: "ShouldBeServiceUnavailableWhenDownPostgres",
+			beforeFunc: func() {
+				suite.postgresConn.Close()
+			},
+			expectedStatus: http.StatusServiceUnavailable,
 		},
 	}
 
 	for _, tc := range testCases {
 		suite.Run(tc.description, func() {
+			tc.beforeFunc()
+
 			actualRes := testutil.Response(
 				suite.T(),
 				suite.router,
