@@ -38,4 +38,6 @@ func (suite *RedisIntegration) TestNewRedisConn() {
 
 	suite.Equal(pong, "PONG")
 	suite.NoError(err)
+
+	suite.NoError(conn.Close())
 }
