@@ -7,7 +7,9 @@ import (
 
 // RedisConnection godoc
 type RedisConnection interface {
+	Healthy() bool
 	Client() *redis.Client
+
 	Close() error
 }
 
@@ -24,6 +26,11 @@ func NewRedisConn(cfg config.Configuration) RedisConnection {
 	}
 
 	return &conn
+}
+
+func (conn *redisConn) Healthy() bool {
+	_, err := conn.client.Ping().Result()
+	return err == nil
 }
 
 func (conn *redisConn) Client() *redis.Client {
