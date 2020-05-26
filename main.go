@@ -86,6 +86,8 @@ func main() {
 		fmt.Println("Server shutdown: ", err)
 	}
 
+	disposeDBConnections(c)
+
 	fmt.Println("Shutdown was successful")
 }
 
@@ -147,4 +149,22 @@ func registerMiddlewares(cfg config.Configuration, router gin.IRouter) {
 	router.Use(middleware.AddAccessTokenHandler(
 		jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg),
 	))
+}
+
+func disposeDBConnections(c *inject.Container) error {
+	var gormConn db.GormConnection
+	var redisConn db.RedisConnection
+
+	if err := c.Extract(&gormConn); err != nil {
+		return err 
+	}
+
+	if err := c.Extract(&redisConn); err != nil {
+		return err
+	}
+	
+	gormConn.Close()
+	redisConn.Close()
+
+	return nil
 }
