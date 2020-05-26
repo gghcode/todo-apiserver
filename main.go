@@ -1,6 +1,15 @@
 package main
 
 import (
+	"context"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
@@ -53,8 +62,31 @@ func main() {
 		panic(err)
 	}
 
-	ginRouter.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	ginRouter.Run(cfg.Addr)
+	srv := &http.Server{
+		Addr:    cfg.Addr,
+		Handler: ginRouter,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil {
+			log.Printf("listen %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+
+	fmt.Println("Shutdown server...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		fmt.Println("Server shutdown: ", err)
+	}
+
+	fmt.Println("Shutdown was successful")
 }
 
 func setupContainer(cfg config.Configuration) *inject.Container {
@@ -105,6 +137,8 @@ func newGinRouter(cfg config.Configuration, controllers []api.GinController) *gi
 	for _, c := range controllers {
 		c.RegisterRoutes(router.Group(""))
 	}
+
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
