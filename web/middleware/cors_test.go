@@ -10,8 +10,10 @@ import (
 )
 
 func TestNewCors(t *testing.T) {
-	handlerFunc := middleware.NewCors(config.CorsConfig{
-		AllowOrigins: []string{"*"},
+	handlerFunc := middleware.NewCors(config.Configuration{
+		Cors: config.CorsConfig{
+			AllowOrigins: []string{"*"},
+		},
 	})
 
 	assert.NotNil(t, handlerFunc)

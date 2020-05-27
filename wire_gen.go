@@ -16,6 +16,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/security"
+	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	app2 "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	auth2 "github.com/gghcode/apas-todo-apiserver/web/api/auth"
@@ -25,13 +26,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/spf13/afero"
-	"github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 // Injectors from wire.go:
 
 func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
+	accessTokenHandlerFactory := jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg)
+	accessTokenHandlerMiddleware := middleware.NewAccessTokenHandler(accessTokenHandlerFactory)
+	corsMiddleware := middleware.NewCors(cfg)
+	v := provideMiddlewares(accessTokenHandlerMiddleware, corsMiddleware)
 	fs := afero.NewOsFs()
 	fileReader := file.NewAferoFileReader(fs)
 	usecaseInteractor := app.NewService(fileReader)
@@ -53,8 +56,8 @@ func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
 	authController := auth2.NewController(authUsecaseInteractor)
 	userUsecaseInteractor := user.NewService(userRepository, passport)
 	userController := user2.NewController(userUsecaseInteractor)
-	v := provideControllers(controller, todoController, authController, userController)
-	engine := newGinRouter(cfg, v)
+	v2 := provideControllers(controller, todoController, authController, userController)
+	engine := web.NewGinRouter(cfg, v, v2)
 	return engine, func() {
 		cleanup2()
 		cleanup()
@@ -77,23 +80,9 @@ var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, user2.N
 
 var appSet = wire.NewSet(afero.NewOsFs, file.NewAferoFileReader, app.NewService, app2.NewController)
 
-var routerSet = wire.NewSet(
-	provideControllers,
-	newGinRouter,
+var routerSet = wire.NewSet(jwt.NewJwtAccessTokenVerifyHandlerFactory, middleware.NewAccessTokenHandler, middleware.NewCors, provideMiddlewares,
+	provideControllers, web.NewGinRouter,
 )
-
-func newGinRouter(cfg config.Configuration, controllers []api.GinController) *gin.Engine {
-	router := gin.New()
-	registerMiddlewares(cfg, router)
-
-	for _, c := range controllers {
-		c.RegisterRoutes(router.Group(""))
-	}
-
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	return router
-}
 
 func provideControllers(
 	appController *app2.Controller,
@@ -109,6 +98,9 @@ func provideControllers(
 	}
 }
 
-func registerMiddlewares(cfg config.Configuration, router gin.IRouter) {
-	router.Use(middleware.AddAccessTokenHandler(jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg)))
+func provideMiddlewares(
+	accessTokenHandlerMiddleware middleware.AccessTokenHandlerMiddleware,
+	corsMiddleware middleware.CorsMiddleware,
+) []gin.HandlerFunc {
+	return []gin.HandlerFunc{gin.HandlerFunc(accessTokenHandlerMiddleware), gin.HandlerFunc(corsMiddleware)}
 }

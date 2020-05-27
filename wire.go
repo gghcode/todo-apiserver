@@ -13,14 +13,13 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/security"
+	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
 	webAuth "github.com/gghcode/apas-todo-apiserver/web/api/auth"
 	webTodo "github.com/gghcode/apas-todo-apiserver/web/api/todo"
 	webUser "github.com/gghcode/apas-todo-apiserver/web/api/user"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
-	ginSwagger "github.com/swaggo/gin-swagger"
-	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
@@ -67,8 +66,12 @@ var appSet = wire.NewSet(
 )
 
 var routerSet = wire.NewSet(
+	jwt.NewJwtAccessTokenVerifyHandlerFactory,
+	middleware.NewAccessTokenHandler,
+	middleware.NewCors,
+	provideMiddlewares,
 	provideControllers,
-	newGinRouter,
+	web.NewGinRouter,
 )
 
 func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
@@ -85,19 +88,6 @@ func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
 	return nil, nil, nil
 }
 
-func newGinRouter(cfg config.Configuration, controllers []api.GinController) *gin.Engine {
-	router := gin.New()
-	registerMiddlewares(cfg, router)
-
-	for _, c := range controllers {
-		c.RegisterRoutes(router.Group(""))
-	}
-
-	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	return router
-}
-
 func provideControllers(
 	appController *webApp.Controller,
 	todoController *webTodo.Controller,
@@ -112,8 +102,12 @@ func provideControllers(
 	}
 }
 
-func registerMiddlewares(cfg config.Configuration, router gin.IRouter) {
-	router.Use(middleware.AddAccessTokenHandler(
-		jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg),
-	))
+func provideMiddlewares(
+	accessTokenHandlerMiddleware middleware.AccessTokenHandlerMiddleware,
+	corsMiddleware middleware.CorsMiddleware,
+) []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		gin.HandlerFunc(accessTokenHandlerMiddleware),
+		gin.HandlerFunc(corsMiddleware),
+	}
 }
