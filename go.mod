@@ -2,13 +2,12 @@ module github.com/gghcode/apas-todo-apiserver
 
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/defval/inject v1.5.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/emicklei/dot v0.10.1 // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
 	github.com/go-redis/redis v6.15.8+incompatible
+	github.com/google/wire v0.4.0
 	github.com/jinzhu/gorm v1.9.12
 	github.com/lib/pq v1.5.2
 	github.com/mailru/easyjson v0.7.0 // indirect
