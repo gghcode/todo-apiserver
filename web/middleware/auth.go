@@ -1,9 +1,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 // accessTokenHandlerToken godoc
@@ -24,10 +25,13 @@ type (
 	AccessTokenHandlerFactory interface {
 		Create() AccessTokenHandlerFunc
 	}
+
+	// AccessTokenHandlerMiddleware godoc
+	AccessTokenHandlerMiddleware gin.HandlerFunc
 )
 
-// AddAccessTokenHandler godoc
-func AddAccessTokenHandler(accessTokenHandlerFactory AccessTokenHandlerFactory) gin.HandlerFunc {
+// NewAccessTokenHandler godoc
+func NewAccessTokenHandler(accessTokenHandlerFactory AccessTokenHandlerFactory) AccessTokenHandlerMiddleware {
 	accessTokenHandler := accessTokenHandlerFactory.Create()
 
 	return func(ctx *gin.Context) {

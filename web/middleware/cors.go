@@ -6,11 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CorsMiddleware godoc
+type CorsMiddleware gin.HandlerFunc
+
 // NewCors godoc
-func NewCors(cfg config.CorsConfig) gin.HandlerFunc {
-	return cors.New(cors.Config{
-		AllowOrigins: cfg.AllowOrigins,
-		AllowMethods: cfg.AllowMethods,
+func NewCors(cfg config.Configuration) CorsMiddleware {
+	return CorsMiddleware(cors.New(cors.Config{
+		AllowOrigins: cfg.Cors.AllowOrigins,
+		AllowMethods: cfg.Cors.AllowMethods,
 		AllowHeaders: []string{
 			"Authorization",
 			"Accept",
@@ -21,5 +24,5 @@ func NewCors(cfg config.CorsConfig) gin.HandlerFunc {
 			"X-Requested-With",
 		},
 		AllowCredentials: true,
-	})
+	}))
 }

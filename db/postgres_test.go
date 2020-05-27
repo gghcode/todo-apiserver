@@ -16,7 +16,8 @@ func TestPostgresConnIntegration(t *testing.T) {
 		BindEnvs("TEST").
 		Build()
 
-	postgresConn, err := db.NewPostgresConn(cfg)
+	postgresConn, postgresCleanup, err := db.NewPostgresConn(cfg)
+
 	if err != nil {
 		t.Error(err)
 	}
@@ -25,7 +26,7 @@ func TestPostgresConnIntegration(t *testing.T) {
 		t.Error("Postgres connection must be healthy")
 	}
 
-	postgresConn.Close()
+	postgresCleanup()
 
 	if postgresConn.Healthy() {
 		t.Error("Postgres connection must be unhealthy after close connection")

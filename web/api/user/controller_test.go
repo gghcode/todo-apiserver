@@ -35,9 +35,9 @@ func (suite *ControllerUnitTestSuite) SetupTest() {
 	suite.fakeUserService = fake.NewUserService()
 	suite.fakeUserIDFactory = &fake.MockUserID{}
 	suite.router = gin.New()
-	suite.router.Use(middleware.AddAccessTokenHandler(
+	suite.router.Use(gin.HandlerFunc(middleware.NewAccessTokenHandler(
 		fake.NewAccessTokenHandlerFactory(suite.fakeUserIDFactory),
-	))
+	)))
 
 	c := webUser.NewController(suite.fakeUserService)
 	c.RegisterRoutes(suite.router)

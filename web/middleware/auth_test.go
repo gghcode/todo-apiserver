@@ -74,7 +74,7 @@ func TestRequiredAccessToken(t *testing.T) {
 			}
 
 			ginRouter := gin.New()
-			ginRouter.Use(middleware.AddAccessTokenHandler(accessTokenHandler))
+			ginRouter.Use(gin.HandlerFunc(middleware.NewAccessTokenHandler(accessTokenHandler)))
 			ginRouter.Use(middleware.RequiredAccessToken())
 			ginRouter.GET("/", func(ctx *gin.Context) {
 				ctx.String(http.StatusOK, strconv.FormatInt(

@@ -37,7 +37,7 @@ func (suite *RedisIntegration) TestNewRedisConn() {
 	expectedHealthyAfterClose := false
 	expectedPong := "ping: PONG"
 
-	conn := db.NewRedisConn(suite.cfg)
+	conn, cleanup := db.NewRedisConn(suite.cfg)
 
 	actualHealthy := conn.Healthy()
 	suite.Equal(expectedHealthy, actualHealthy)
@@ -45,7 +45,8 @@ func (suite *RedisIntegration) TestNewRedisConn() {
 	actualPong := conn.Client().Ping().String()
 	suite.Equal(expectedPong, actualPong)
 
-	suite.NoError(conn.Close())
+	cleanup()
+
 	actualHealthyAfterClose := conn.Healthy()
 	suite.Equal(expectedHealthyAfterClose, actualHealthyAfterClose)
 }

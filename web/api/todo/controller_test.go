@@ -34,9 +34,9 @@ func (suite *ControllerUnitTestSuite) SetupTest() {
 	suite.fakeTodoService = fake.NewTodoService()
 	suite.fakeUserIDFactory = &fake.MockUserID{}
 	suite.router = gin.New()
-	suite.router.Use(middleware.AddAccessTokenHandler(
+	suite.router.Use(gin.HandlerFunc(middleware.NewAccessTokenHandler(
 		fake.NewAccessTokenHandlerFactory(suite.fakeUserIDFactory),
-	))
+	)))
 
 	c := webTodo.NewController(suite.fakeTodoService)
 	c.RegisterRoutes(suite.router)
