@@ -36,7 +36,7 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 		Build()
 	suite.NoError(err)
 
-	dbConn, err := db.NewPostgresConn(cfg)
+	dbConn, _, err := db.NewPostgresConn(cfg)
 	suite.NoError(err)
 
 	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())

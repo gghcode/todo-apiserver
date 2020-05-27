@@ -19,6 +19,7 @@ type ControllerIntegrationTestSuite struct {
 	fakeAppService *fake.AppService
 	postgresConn   db.GormConnection
 	redisConn      db.RedisConnection
+	cleanup        func()
 
 	router *gin.Engine
 }
@@ -39,11 +40,25 @@ func (suite *ControllerIntegrationTestSuite) SetupTest() {
 
 	suite.router = gin.New()
 	suite.fakeAppService = fake.NewAppService()
-	suite.postgresConn, _ = db.NewPostgresConn(cfg)
-	suite.redisConn = db.NewRedisConn(cfg)
+
+	postgresConn, postgresCleanup, err := db.NewPostgresConn(cfg)
+	redisConn, redisCleanup := db.NewRedisConn(cfg)
+
+	suite.NoError(err)
+
+	suite.postgresConn = postgresConn
+	suite.redisConn = redisConn
+	suite.cleanup = func() {
+		redisCleanup()
+		postgresCleanup()
+	}
 
 	c := app.NewController(suite.fakeAppService, suite.postgresConn, suite.redisConn)
 	c.RegisterRoutes(suite.router)
+}
+
+func (suite *ControllerIntegrationTestSuite) TearDownTest() {
+	suite.cleanup()
 }
 
 func (suite *ControllerIntegrationTestSuite) TestVersion() {

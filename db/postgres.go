@@ -15,7 +15,7 @@ type PostgresConn struct {
 }
 
 // NewPostgresConn godoc
-func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
+func NewPostgresConn(cfg config.Configuration) (GormConnection, func(), error) {
 	gormDB, err := gorm.Open(cfg.Postgres.Driver,
 		"host="+cfg.Postgres.Host+
 			" port="+cfg.Postgres.Port+
@@ -25,7 +25,7 @@ func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 			" sslmode=disable")
 
 	if err != nil {
-		return nil, errors.Wrap(err, "db connect failed...")
+		return nil, nil, errors.Wrap(err, "db connect failed...")
 	}
 
 	gormDB.AutoMigrate(
@@ -33,9 +33,15 @@ func NewPostgresConn(cfg config.Configuration) (GormConnection, error) {
 		&model.User{},
 	)
 
-	return &PostgresConn{
+	conn := &PostgresConn{
 		db: gormDB,
-	}, nil
+	}
+
+	cleanupFunc := func() {
+		conn.Close()
+	}
+
+	return conn, cleanupFunc, nil
 }
 
 // Healthy return database connection status if connection connected, method return true

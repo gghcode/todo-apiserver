@@ -18,14 +18,18 @@ type redisConn struct {
 }
 
 // NewRedisConn return new connection of redis
-func NewRedisConn(cfg config.Configuration) RedisConnection {
+func NewRedisConn(cfg config.Configuration) (RedisConnection, func()) {
 	conn := redisConn{
 		client: redis.NewClient(&redis.Options{
 			Addr: cfg.Redis.Addr,
 		}),
 	}
 
-	return &conn
+	cleanupFunc := func() {
+		conn.Close()
+	}
+
+	return &conn, cleanupFunc
 }
 
 func (conn *redisConn) Healthy() bool {
