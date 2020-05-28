@@ -9,10 +9,6 @@ import (
 	_ "github.com/gghcode/apas-todo-apiserver/docs"
 )
 
-const (
-	envPrefix = "REST"
-)
-
 // @title APAS TODO API
 // @version 1.0
 // @description This is a apas todo api server.
