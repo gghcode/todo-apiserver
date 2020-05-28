@@ -3,6 +3,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/app"
@@ -24,6 +26,34 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/spf13/afero"
+)
+
+func provideControllers(
+	appController *webApp.Controller,
+	todoController *webTodo.Controller,
+	authController *webAuth.Controller,
+	userController *webUser.Controller,
+) []api.GinController {
+	return []api.GinController{
+		appController,
+		todoController,
+		authController,
+		userController,
+	}
+}
+
+func provideMiddlewares(
+	accessTokenHandlerMiddleware middleware.AccessTokenHandlerMiddleware,
+	corsMiddleware middleware.CorsMiddleware,
+) []gin.HandlerFunc {
+	return []gin.HandlerFunc{
+		gin.HandlerFunc(accessTokenHandlerMiddleware),
+		gin.HandlerFunc(corsMiddleware),
+	}
+}
+
+var configSet = wire.NewSet(
+	config.FromEnvs,
 )
 
 var dbSet = wire.NewSet(
@@ -74,8 +104,9 @@ var routerSet = wire.NewSet(
 	web.NewGinRouter,
 )
 
-func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
+func InitializeRouter() (*http.Server, func(), error) {
 	wire.Build(
+		configSet,
 		dbSet,
 		redisSet,
 		securitySet,
@@ -86,28 +117,4 @@ func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
 		routerSet,
 	)
 	return nil, nil, nil
-}
-
-func provideControllers(
-	appController *webApp.Controller,
-	todoController *webTodo.Controller,
-	authController *webAuth.Controller,
-	userController *webUser.Controller,
-) []api.GinController {
-	return []api.GinController{
-		appController,
-		todoController,
-		authController,
-		userController,
-	}
-}
-
-func provideMiddlewares(
-	accessTokenHandlerMiddleware middleware.AccessTokenHandlerMiddleware,
-	corsMiddleware middleware.CorsMiddleware,
-) []gin.HandlerFunc {
-	return []gin.HandlerFunc{
-		gin.HandlerFunc(accessTokenHandlerMiddleware),
-		gin.HandlerFunc(corsMiddleware),
-	}
 }

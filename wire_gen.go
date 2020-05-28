@@ -26,63 +26,51 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"github.com/spf13/afero"
+	"net/http"
 )
 
 // Injectors from wire.go:
 
-func InitializeRouter(cfg config.Configuration) (*gin.Engine, func(), error) {
-	accessTokenHandlerFactory := jwt.NewJwtAccessTokenVerifyHandlerFactory(cfg)
+func InitializeRouter() (*http.Server, func(), error) {
+	configuration, err := config.FromEnvs()
+	if err != nil {
+		return nil, nil, err
+	}
+	accessTokenHandlerFactory := jwt.NewJwtAccessTokenVerifyHandlerFactory(configuration)
 	accessTokenHandlerMiddleware := middleware.NewAccessTokenHandler(accessTokenHandlerFactory)
-	corsMiddleware := middleware.NewCors(cfg)
+	corsMiddleware := middleware.NewCors(configuration)
 	v := provideMiddlewares(accessTokenHandlerMiddleware, corsMiddleware)
 	fs := afero.NewOsFs()
 	fileReader := file.NewAferoFileReader(fs)
 	usecaseInteractor := app.NewService(fileReader)
-	gormConnection, cleanup, err := db.NewPostgresConn(cfg)
+	gormConnection, cleanup, err := db.NewPostgresConn(configuration)
 	if err != nil {
 		return nil, nil, err
 	}
-	redisConnection, cleanup2 := db.NewRedisConn(cfg)
+	redisConnection, cleanup2 := db.NewRedisConn(configuration)
 	controller := app2.NewController(usecaseInteractor, gormConnection, redisConnection)
 	todoRepository := repository.NewGormTodoRepository(gormConnection)
 	todoUsecaseInteractor := todo.NewTodoService(todoRepository)
 	todoController := todo2.NewController(todoUsecaseInteractor)
-	passport := security.NewBcryptPassport(cfg)
+	passport := security.NewBcryptPassport(configuration)
 	tokenRepository := repository.NewRedisTokenRepository(redisConnection)
 	userRepository := repository.NewUserRepository(gormConnection)
-	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(cfg)
-	refreshTokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(cfg)
-	authUsecaseInteractor := auth.NewService(cfg, passport, tokenRepository, userRepository, accessTokenGeneratorFunc, refreshTokenGeneratorFunc)
+	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(configuration)
+	refreshTokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(configuration)
+	authUsecaseInteractor := auth.NewService(configuration, passport, tokenRepository, userRepository, accessTokenGeneratorFunc, refreshTokenGeneratorFunc)
 	authController := auth2.NewController(authUsecaseInteractor)
 	userUsecaseInteractor := user.NewService(userRepository, passport)
 	userController := user2.NewController(userUsecaseInteractor)
 	v2 := provideControllers(controller, todoController, authController, userController)
-	engine := web.NewGinRouter(cfg, v, v2)
-	return engine, func() {
+	server, cleanup3 := web.NewGinRouter(configuration, v, v2)
+	return server, func() {
+		cleanup3()
 		cleanup2()
 		cleanup()
 	}, nil
 }
 
 // wire.go:
-
-var dbSet = wire.NewSet(db.NewPostgresConn)
-
-var redisSet = wire.NewSet(db.NewRedisConn)
-
-var todoSet = wire.NewSet(repository.NewGormTodoRepository, todo.NewTodoService, todo2.NewController)
-
-var securitySet = wire.NewSet(security.NewBcryptPassport)
-
-var authSet = wire.NewSet(repository.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
-
-var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, user2.NewController)
-
-var appSet = wire.NewSet(afero.NewOsFs, file.NewAferoFileReader, app.NewService, app2.NewController)
-
-var routerSet = wire.NewSet(jwt.NewJwtAccessTokenVerifyHandlerFactory, middleware.NewAccessTokenHandler, middleware.NewCors, provideMiddlewares,
-	provideControllers, web.NewGinRouter,
-)
 
 func provideControllers(
 	appController *app2.Controller,
@@ -104,3 +92,23 @@ func provideMiddlewares(
 ) []gin.HandlerFunc {
 	return []gin.HandlerFunc{gin.HandlerFunc(accessTokenHandlerMiddleware), gin.HandlerFunc(corsMiddleware)}
 }
+
+var configSet = wire.NewSet(config.FromEnvs)
+
+var dbSet = wire.NewSet(db.NewPostgresConn)
+
+var redisSet = wire.NewSet(db.NewRedisConn)
+
+var todoSet = wire.NewSet(repository.NewGormTodoRepository, todo.NewTodoService, todo2.NewController)
+
+var securitySet = wire.NewSet(security.NewBcryptPassport)
+
+var authSet = wire.NewSet(repository.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
+
+var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, user2.NewController)
+
+var appSet = wire.NewSet(afero.NewOsFs, file.NewAferoFileReader, app.NewService, app2.NewController)
+
+var routerSet = wire.NewSet(jwt.NewJwtAccessTokenVerifyHandlerFactory, middleware.NewAccessTokenHandler, middleware.NewCors, provideMiddlewares,
+	provideControllers, web.NewGinRouter,
+)

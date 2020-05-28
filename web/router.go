@@ -1,6 +1,11 @@
 package web
 
 import (
+	"context"
+	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 
@@ -14,7 +19,7 @@ func NewGinRouter(
 	cfg config.Configuration,
 	middlwares []gin.HandlerFunc,
 	controllers []api.GinController,
-) *gin.Engine {
+) (*http.Server, func()) {
 	router := gin.New()
 	for _, m := range middlwares {
 		router.Use(m)
@@ -26,5 +31,26 @@ func NewGinRouter(
 
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	return router
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", cfg.Port),
+		Handler: router,
+	}
+
+	gracefullyShutdownFunc := func() {
+		fmt.Println("Shutdown server...")
+
+		ctx, cancel := context.WithTimeout(
+			context.Background(),
+			time.Duration(cfg.GracefulShutdownTimeoutSec)*time.Second,
+		)
+		defer cancel()
+
+		if err := srv.Shutdown(ctx); err != nil {
+			fmt.Println("Server shutdown: ", err)
+		}
+
+		fmt.Println("Shutdown was successful")
+	}
+
+	return srv, gracefullyShutdownFunc
 }

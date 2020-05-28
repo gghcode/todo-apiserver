@@ -12,8 +12,8 @@ type CorsMiddleware gin.HandlerFunc
 // NewCors godoc
 func NewCors(cfg config.Configuration) CorsMiddleware {
 	return CorsMiddleware(cors.New(cors.Config{
-		AllowOrigins: cfg.Cors.AllowOrigins,
-		AllowMethods: cfg.Cors.AllowMethods,
+		AllowOrigins: cfg.CorsAllowOrigins,
+		AllowMethods: cfg.CorsAllowMethods,
 		AllowHeaders: []string{
 			"Authorization",
 			"Accept",

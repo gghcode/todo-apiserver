@@ -30,9 +30,7 @@ func TestUserRepositoryIntegrationTests(t *testing.T) {
 }
 
 func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
-	cfg, err := config.NewViperBuilder().
-		BindEnvs("TEST").
-		Build()
+	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
 	dbConn, _, err := db.NewPostgresConn(cfg)

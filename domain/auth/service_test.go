@@ -29,11 +29,9 @@ func TestAuthServiceUnit(t *testing.T) {
 
 func (suite *ServiceUnit) SetupTest() {
 	suite.cfg = config.Configuration{
-		Jwt: config.JwtConfig{
-			SecretKey:           "testkey",
-			AccessExpiresInSec:  3600,
-			RefreshExpiresInSec: 7200,
-		},
+		JwtSecretKey:           "testkey",
+		JwtAccessExpiresInSec:  3600,
+		JwtRefreshExpiresInSec: 7200,
 	}
 
 	suite.fakeTokenRepo = fake.TokenRepository{}
@@ -78,7 +76,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 				Type:         "Bearer",
 				AccessToken:  stubCreateAccessToken(fakeUser.ID),
 				RefreshToken: stubCreateRefreshToken(fakeUser.ID),
-				ExpiresIn:    suite.cfg.Jwt.AccessExpiresInSec,
+				ExpiresIn:    suite.cfg.JwtAccessExpiresInSec,
 			},
 			expectedErr: nil,
 		},

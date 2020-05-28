@@ -14,7 +14,7 @@ type (
 	RefreshTokenGeneratorFunc func(userID int64) (string, error)
 
 	authService struct {
-		cfg                  config.JwtConfig
+		cfg                  config.Configuration
 		tokenRepo            TokenRepository
 		userRepo             user.Repository
 		passport             security.Passport
@@ -33,7 +33,7 @@ func NewService(
 	refreshTokenGeneratorFunc RefreshTokenGeneratorFunc) UsecaseInteractor {
 
 	return &authService{
-		cfg:                  cfg.Jwt,
+		cfg:                  cfg,
 		userRepo:             userRepo,
 		tokenRepo:            tokenRepo,
 		passport:             passport,
@@ -64,7 +64,7 @@ func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) 
 		Type:         "Bearer",
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		ExpiresIn:    service.cfg.AccessExpiresInSec,
+		ExpiresIn:    service.cfg.JwtAccessExpiresInSec,
 	}
 
 	return res, nil
@@ -86,7 +86,7 @@ func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (Token
 	res = TokenResponse{
 		Type:        "Bearer",
 		AccessToken: accessToken,
-		ExpiresIn:   service.cfg.AccessExpiresInSec,
+		ExpiresIn:   service.cfg.JwtAccessExpiresInSec,
 	}
 
 	return res, nil

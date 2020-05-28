@@ -25,8 +25,8 @@ type (
 // NewJwtAccessTokenGeneratorFunc return new jwt access token generator function
 func NewJwtAccessTokenGeneratorFunc(cfg config.Configuration) auth.AccessTokenGeneratorFunc {
 	opt := jwtOptions{
-		SecretKeyBytes: []byte(cfg.Jwt.SecretKey),
-		ExpiresInSec:   time.Duration(cfg.Jwt.AccessExpiresInSec),
+		SecretKeyBytes: []byte(cfg.JwtSecretKey),
+		ExpiresInSec:   time.Duration(cfg.JwtAccessExpiresInSec),
 	}
 
 	return func(userID int64) (string, error) {
@@ -42,8 +42,8 @@ func NewJwtAccessTokenGeneratorFunc(cfg config.Configuration) auth.AccessTokenGe
 // NewJwtRefreshTokenGeneratorFunc return new jwt refresh token generator function
 func NewJwtRefreshTokenGeneratorFunc(cfg config.Configuration) auth.RefreshTokenGeneratorFunc {
 	opt := jwtOptions{
-		SecretKeyBytes: []byte(cfg.Jwt.SecretKey),
-		ExpiresInSec:   time.Duration(cfg.Jwt.RefreshExpiresInSec),
+		SecretKeyBytes: []byte(cfg.JwtSecretKey),
+		ExpiresInSec:   time.Duration(cfg.JwtRefreshExpiresInSec),
 	}
 
 	return func(userID int64) (string, error) {

@@ -5,48 +5,34 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
-	"github.com/stretchr/testify/suite"
+
+	"github.com/stretchr/testify/assert"
 )
-
-type RedisIntegration struct {
-	suite.Suite
-
-	cfg config.Configuration
-}
-
-func (suite *RedisIntegration) SetupSuite() {
-	cfg, err := config.NewViperBuilder().
-		BindEnvs("TEST").
-		Build()
-
-	suite.NoError(err)
-
-	suite.cfg = cfg
-}
 
 func TestRedisConnIntegration(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
 	}
 
-	suite.Run(t, new(RedisIntegration))
-}
+	cfg, err := config.FromEnvs()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-func (suite *RedisIntegration) TestNewRedisConn() {
 	expectedHealthy := true
 	expectedHealthyAfterClose := false
 	expectedPong := "ping: PONG"
 
-	conn, cleanup := db.NewRedisConn(suite.cfg)
+	redisConn, cleanup := db.NewRedisConn(cfg)
 
-	actualHealthy := conn.Healthy()
-	suite.Equal(expectedHealthy, actualHealthy)
+	actualHealthy := redisConn.Healthy()
+	assert.Equal(t, expectedHealthy, actualHealthy)
 
-	actualPong := conn.Client().Ping().String()
-	suite.Equal(expectedPong, actualPong)
+	actualPong := redisConn.Client().Ping().String()
+	assert.Equal(t, expectedPong, actualPong)
 
 	cleanup()
 
-	actualHealthyAfterClose := conn.Healthy()
-	suite.Equal(expectedHealthyAfterClose, actualHealthyAfterClose)
+	actualHealthyAfterClose := redisConn.Healthy()
+	assert.Equal(t, expectedHealthyAfterClose, actualHealthyAfterClose)
 }

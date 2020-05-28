@@ -5,6 +5,7 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestPostgresConnIntegration(t *testing.T) {
@@ -12,23 +13,24 @@ func TestPostgresConnIntegration(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	cfg, err := config.NewViperBuilder().
-		BindEnvs("TEST").
-		Build()
+	cfg, err := config.FromEnvs()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	postgresConn, postgresCleanup, err := db.NewPostgresConn(cfg)
+	expectedHealthy := true
+	expectedHealthyAfterClose := false
 
+	postgresConn, cleanup, err := db.NewPostgresConn(cfg)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if !postgresConn.Healthy() {
-		t.Error("Postgres connection must be healthy")
-	}
+	actualHealthy := postgresConn.Healthy()
+	assert.Equal(t, expectedHealthy, actualHealthy)
 
-	postgresCleanup()
+	cleanup()
 
-	if postgresConn.Healthy() {
-		t.Error("Postgres connection must be unhealthy after close connection")
-	}
+	actualHealthyAfterClose := postgresConn.Healthy()
+	assert.Equal(t, expectedHealthyAfterClose, actualHealthyAfterClose)
 }
