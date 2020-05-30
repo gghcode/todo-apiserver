@@ -29,9 +29,7 @@ func TestTokenRepositoryIntegration(t *testing.T) {
 }
 
 func (suite *RepositoryIntegration) SetupTest() {
-	cfg, err := config.NewViperBuilder().
-		BindEnvs("TEST").
-		Build()
+	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
 	suite.redisConn, suite.cleanup = db.NewRedisConn(cfg)

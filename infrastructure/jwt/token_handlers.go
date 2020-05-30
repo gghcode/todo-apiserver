@@ -12,18 +12,18 @@ import (
 )
 
 type jwtAccessTokenHandler struct {
-	jwtCfg config.JwtConfig
+	cfg config.Configuration
 }
 
 // NewJwtAccessTokenVerifyHandlerFactory return new jwtAccessTokenHandler instance
 func NewJwtAccessTokenVerifyHandlerFactory(cfg config.Configuration) middleware.AccessTokenHandlerFactory {
 	return &jwtAccessTokenHandler{
-		jwtCfg: cfg.Jwt,
+		cfg: cfg,
 	}
 }
 
 func (handler *jwtAccessTokenHandler) Create() middleware.AccessTokenHandlerFunc {
-	secretKeyBytes := []byte(handler.jwtCfg.SecretKey)
+	secretKeyBytes := []byte(handler.cfg.JwtSecretKey)
 
 	return func(token string) (middleware.TokenClaims, error) {
 		var result middleware.TokenClaims

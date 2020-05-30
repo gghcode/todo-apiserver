@@ -16,12 +16,10 @@ import (
 
 func TestJwtVerifyAccessToken(t *testing.T) {
 	testCfg := config.Configuration{
-		Jwt: config.JwtConfig{
-			SecretKey: "testkey",
-		},
+		JwtSecretKey: "testkey",
 	}
 
-	testSecretKeyBytes := []byte(testCfg.Jwt.SecretKey)
+	testSecretKeyBytes := []byte(testCfg.JwtSecretKey)
 
 	testCases := []struct {
 		description    string

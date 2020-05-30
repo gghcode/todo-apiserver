@@ -27,8 +27,8 @@ func TestJwtAccessTokenGenerator(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			cfg := config.DefaultConfig()
-			secretKeyBytes := []byte(cfg.Jwt.SecretKey)
+			cfg := config.Configuration{}
+			secretKeyBytes := []byte(cfg.JwtSecretKey)
 
 			tokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(cfg)
 			tok, err := tokenGeneratorFunc(tc.argUserID)
@@ -67,8 +67,8 @@ func TestJwtRefreshTokenGenerator(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			cfg := config.DefaultConfig()
-			secretKeyBytes := []byte(cfg.Jwt.SecretKey)
+			cfg := config.Configuration{}
+			secretKeyBytes := []byte(cfg.JwtSecretKey)
 
 			tokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(cfg)
 			tok, err := tokenGeneratorFunc(tc.argUserID)

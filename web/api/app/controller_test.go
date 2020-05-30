@@ -35,7 +35,7 @@ func TestAppControllerIntegrationTests(t *testing.T) {
 func (suite *ControllerIntegrationTestSuite) SetupTest() {
 	gin.SetMode(gin.TestMode)
 
-	cfg, err := config.NewViperBuilder().BindEnvs("TEST").Build()
+	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
 	suite.router = gin.New()

@@ -16,12 +16,12 @@ type PostgresConn struct {
 
 // NewPostgresConn godoc
 func NewPostgresConn(cfg config.Configuration) (GormConnection, func(), error) {
-	gormDB, err := gorm.Open(cfg.Postgres.Driver,
-		"host="+cfg.Postgres.Host+
-			" port="+cfg.Postgres.Port+
-			" user="+cfg.Postgres.User+
-			" dbname="+cfg.Postgres.Name+
-			" password="+cfg.Postgres.Password+
+	gormDB, err := gorm.Open("postgres",
+		"host="+cfg.PostgresHost+
+			" port="+cfg.PostgresPort+
+			" user="+cfg.PostgresUser+
+			" dbname="+cfg.PostgresName+
+			" password="+cfg.PostgresPassword+
 			" sslmode=disable")
 
 	if err != nil {
