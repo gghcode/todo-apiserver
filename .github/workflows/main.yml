@@ -147,14 +147,13 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: Make mask.sh
-        run: | 
-          echo "sed \\" > mask.sh
-          env | grep -i TF_VAR_ | column -t -s '=' | awk '{ print $2 }' | while read line; do echo "-e s/${line}/**********/g \\" >> mask.sh; done
-
+      - name: Export mask
+        run: 
+          export mask='sed -E -e "s/value = \".+-> .+/value = ************** -> **************/g" -e "s/value = \".+/value = **************/g"'
+          
       - name: Terraform Plan
-        run: terraform plan -no-color -var-file="prod.tfvars" | sh mask.sh
+        run: terraform plan -no-color -var-file="prod.tfvars" | sh -c $mask
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -no-color -var-file="prod.tfvars" | sh mask.sh
+        run: terraform apply -auto-approve -no-color -var-file="prod.tfvars" | sh -c $mask
 
