@@ -76,6 +76,10 @@ resource "google_cloud_run_service" "this" {
           value = var.postgres_user
         }
         env {
+          name  = "POSTGRES_PORT"
+          value = var.postgres_port
+        }
+        env {
           name  = "POSTGRES_NAME"
           value = var.postgres_name
         }

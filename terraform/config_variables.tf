@@ -34,6 +34,10 @@ variable "postgres_host" {
   type = string
 }
 
+variable "postgres_port" {
+  type = string
+}
+
 variable "postgres_user" {
   type = string
 }
