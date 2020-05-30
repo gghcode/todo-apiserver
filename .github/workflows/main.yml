@@ -118,12 +118,12 @@ jobs:
       - "Push-Docker-Image"
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      TF_VAR_JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-      TF_VAR_POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-      TF_VAR_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-      TF_VAR_POSTGRES_NAME: ${{ secrets.POSTGRES_NAME }}
-      TF_VAR_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      TF_VAR_REDIS_ADDR: ${{ secrets.REDIS_ADDR }}
+      TF_VAR_jwt_secret_key: ${{ secrets.JWT_SECRET_KEY }}
+      TF_VAR_postgres_host: ${{ secrets.POSTGRES_HOST }}
+      TF_VAR_postgres_user: ${{ secrets.POSTGRES_USER }}
+      TF_VAR_postgres_name: ${{ secrets.POSTGRES_NAME }}
+      TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD }}
+      TF_VAR_redis_addr: ${{ secrets.REDIS_ADDR }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -137,7 +137,9 @@ jobs:
         run: terraform init -input=false -no-color
           
       - name: Make prod.tfvars
-        run: cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
+        run:  |
+          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
+          cat prod.tfvars
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -147,14 +149,11 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: Make mask.sh
-        run: | 
-          echo "sed \\" > mask.sh
-          env | grep -i TF_VAR_ | column -t -s '=' | awk '{ print $2 }' | while read line; do echo "-e s/${line}/**********/g \\" >> mask.sh; done
+      - run: echo 'sed -E -e "s/value = \".+-> .+/value = ************** -> **************/g" -e "s/value = \".+/value = **************/g"' > mask.sh
 
       - name: Terraform Plan
-        run: terraform plan -no-color -var-file="prod.tfvars" | sh mask.sh
+        run: terraform plan -input=false -no-color -var-file="prod.tfvars" | sh mask.sh
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -no-color -var-file="prod.tfvars" | sh mask.sh
+        run: terraform apply -input=false -auto-approve -no-color -var-file="prod.tfvars" | sh mask.sh
 

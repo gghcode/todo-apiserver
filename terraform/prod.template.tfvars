@@ -1,10 +1,4 @@
-image_tag                     = "{IMAGE_TAG}"
-# jwt_secret_key                = "{JWT_SECRET_KEY}"
-# postgres_host                 = "{POSTGRES_HOST}"
-# postgres_user                 = "{POSTGRES_USER}"
-# postgres_name                 = "{POSTGRES_NAME}"
-# postgres_password             = "{POSTGRES_PASSWORD}"
-# redis_addr                    = "{REDIS_ADDR}"
+image_tag                     = "${IMAGE_TAG}"
 base_path                     = "api"
 bcrypt_cost                   = 12
 graceful_shutdown_timeout_sec = 30
