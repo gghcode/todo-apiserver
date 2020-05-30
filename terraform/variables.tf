@@ -21,19 +21,3 @@ variable "project" {
   description = "Name of Google cloud platform project"
   default     = "vapias"
 }
-
-variable "postgres_host" {
-  type = string
-}
-
-variable "postgres_user" {
-  type = string
-}
-
-variable "postgres_name" {
-  type = string
-}
-
-variable "postgres_password" {
-  type = string
-}

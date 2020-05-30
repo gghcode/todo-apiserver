@@ -36,20 +36,56 @@ resource "google_cloud_run_service" "this" {
       containers {
         image = "${var.image_name}:${var.image_tag}"
         env {
-          name  = "REST_POSTGRES_HOST"
+          name  = "BASE_PATH"
+          value = var.base_path
+        }
+        env {
+          name  = "BCRYPT_COST"
+          value = var.bcrypt_cost
+        }
+        env {
+          name  = "GRACEFUL_SHUTDOWN_TIMEOUT_SEC"
+          value = var.graceful_shutdown_timeout_sec
+        }
+        env {
+          name  = "JWT_SECRET_KEY"
+          value = var.jwt_secret_key
+        }
+        env {
+          name  = "JWT_ACCESS_EXPIRES_IN_SEC"
+          value = var.jwt_access_expires_in_sec
+        }
+        env {
+          name  = "JWT_REFRESH_EXPIRES_IN_SEC"
+          value = var.jwt_refresh_expires_in_sec
+        }
+        env {
+          name  = "CORS_ALLOW_ORIGINS"
+          value = var.cors_allow_origins
+        }
+        env {
+          name  = "CORS_ALLOW_METHODS"
+          value = var.cors_allow_methods
+        }
+        env {
+          name  = "POSTGRES_HOST"
           value = var.postgres_host
         }
         env {
-          name  = "REST_POSTGRES_USER"
+          name  = "POSTGRES_USER"
           value = var.postgres_user
         }
         env {
-          name  = "REST_POSTGRES_NAME"
+          name  = "POSTGRES_NAME"
           value = var.postgres_name
         }
         env {
           name  = "REST_POSTGRES_PASSWORD"
           value = var.postgres_password
+        }
+        env {
+          name  = "REDIS_ADDR"
+          value = var.redis_addr
         }
       }
     }
