@@ -84,7 +84,7 @@ resource "google_cloud_run_service" "this" {
           value = var.postgres_name
         }
         env {
-          name  = "REST_POSTGRES_PASSWORD"
+          name  = "POSTGRES_PASSWORD"
           value = var.postgres_password
         }
         env {
