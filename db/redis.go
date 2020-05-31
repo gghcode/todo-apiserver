@@ -21,7 +21,8 @@ type redisConn struct {
 func NewRedisConn(cfg config.Configuration) (RedisConnection, func()) {
 	conn := redisConn{
 		client: redis.NewClient(&redis.Options{
-			Addr: cfg.RedisAddr,
+			Addr:     cfg.RedisAddr,
+			Password: cfg.RedisPassword,
 		}),
 	}
 

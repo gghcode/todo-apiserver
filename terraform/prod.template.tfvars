@@ -1,4 +1,5 @@
 image_tag                     = "${IMAGE_TAG}"
+gin_mode                      = "release"
 base_path                     = "api"
 bcrypt_cost                   = 12
 graceful_shutdown_timeout_sec = 30

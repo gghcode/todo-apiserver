@@ -36,6 +36,10 @@ resource "google_cloud_run_service" "this" {
       containers {
         image = "${var.image_name}:${var.image_tag}"
         env {
+          name  = "GIN_MODE"
+          value = var.gin_mode
+        }
+        env {
           name  = "BASE_PATH"
           value = var.base_path
         }
@@ -90,6 +94,10 @@ resource "google_cloud_run_service" "this" {
         env {
           name  = "REDIS_ADDR"
           value = var.redis_addr
+        }
+        env {
+          name  = "REDIS_PASSWORD"
+          value = var.redis_password
         }
       }
     }
