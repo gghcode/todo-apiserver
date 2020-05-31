@@ -14,6 +14,7 @@ POSTGRES_USER=postgres
 POSTGRES_NAME=postgres
 POSTGRES_PASSWORD=postgres
 REDIS_ADDR=127.0.0.1:6378
+REDIS_PASSWORD=test
 
 run:
 	@go run .
