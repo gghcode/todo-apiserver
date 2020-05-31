@@ -2,6 +2,9 @@ version: "2.0"
 services:
   redis:
     image: redis:5.0.5-alpine
+    command: sh -c 'exec redis-server --requirepass "$REDIS_PASSWORD"'
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     ports:
       - 6378:6379
     networks:

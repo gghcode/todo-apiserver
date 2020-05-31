@@ -124,6 +124,7 @@ jobs:
       TF_VAR_postgres_name: ${{ secrets.POSTGRES_NAME }}
       TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD }}
       TF_VAR_redis_addr: ${{ secrets.REDIS_ADDR }}
+      TF_VAR_redis_password: ${{ secrets.REDIS_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

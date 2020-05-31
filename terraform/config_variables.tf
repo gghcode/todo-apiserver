@@ -1,3 +1,7 @@
+variable "gin_mode" {
+  type = string
+}
+
 variable "base_path" {
   type = string
 }
@@ -51,5 +55,9 @@ variable "postgres_password" {
 }
 
 variable "redis_addr" {
+  type = string
+}
+
+variable "redis_password" {
   type = string
 }

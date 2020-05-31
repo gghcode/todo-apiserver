@@ -20,5 +20,6 @@ type Configuration struct {
 	PostgresName     string
 	PostgresPassword string
 
-	RedisAddr string
+	RedisAddr     string
+	RedisPassword string
 }
