@@ -8,7 +8,7 @@ require (
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/google/wire v0.4.0
-	github.com/jinzhu/gorm v1.9.12
+	github.com/jinzhu/gorm v1.9.14
 	github.com/lib/pq v1.6.0
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
