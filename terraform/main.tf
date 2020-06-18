@@ -2,7 +2,7 @@ provider "google" {
   project = "vapias"
   region  = "asia-northeast1"
 
-  version = "~> v3.19.0"
+  version = "~> 3.19.0"
 }
 
 terraform {
