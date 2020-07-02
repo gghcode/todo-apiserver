@@ -2,7 +2,7 @@ on: [push, pull_request]
 name: Actions CI Workflow
 env:
   BUILD_VERSION: b${{ github.run_id }}
-  tf_version: "latest"
+  tf_version: "0.12.26"
   tf_working_dir: "terraform"
 jobs:
   "Build":
@@ -136,9 +136,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init -input=false -no-color
-          
+
       - name: Make prod.tfvars
-        run:  |
+        run: |
           cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
           cat prod.tfvars
 
@@ -157,4 +157,3 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -input=false -auto-approve -no-color -var-file="prod.tfvars" | sh mask.sh
-
