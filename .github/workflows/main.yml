@@ -1,39 +1,63 @@
-on: [push, pull_request]
+on: [push]
 name: Actions CI Workflow
 env:
   BUILD_VERSION: b${{ github.run_id }}
+  go_version: "1.14.4"
   tf_version: "0.12.26"
   tf_working_dir: "terraform"
 jobs:
+  "Terraform-Format":
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ${{ env.tf_working_dir }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.tf_version }}
+
+      - run: terraform fmt -check
+
+  "Terraform-Validate":
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ${{ env.tf_working_dir }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.tf_version }}
+
+      - name: Terraform Validate
+        run: |
+          terraform init -backend=false -input=false -no-color
+          terraform validate -no-color
+
   "Build":
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build Docker Image
-        run: DOCKER_BUILDKIT=1 docker build
+      - uses: actions/checkout@v2
+      - run: DOCKER_BUILDKIT=1 docker build
           --build-arg BUILD_APP_VERSION=$BUILD_VERSION
           -t gcr.io/vapias/todo-apiserver:latest
           "."
 
-      - name: Export Docker Image
-        run: docker save gcr.io/vapias/todo-apiserver:latest > image.tar
+      - run: docker save gcr.io/vapias/todo-apiserver:latest > image.tar
 
       - uses: actions/upload-artifact@v1
         with:
           name: docker-image-tar
           path: image.tar
+
   "Integration-Test":
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2-beta
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2-beta
         with:
-          go-version: "^1.13.1"
-
-      - name: Checkout code
-        uses: actions/checkout@v2
+          go-version: ${{ env.go_version }}
 
       - uses: actions/cache@v1
         with:
@@ -42,23 +66,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Integration Test
-        run: make integration_ci
+      - run: make integration_ci
+      - uses: codecov/codecov-action@v1
+        with:
+          flags: integration
 
-      - name: Upload codecov
-        run: |
-          bash <(curl -s https://codecov.io/bash) -F integration ||
-            echo 'Codecov failed to upload'
   "Unit-Test":
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v2-beta
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2-beta
         with:
-          go-version: "^1.13.1"
-
-      - name: Checkout code
-        uses: actions/checkout@v2
+          go-version: ${{ env.go_version }}
 
       - uses: actions/cache@v1
         with:
@@ -67,18 +86,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-go-
 
-      - name: Unit Test
-        run: make unit_ci
-
-      - name: Upload codecov
-        run: |
-          bash <(curl -s https://codecov.io/bash) -F unittests || 
-            echo 'Codecov failed to upload'
+      - run: make unit_ci
+      - uses: codecov/codecov-action@v1
+        with:
+          flags: unittests
 
   "Push-Docker-Image":
     if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     needs:
+      - "Terraform-Format"
+      - "Terraform-Validate"
       - "Build"
       - "Integration-Test"
       - "Unit-Test"
@@ -94,9 +112,12 @@ jobs:
           service_account_email: ${{ secrets.GCP_SA_EMAIL }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
-      - name: Login GCR
-        run: gcloud auth configure-docker --quiet
-
+      - run: |
+          gcloud auth configure-docker --quiet
+          docker load --input docker-image-tar/image.tar
+          docker tag
+            gcr.io/vapias/todo-apiserver:latest
+            gcr.io/vapias/todo-apiserver:$BUILD_VERSION
       - name: Load docker image
         run: docker load --input docker-image-tar/image.tar
 
@@ -113,7 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: terraform
+        working-directory: ${{ env.tf_working_dir }}
     needs:
       - "Push-Docker-Image"
     env:
@@ -126,21 +147,11 @@ jobs:
       TF_VAR_redis_addr: ${{ secrets.REDIS_ADDR }}
       TF_VAR_redis_password: ${{ secrets.REDIS_PASSWORD }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: ${{ env.tf_version }}
           cli_config_credentials_token: ${{ secrets.TF_TOKEN }}
-
-      - name: Terraform Init
-        run: terraform init -input=false -no-color
-
-      - name: Make prod.tfvars
-        run: |
-          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
-          cat prod.tfvars
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
@@ -150,10 +161,8 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - run: echo 'sed -E -e "s/value = \".+-> .+/value = ************** -> **************/g" -e "s/value = \".+/value = **************/g"' > mask.sh
-
-      - name: Terraform Plan
-        run: terraform plan -input=false -no-color -var-file="prod.tfvars" | sh mask.sh
-
-      - name: Terraform Apply
-        run: terraform apply -input=false -auto-approve -no-color -var-file="prod.tfvars" | sh mask.sh
+      - name: "Terraform Apply"
+        run: |
+          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
+          terraform init -input=false -no-color
+          terraform apply -input=false -auto-approve -no-color -var-file="prod.tfvars"
