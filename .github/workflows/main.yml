@@ -115,21 +115,10 @@ jobs:
       - run: |
           gcloud auth configure-docker --quiet
           docker load --input docker-image-tar/image.tar
-          docker tag
-            gcr.io/vapias/todo-apiserver:latest
-            gcr.io/vapias/todo-apiserver:$BUILD_VERSION
-      - name: Load docker image
-        run: docker load --input docker-image-tar/image.tar
-
-      - name: Tag docker image
-        run: docker tag
-          gcr.io/vapias/todo-apiserver:latest
-          gcr.io/vapias/todo-apiserver:$BUILD_VERSION
-
-      - name: Push docker image
-        run: |
+          docker tag gcr.io/vapias/todo-apiserver gcr.io/vapias/todo-apiserver:$BUILD_VERSION
           docker push gcr.io/vapias/todo-apiserver:latest
           docker push gcr.io/vapias/todo-apiserver:$BUILD_VERSION
+
   "Deploy":
     runs-on: ubuntu-latest
     defaults:
