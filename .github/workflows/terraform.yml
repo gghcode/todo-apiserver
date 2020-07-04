@@ -8,6 +8,14 @@ defaults:
 jobs:
   "Plan":
     runs-on: ubuntu-20.04
+    env:
+      TF_VAR_jwt_secret_key: ${{ secrets.JWT_SECRET_KEY }}
+      TF_VAR_postgres_host: ${{ secrets.POSTGRES_HOST }}
+      TF_VAR_postgres_user: ${{ secrets.POSTGRES_USER }}
+      TF_VAR_postgres_name: ${{ secrets.POSTGRES_NAME }}
+      TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD }}
+      TF_VAR_redis_addr: ${{ secrets.REDIS_ADDR }}
+      TF_VAR_redis_password: ${{ secrets.REDIS_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
