@@ -25,6 +25,6 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvar
+          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
           terraform init -input=false -no-color
           terraform plan -input=false -no-color -var-file="prod.tfvars"
