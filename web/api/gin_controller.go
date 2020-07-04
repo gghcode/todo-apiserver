@@ -6,6 +6,3 @@ import "github.com/gin-gonic/gin"
 type GinController interface {
 	RegisterRoutes(gin.IRouter)
 }
-
-// GinControllerToken godoc
-var GinControllerToken = new(GinController)
