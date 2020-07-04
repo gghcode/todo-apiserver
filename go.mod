@@ -22,8 +22,7 @@ require (
 	github.com/vrischmann/envconfig v1.2.0
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 	golang.org/x/tools v0.0.0-20191114200427-caa0b0f7d508 // indirect
-	google.golang.org/appengine v1.6.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
-go 1.13
+go 1.14

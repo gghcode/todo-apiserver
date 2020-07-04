@@ -1,56 +1,38 @@
-on: [push, pull_request]
-name: Terraform Actions
+on: [pull_request]
+name: Terraform Plan
 env:
   tf_version: "0.12.26"
 defaults:
   run:
     working-directory: terraform
 jobs:
-  "Format":
-    runs-on: ubuntu-latest
+  "Plan":
+    runs-on: ubuntu-20.04
+    env:
+      TF_VAR_jwt_secret_key: ${{ secrets.JWT_SECRET_KEY }}
+      TF_VAR_postgres_host: ${{ secrets.POSTGRES_HOST }}
+      TF_VAR_postgres_user: ${{ secrets.POSTGRES_USER }}
+      TF_VAR_postgres_name: ${{ secrets.POSTGRES_NAME }}
+      TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD }}
+      TF_VAR_redis_addr: ${{ secrets.REDIS_ADDR }}
+      TF_VAR_redis_password: ${{ secrets.REDIS_PASSWORD }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: ${{ env.tf_version }}
-
-      - name: Terraform fmt
-        run: terraform fmt
-
-  "Validate":
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
+      - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: ${{ env.tf_version }}
           cli_config_credentials_token: ${{ secrets.TF_TOKEN }}
 
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Validate
-        run: terraform validate -no-color
-  "Lint":
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - uses: hashicorp/setup-terraform@v1
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          terraform_version: ${{ env.tf_version }}
-          cli_config_credentials_token: ${{ secrets.TF_TOKEN }}
-      - name: Terraform Init
-        run: terraform init
+          version: "286.0.0"
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-      - name: tflint
-        uses: reviewdog/action-tflint@master
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          flags: "--deep"
+      - name: Terraform Plan
+        run: |
+          cat prod.template.tfvars | IMAGE_TAG=$BUILD_VERSION envsubst > prod.tfvars
+          terraform init -input=false -no-color
+          terraform plan -input=false -no-color -var-file="prod.tfvars"

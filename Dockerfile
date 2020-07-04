@@ -1,4 +1,4 @@
-FROM golang:1.13.3-alpine AS builder
+FROM golang:1.14.4-alpine AS builder
 ARG BUILD_APP_VERSION="dev version on docker"
 WORKDIR /app
 
