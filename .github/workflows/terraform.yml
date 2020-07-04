@@ -6,8 +6,25 @@ defaults:
   run:
     working-directory: terraform
 jobs:
+  "Lint":
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ env.tf_version }}
+
+      - run: terraform init -backend=false -input=false -no-color
+      - uses: reviewdog/action-tflint@master
+        with:
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          flags: "--deep"
+
   "Plan":
     runs-on: ubuntu-20.04
+    needs:
+      - "Lint"
     steps:
       - uses: actions/checkout@v2
       - uses: hashicorp/setup-terraform@v1
@@ -26,18 +43,3 @@ jobs:
         run: |
           terraform init -input=false -no-color
           terraform plan -input=false -no-color -var-file="prod.tfvars"
-
-  "Lint":
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: ${{ env.tf_version }}
-
-      - run: terraform init -backend=false -input=false -no-color
-      - uses: reviewdog/action-tflint@master
-        with:
-          github_token: ${{ secrets.github_token }}
-          reporter: github-pr-review
-          flags: "--deep"
