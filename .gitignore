@@ -2,6 +2,7 @@
 ### Application ###
 VERSION
 prod.tfvars
+tmp/
 
 # Created by https://www.gitignore.io/api/go,macos,terraform,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=go,macos,terraform,visualstudiocode

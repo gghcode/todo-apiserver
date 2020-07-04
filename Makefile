@@ -16,12 +16,6 @@ POSTGRES_PASSWORD=postgres
 REDIS_ADDR=127.0.0.1:6378
 REDIS_PASSWORD=test
 
-run:
-	@go run .
-
-live:
-	@realize start --run --fmt --no-config
-
 unit:
 	@go test -race -short ./...
 
@@ -37,7 +31,7 @@ integration_ci: docker_up
 	@$(MAKE) docker_down
 
 docker_up: docker_down
-	@-docker-compose -p integration -f docker-compose.integration.yml up -d
+	@docker-compose -p integration up -d redis postgres
 
 docker_down:
-	@docker-compose -p integration -f docker-compose.integration.yml down -v
+	@docker-compose -p integration down -v

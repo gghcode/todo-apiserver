@@ -1,13 +1,17 @@
 version: "3.7"
 services:
   app:
-    build: .
-    restart: always
+    image: golang:1.14.4
+    working_dir: /app
+    command: >
+      sh -c "GO111MODULE=off go get -u github.com/cosmtrek/air && air"
     ports:
       - 8080:8080
-    environment:
-      - REST_REDIS_ADDR=redis:6379
-      - REST_POSTGRES_HOST=postgres
+    env_file: .env.development
+    volumes:
+      - .:/app
+      - go-tools:/go/bin
+      - go-mod:/go/pkg
     depends_on:
       - postgres
       - redis
@@ -15,8 +19,11 @@ services:
       - internal
   redis:
     image: redis:5.0.5-alpine
+    command: sh -c 'exec redis-server --requirepass "$REDIS_PASSWORD"'
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-redis}
     ports:
-      - 6379:6379
+      - ${REDIS_PORT:-6379}:6379
     networks:
       - internal
   postgres:
@@ -26,9 +33,13 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - 5432:5432
+      - ${POSTGRES_PORT:-5432}:5432
     networks:
       - internal
+
+volumes:
+  go-tools:
+  go-mod:
 
 networks:
   internal:
