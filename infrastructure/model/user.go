@@ -1,6 +1,6 @@
 package model
 
-import "github.com/gghcode/apas-todo-apiserver/domain/user"
+import "github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 
 // User is user data model
 type User struct {

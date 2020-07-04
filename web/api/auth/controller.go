@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 
 	"github.com/gin-gonic/gin"

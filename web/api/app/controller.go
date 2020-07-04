@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gghcode/apas-todo-apiserver/db"
-	"github.com/gghcode/apas-todo-apiserver/domain/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/gin-gonic/gin"
 )
 

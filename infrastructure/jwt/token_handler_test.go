@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/db"
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/go-redis/redis"
 )
 

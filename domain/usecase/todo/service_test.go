@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 )
 

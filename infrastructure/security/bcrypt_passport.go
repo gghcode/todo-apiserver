@@ -2,7 +2,7 @@ package security
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/domain/security"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
 	"golang.org/x/crypto/bcrypt"
 )
 

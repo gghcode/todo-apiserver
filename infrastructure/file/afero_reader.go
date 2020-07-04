@@ -3,7 +3,7 @@ package file
 import (
 	"bufio"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/spf13/afero"
 )
 

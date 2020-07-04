@@ -3,7 +3,7 @@ package model
 import (
 	"time"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	uuid "github.com/satori/go.uuid"
 )
 

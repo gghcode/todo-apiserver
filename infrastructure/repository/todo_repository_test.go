@@ -5,7 +5,7 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"

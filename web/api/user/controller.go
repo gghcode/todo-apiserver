@@ -3,7 +3,7 @@ package user
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 

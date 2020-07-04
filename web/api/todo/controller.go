@@ -3,7 +3,7 @@ package todo
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	"github.com/gin-gonic/gin"

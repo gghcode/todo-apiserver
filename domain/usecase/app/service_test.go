@@ -3,7 +3,7 @@ package app_test
 import (
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 
 	"github.com/stretchr/testify/assert"

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 
 	"github.com/stretchr/testify/mock"

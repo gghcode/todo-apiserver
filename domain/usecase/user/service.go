@@ -1,6 +1,6 @@
 package user
 
-import "github.com/gghcode/apas-todo-apiserver/domain/security"
+import "github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
 
 type userService struct {
 	userRepo Repository
