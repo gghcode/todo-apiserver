@@ -7,7 +7,7 @@ type todoService struct {
 }
 
 // NewTodoService return new todo service
-func NewTodoService(todoRepo Repository) UsecaseInteractor {
+func NewTodoService(todoRepo Repository) UseCase {
 	return &todoService{
 		todoRepo: todoRepo,
 	}

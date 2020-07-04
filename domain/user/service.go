@@ -8,7 +8,7 @@ type userService struct {
 }
 
 // NewService return user service
-func NewService(userRepo Repository, passport security.Passport) UsecaseInteractor {
+func NewService(userRepo Repository, passport security.Passport) UseCase {
 	return &userService{
 		userRepo: userRepo,
 		passport: passport,

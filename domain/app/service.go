@@ -17,7 +17,7 @@ type (
 )
 
 // NewService return appService
-func NewService(reader FileReader) UsecaseInteractor {
+func NewService(reader FileReader) UseCase {
 	return &appService{
 		reader: reader,
 	}

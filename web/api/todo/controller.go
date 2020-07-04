@@ -11,11 +11,11 @@ import (
 
 // Controller is todo controller
 type Controller struct {
-	todoService todo.UsecaseInteractor
+	todoService todo.UseCase
 }
 
 // NewController return todo controller
-func NewController(todoService todo.UsecaseInteractor) *Controller {
+func NewController(todoService todo.UseCase) *Controller {
 	return &Controller{
 		todoService: todoService,
 	}

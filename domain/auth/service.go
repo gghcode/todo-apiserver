@@ -30,7 +30,7 @@ func NewService(
 	tokenRepo TokenRepository,
 	userRepo user.Repository,
 	accessTokenGeneratorFunc AccessTokenGeneratorFunc,
-	refreshTokenGeneratorFunc RefreshTokenGeneratorFunc) UsecaseInteractor {
+	refreshTokenGeneratorFunc RefreshTokenGeneratorFunc) UseCase {
 
 	return &authService{
 		cfg:                  cfg,

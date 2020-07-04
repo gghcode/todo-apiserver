@@ -20,7 +20,7 @@ type ServiceUnit struct {
 	fakeTokenRepo fake.TokenRepository
 	fakeUserRepo  fake.UserRepository
 	fakePassport  fake.Passport
-	service       auth.UsecaseInteractor
+	service       auth.UseCase
 }
 
 func TestAuthServiceUnit(t *testing.T) {

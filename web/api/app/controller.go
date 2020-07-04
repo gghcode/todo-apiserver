@@ -10,14 +10,14 @@ import (
 
 // Controller is app controller
 type Controller struct {
-	appService   app.UsecaseInteractor
+	appService   app.UseCase
 	postgresConn db.GormConnection
 	redisConn    db.RedisConnection
 }
 
 // NewController return new app controller
 func NewController(
-	appService app.UsecaseInteractor,
+	appService app.UseCase,
 	postgresConn db.GormConnection,
 	redisConn db.RedisConnection,
 ) *Controller {

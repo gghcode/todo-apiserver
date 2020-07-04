@@ -11,11 +11,11 @@ import (
 
 // Controller godoc
 type Controller struct {
-	service auth.UsecaseInteractor
+	service auth.UseCase
 }
 
 // NewController return new auth controller instance.
-func NewController(service auth.UsecaseInteractor) *Controller {
+func NewController(service auth.UseCase) *Controller {
 	return &Controller{
 		service: service,
 	}

@@ -1,7 +1,7 @@
 package auth
 
-// UsecaseInteractor godoc
-type UsecaseInteractor interface {
+// UseCase godoc
+type UseCase interface {
 	IssueToken(LoginRequest) (TokenResponse, error)
 	RefreshToken(AccessTokenByRefreshRequest) (TokenResponse, error)
 }
