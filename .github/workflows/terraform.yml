@@ -17,8 +17,9 @@ jobs:
       - run: terraform init -backend=false -input=false -no-color
       - uses: reviewdog/action-tflint@master
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
+          fail_on_error: "true"
           flags: "--deep"
 
   "Plan":
@@ -30,6 +31,7 @@ jobs:
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: ${{ env.tf_version }}
+          cli_config_credentials_token: ${{ secrets.TF_TOKEN }}
 
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
