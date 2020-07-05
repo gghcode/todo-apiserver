@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 
 	jwtGo "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"

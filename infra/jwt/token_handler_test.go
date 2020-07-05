@@ -7,7 +7,7 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 
 	jwtGo "github.com/dgrijalva/jwt-go"

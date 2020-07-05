@@ -6,7 +6,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
+	"github.com/gghcode/apas-todo-apiserver/infra/model"
 	"github.com/jinzhu/gorm"
 	pg "github.com/lib/pq"
 )

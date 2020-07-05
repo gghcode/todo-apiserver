@@ -3,7 +3,7 @@ package file_test
 import (
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
+	"github.com/gghcode/apas-todo-apiserver/infra/file"
 
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/assert"
