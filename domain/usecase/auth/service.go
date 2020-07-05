@@ -2,7 +2,6 @@ package auth
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 )
 
@@ -16,8 +15,8 @@ type (
 	authService struct {
 		cfg                  config.Configuration
 		tokenRepo            TokenRepository
-		userRepo             user.Repository
-		passport             security.Passport
+		userDataSource       UserDataSource
+		authenticator        PasswordAuthenticator
 		generateAccessToken  AccessTokenGeneratorFunc
 		generateRefreshToken RefreshTokenGeneratorFunc
 	}
@@ -26,36 +25,36 @@ type (
 // NewService return new auth authService instance.
 func NewService(
 	cfg config.Configuration,
-	passport security.Passport,
+	authenticator PasswordAuthenticator,
 	tokenRepo TokenRepository,
-	userRepo user.Repository,
+	userDataSource UserDataSource,
 	accessTokenGeneratorFunc AccessTokenGeneratorFunc,
 	refreshTokenGeneratorFunc RefreshTokenGeneratorFunc) UseCase {
 
 	return &authService{
 		cfg:                  cfg,
-		userRepo:             userRepo,
+		userDataSource:       userDataSource,
 		tokenRepo:            tokenRepo,
-		passport:             passport,
+		authenticator:        authenticator,
 		generateAccessToken:  accessTokenGeneratorFunc,
 		generateRefreshToken: refreshTokenGeneratorFunc,
 	}
 }
 
-func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
+func (srv *authService) IssueToken(req LoginRequest) (TokenResponse, error) {
 	var res TokenResponse
 
 	var userID int64
-	if err := service.authenticate(req, &userID); err != nil {
+	if err := srv.authenticate(req, &userID); err != nil {
 		return res, err
 	}
 
-	accessToken, err := service.generateAccessToken(userID)
+	accessToken, err := srv.generateAccessToken(userID)
 	if err != nil {
 		return res, err
 	}
 
-	refreshToken, err := service.generateRefreshToken(userID)
+	refreshToken, err := srv.generateRefreshToken(userID)
 	if err != nil {
 		return res, err
 	}
@@ -64,21 +63,21 @@ func (service *authService) IssueToken(req LoginRequest) (TokenResponse, error) 
 		Type:         "Bearer",
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
-		ExpiresIn:    service.cfg.JwtAccessExpiresInSec,
+		ExpiresIn:    srv.cfg.JwtAccessExpiresInSec,
 	}
 
 	return res, nil
 }
 
-func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error) {
+func (srv *authService) RefreshToken(req AccessTokenByRefreshRequest) (TokenResponse, error) {
 	var res TokenResponse
 
-	userID, err := service.tokenRepo.UserIDByRefreshToken(req.Token)
+	userID, err := srv.tokenRepo.UserIDByRefreshToken(req.Token)
 	if err != nil {
 		return res, err
 	}
 
-	accessToken, err := service.generateAccessToken(userID)
+	accessToken, err := srv.generateAccessToken(userID)
 	if err != nil {
 		return res, err
 	}
@@ -86,21 +85,21 @@ func (service *authService) RefreshToken(req AccessTokenByRefreshRequest) (Token
 	res = TokenResponse{
 		Type:        "Bearer",
 		AccessToken: accessToken,
-		ExpiresIn:   service.cfg.JwtAccessExpiresInSec,
+		ExpiresIn:   srv.cfg.JwtAccessExpiresInSec,
 	}
 
 	return res, nil
 }
 
-func (service *authService) authenticate(req LoginRequest, userID *int64) error {
-	usr, err := service.userRepo.UserByUserName(req.Username)
+func (srv *authService) authenticate(req LoginRequest, userID *int64) error {
+	usr, err := srv.userDataSource.UserByUserName(req.Username)
 	if err == user.ErrUserNotFound {
 		return ErrInvalidCredential
 	} else if err != nil {
 		return err
 	}
 
-	if !service.passport.IsValidPassword(req.Password, usr.PasswordHash) {
+	if !srv.authenticator.IsValidPassword(req.Password, usr.PasswordHash) {
 		return ErrInvalidCredential
 	}
 

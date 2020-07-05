@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 )
@@ -14,7 +15,7 @@ func TestUserService_GetUserByUserName(t *testing.T) {
 	testCases := []struct {
 		description string
 		argUserName string
-		stubUser    user.User
+		stubUser    entity.User
 		stubErr     error
 		expectedRes user.UserResponse
 		expectedErr error
@@ -22,7 +23,7 @@ func TestUserService_GetUserByUserName(t *testing.T) {
 		{
 			description: "ShouldGetUser",
 			argUserName: "test name",
-			stubUser: user.User{
+			stubUser: entity.User{
 				ID:       10,
 				UserName: "test name",
 			},
@@ -36,7 +37,7 @@ func TestUserService_GetUserByUserName(t *testing.T) {
 		{
 			description: "ShouldReturnErrStub",
 			argUserName: "NOT_EXIST_USER_NAME",
-			stubUser:    user.User{},
+			stubUser:    entity.User{},
 			stubErr:     fake.ErrStub,
 			expectedRes: user.UserResponse{},
 			expectedErr: fake.ErrStub,

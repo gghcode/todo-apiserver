@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/jinzhu/gorm"
@@ -55,7 +56,7 @@ func (repo *repository) UserByID(userID int64) (user.User, error) {
 	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) UserByUserName(username string) (user.User, error) {
+func (repo *repository) UserByUserName(username string) (entity.User, error) {
 	var u model.User
 
 	err := repo.dbConn.DB().
@@ -64,12 +65,17 @@ func (repo *repository) UserByUserName(username string) (user.User, error) {
 		Error
 
 	if err == gorm.ErrRecordNotFound {
-		return user.User{}, user.ErrUserNotFound
+		return entity.User{}, user.ErrUserNotFound
 	} else if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
-	return model.ToUserEntity(u), nil
+	return entity.User{
+		ID:           u.ID,
+		UserName:     u.UserName,
+		PasswordHash: u.PasswordHash,
+	}, nil
+	// return model.ToUserEntity(u), nil
 }
 
 func (repo *repository) UpdateUserByID(usr user.User) (user.User, error) {

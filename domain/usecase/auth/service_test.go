@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
@@ -52,7 +53,7 @@ func (suite *ServiceUnit) SetupTest() {
 }
 
 func (suite *ServiceUnit) TestIssueToken() {
-	fakeUser := user.User{
+	fakeUser := entity.User{
 		ID:           100,
 		UserName:     "testuser",
 		PasswordHash: []byte("testtest"),
@@ -61,7 +62,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 	testCases := []struct {
 		description string
 		argReq      auth.LoginRequest
-		stubUser    user.User
+		stubUser    entity.User
 		stubErr     error
 		stubValid   bool
 		expected    auth.TokenResponse
@@ -86,7 +87,7 @@ func (suite *ServiceUnit) TestIssueToken() {
 				Username: "NOT_EXISTS_USER",
 				Password: "testtest",
 			},
-			stubUser:    user.User{},
+			stubUser:    entity.User{},
 			stubErr:     user.ErrUserNotFound,
 			expected:    auth.TokenResponse{},
 			expectedErr: auth.ErrInvalidCredential,

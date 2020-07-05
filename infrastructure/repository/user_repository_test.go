@@ -5,6 +5,7 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/model"
 	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
@@ -119,19 +120,24 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByUserName() {
 	testCases := []struct {
 		description string
 		argUserName string
-		expected    user.User
+		expected    entity.User
 		expectedErr error
 	}{
 		{
 			description: "ShouldGetUser",
 			argUserName: suite.testUsers[0].UserName,
-			expected:    model.ToUserEntity(suite.testUsers[0]),
+			expected: entity.User{
+				ID:           suite.testUsers[0].ID,
+				UserName:     suite.testUsers[0].UserName,
+				PasswordHash: suite.testUsers[0].PasswordHash,
+			},
+			// expected:    model.ToUserEntity(suite.testUsers[0]),
 			expectedErr: nil,
 		},
 		{
 			description: "ShouldBeErrNotFoundUser",
 			argUserName: "NOT_EXIST_USER",
-			expected:    user.User{},
+			expected:    entity.User{},
 			expectedErr: user.ErrUserNotFound,
 		},
 	}
