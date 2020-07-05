@@ -66,7 +66,7 @@ func TestUserService_GetUserByUserID(t *testing.T) {
 	testCases := []struct {
 		description string
 		argUserID   int64
-		stubUser    user.User
+		stubUser    entity.User
 		stubErr     error
 		expectedRes user.UserResponse
 		expectedErr error
@@ -74,7 +74,7 @@ func TestUserService_GetUserByUserID(t *testing.T) {
 		{
 			description: "ShouldGetUser",
 			argUserID:   10,
-			stubUser: user.User{
+			stubUser: entity.User{
 				ID:       10,
 				UserName: "test name",
 			},
@@ -88,7 +88,7 @@ func TestUserService_GetUserByUserID(t *testing.T) {
 		{
 			description: "ShouldReturnErrStub",
 			argUserID:   -1,
-			stubUser:    user.User{},
+			stubUser:    entity.User{},
 			stubErr:     fake.ErrStub,
 			expectedRes: user.UserResponse{},
 			expectedErr: fake.ErrStub,
@@ -117,7 +117,7 @@ func TestUserService_CreateUser(t *testing.T) {
 	testCases := []struct {
 		description      string
 		argCreateUserReq user.CreateUserRequest
-		stubUser         user.User
+		stubUser         entity.User
 		stubErr          error
 		expectedRes      user.UserResponse
 		expectedErr      error
@@ -128,7 +128,7 @@ func TestUserService_CreateUser(t *testing.T) {
 				UserName: "test",
 				Password: "testtest",
 			},
-			stubUser: user.User{
+			stubUser: entity.User{
 				UserName: "test",
 			},
 			expectedRes: user.UserResponse{

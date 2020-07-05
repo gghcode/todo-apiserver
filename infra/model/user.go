@@ -1,6 +1,8 @@
 package model
 
-import "github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
+import (
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
+)
 
 // User is user data model
 type User struct {
@@ -11,7 +13,7 @@ type User struct {
 }
 
 // FromUserEntity create user data model from user entity model
-func FromUserEntity(usr user.User) User {
+func FromUserEntity(usr entity.User) User {
 	return User{
 		ID:           usr.ID,
 		UserName:     usr.UserName,
@@ -21,8 +23,8 @@ func FromUserEntity(usr user.User) User {
 }
 
 // ToUserEntity create user entity model from user data model
-func ToUserEntity(usr User) user.User {
-	return user.User{
+func ToUserEntity(usr User) entity.User {
+	return entity.User{
 		ID:           usr.ID,
 		UserName:     usr.UserName,
 		PasswordHash: usr.PasswordHash,

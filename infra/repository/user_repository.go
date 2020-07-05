@@ -22,7 +22,7 @@ func NewUserRepository(dbConn db.GormConnection) user.Repository {
 	}
 }
 
-func (repo *repository) CreateUser(usr user.User) (user.User, error) {
+func (repo *repository) CreateUser(usr entity.User) (entity.User, error) {
 	newUser := model.FromUserEntity(usr)
 	newUser.CreatedAt = time.Now().Unix()
 
@@ -31,15 +31,15 @@ func (repo *repository) CreateUser(usr user.User) (user.User, error) {
 		Error
 
 	if pgErr, ok := err.(*pg.Error); ok && pgErr.Code == "23505" {
-		return user.User{}, user.ErrAlreadyExistUser
+		return entity.User{}, user.ErrAlreadyExistUser
 	} else if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	return model.ToUserEntity(newUser), nil
 }
 
-func (repo *repository) UserByID(userID int64) (user.User, error) {
+func (repo *repository) UserByID(userID int64) (entity.User, error) {
 	var u model.User
 
 	err := repo.dbConn.DB().
@@ -48,9 +48,9 @@ func (repo *repository) UserByID(userID int64) (user.User, error) {
 		Error
 
 	if err == gorm.ErrRecordNotFound {
-		return user.User{}, user.ErrUserNotFound
+		return entity.User{}, user.ErrUserNotFound
 	} else if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	return model.ToUserEntity(u), nil
@@ -78,10 +78,10 @@ func (repo *repository) UserByUserName(username string) (entity.User, error) {
 	// return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) UpdateUserByID(usr user.User) (user.User, error) {
+func (repo *repository) UpdateUserByID(usr entity.User) (entity.User, error) {
 	u, err := repo.userByID(usr.ID)
 	if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	err = repo.dbConn.DB().
@@ -90,16 +90,16 @@ func (repo *repository) UpdateUserByID(usr user.User) (user.User, error) {
 		Error
 
 	if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) RemoveUserByID(userID int64) (user.User, error) {
+func (repo *repository) RemoveUserByID(userID int64) (entity.User, error) {
 	u, err := repo.userByID(userID)
 	if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	err = repo.dbConn.DB().
@@ -107,7 +107,7 @@ func (repo *repository) RemoveUserByID(userID int64) (user.User, error) {
 		Error
 
 	if err != nil {
-		return user.User{}, err
+		return entity.User{}, err
 	}
 
 	return model.ToUserEntity(u), nil

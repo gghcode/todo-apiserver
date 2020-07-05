@@ -56,20 +56,20 @@ func (suite *userRepositoryIntegrationTestSuite) TearDownTest() {
 func (suite *userRepositoryIntegrationTestSuite) TestCreateUser() {
 	testCases := []struct {
 		description string
-		argUser     user.User
-		expected    user.User
+		argUser     entity.User
+		expected    entity.User
 		expectedErr error
 	}{
 		{
 			description: "ShouldCreateUser",
-			argUser:     user.User{UserName: "testuser", PasswordHash: []byte("password")},
-			expected:    user.User{UserName: "testuser", PasswordHash: []byte("password")},
+			argUser:     entity.User{UserName: "testuser", PasswordHash: []byte("password")},
+			expected:    entity.User{UserName: "testuser", PasswordHash: []byte("password")},
 			expectedErr: nil,
 		},
 		{
 			description: "ShouldBeErrAlreadyExistUser",
-			argUser:     user.User{UserName: suite.testUsers[0].UserName},
-			expected:    user.User{},
+			argUser:     entity.User{UserName: suite.testUsers[0].UserName},
+			expected:    entity.User{},
 			expectedErr: user.ErrAlreadyExistUser,
 		},
 	}
@@ -89,7 +89,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 	testCases := []struct {
 		description string
 		argUserID   int64
-		expected    user.User
+		expected    entity.User
 		expectedErr error
 	}{
 		{
@@ -101,7 +101,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByID() {
 		{
 			description: "ShouldBeErrNotFoundUser",
 			argUserID:   -1,
-			expected:    user.User{},
+			expected:    entity.User{},
 			expectedErr: user.ErrUserNotFound,
 		},
 	}
@@ -155,19 +155,19 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByUserName() {
 func (suite *userRepositoryIntegrationTestSuite) TestUpdateUserByID() {
 	testCases := []struct {
 		description string
-		argUser     user.User
-		expected    user.User
+		argUser     entity.User
+		expected    entity.User
 		expectedErr error
 	}{
 		{
 			description: "ShouldUpdateUser",
-			argUser: user.User{
+			argUser: entity.User{
 				ID:           suite.testUsers[0].ID,
 				PasswordHash: suite.testUsers[0].PasswordHash,
 				CreatedAt:    suite.testUsers[0].CreatedAt,
 				UserName:     "updateUserName",
 			},
-			expected: user.User{
+			expected: entity.User{
 				ID:           suite.testUsers[0].ID,
 				PasswordHash: suite.testUsers[0].PasswordHash,
 				CreatedAt:    suite.testUsers[0].CreatedAt,
@@ -177,8 +177,8 @@ func (suite *userRepositoryIntegrationTestSuite) TestUpdateUserByID() {
 		},
 		{
 			description: "ShouldBeErrNotFoundUser",
-			argUser:     user.User{ID: -1},
-			expected:    user.User{},
+			argUser:     entity.User{ID: -1},
+			expected:    entity.User{},
 			expectedErr: user.ErrUserNotFound,
 		},
 	}
@@ -197,7 +197,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestRemoveUserByID() {
 	testCases := []struct {
 		description string
 		argUserID   int64
-		expected    user.User
+		expected    entity.User
 		expectedErr error
 	}{
 		{
@@ -209,7 +209,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestRemoveUserByID() {
 		{
 			description: "ShouldErrNotFoundUser",
 			argUserID:   -1,
-			expected:    user.User{},
+			expected:    entity.User{},
 			expectedErr: user.ErrUserNotFound,
 		},
 	}

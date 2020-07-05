@@ -1,6 +1,9 @@
 package user
 
-import "github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
+import (
+	"github.com/gghcode/apas-todo-apiserver/domain/entity"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
+)
 
 type userService struct {
 	userRepo Repository
@@ -23,7 +26,7 @@ func (srv *userService) CreateUser(req CreateUserRequest) (UserResponse, error) 
 		return res, err
 	}
 
-	usr := User{
+	usr := entity.User{
 		UserName:     req.UserName,
 		PasswordHash: hashPassword,
 	}
