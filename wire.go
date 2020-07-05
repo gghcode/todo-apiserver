@@ -11,10 +11,10 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
+	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infra/repository"
-	"github.com/gghcode/apas-todo-apiserver/infra/security"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -52,6 +52,10 @@ func provideMiddlewares(
 	}
 }
 
+func provideDataSource(userRepo user.Repository) auth.UserDataSource {
+	return userRepo
+}
+
 var configSet = wire.NewSet(
 	config.FromEnvs,
 )
@@ -70,8 +74,9 @@ var todoSet = wire.NewSet(
 	webTodo.NewController,
 )
 
-var securitySet = wire.NewSet(
-	security.NewBcryptPassport,
+var bcryptSet = wire.NewSet(
+	bcrypt.NewPasswordAuthenticator,
+	bcrypt.NewPasswordEncryptor,
 )
 
 var authSet = wire.NewSet(
@@ -85,6 +90,7 @@ var authSet = wire.NewSet(
 var userSet = wire.NewSet(
 	repository.NewUserRepository,
 	user.NewService,
+	provideDataSource,
 	webUser.NewController,
 )
 
@@ -109,7 +115,7 @@ func InitializeRouter() (*http.Server, func(), error) {
 		configSet,
 		dbSet,
 		redisSet,
-		securitySet,
+		bcryptSet,
 		todoSet,
 		authSet,
 		userSet,

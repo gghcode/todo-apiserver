@@ -12,10 +12,10 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
+	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infra/repository"
-	"github.com/gghcode/apas-todo-apiserver/infra/security"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	app2 "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -27,6 +27,10 @@ import (
 	"github.com/google/wire"
 	"github.com/spf13/afero"
 	"net/http"
+)
+
+import (
+	_ "github.com/gghcode/apas-todo-apiserver/docs"
 )
 
 // Injectors from wire.go:
@@ -42,25 +46,27 @@ func InitializeRouter() (*http.Server, func(), error) {
 	v := provideMiddlewares(accessTokenHandlerMiddleware, corsMiddleware)
 	fs := afero.NewOsFs()
 	fileReader := file.NewAferoFileReader(fs)
-	usecaseInteractor := app.NewService(fileReader)
+	useCase := app.NewService(fileReader)
 	gormConnection, cleanup, err := db.NewPostgresConn(configuration)
 	if err != nil {
 		return nil, nil, err
 	}
 	redisConnection, cleanup2 := db.NewRedisConn(configuration)
-	controller := app2.NewController(usecaseInteractor, gormConnection, redisConnection)
+	controller := app2.NewController(useCase, gormConnection, redisConnection)
 	todoRepository := repository.NewGormTodoRepository(gormConnection)
-	todoUsecaseInteractor := todo.NewTodoService(todoRepository)
-	todoController := todo2.NewController(todoUsecaseInteractor)
-	passport := security.NewBcryptPassport(configuration)
+	todoUseCase := todo.NewTodoService(todoRepository)
+	todoController := todo2.NewController(todoUseCase)
+	passwordAuthenticator := bcrypt.NewPasswordAuthenticator()
 	tokenRepository := repository.NewRedisTokenRepository(redisConnection)
 	userRepository := repository.NewUserRepository(gormConnection)
+	userDataSource := provideDataSource(userRepository)
 	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(configuration)
 	refreshTokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(configuration)
-	authUsecaseInteractor := auth.NewService(configuration, passport, tokenRepository, userRepository, accessTokenGeneratorFunc, refreshTokenGeneratorFunc)
-	authController := auth2.NewController(authUsecaseInteractor)
-	userUsecaseInteractor := user.NewService(userRepository, passport)
-	userController := user2.NewController(userUsecaseInteractor)
+	authUseCase := auth.NewService(configuration, passwordAuthenticator, tokenRepository, userDataSource, accessTokenGeneratorFunc, refreshTokenGeneratorFunc)
+	authController := auth2.NewController(authUseCase)
+	passwordEncryptor := bcrypt.NewPasswordEncryptor(configuration)
+	userUseCase := user.NewService(userRepository, passwordEncryptor)
+	userController := user2.NewController(userUseCase)
 	v2 := provideControllers(controller, todoController, authController, userController)
 	server, cleanup3 := web.NewGinRouter(configuration, v, v2)
 	return server, func() {
@@ -93,6 +99,10 @@ func provideMiddlewares(
 	return []gin.HandlerFunc{gin.HandlerFunc(accessTokenHandlerMiddleware), gin.HandlerFunc(corsMiddleware)}
 }
 
+func provideDataSource(userRepo user.Repository) auth.UserDataSource {
+	return userRepo
+}
+
 var configSet = wire.NewSet(config.FromEnvs)
 
 var dbSet = wire.NewSet(db.NewPostgresConn)
@@ -101,11 +111,11 @@ var redisSet = wire.NewSet(db.NewRedisConn)
 
 var todoSet = wire.NewSet(repository.NewGormTodoRepository, todo.NewTodoService, todo2.NewController)
 
-var securitySet = wire.NewSet(security.NewBcryptPassport)
+var bcryptSet = wire.NewSet(bcrypt.NewPasswordAuthenticator, bcrypt.NewPasswordEncryptor)
 
 var authSet = wire.NewSet(repository.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
 
-var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, user2.NewController)
+var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, provideDataSource, user2.NewController)
 
 var appSet = wire.NewSet(afero.NewOsFs, file.NewAferoFileReader, app.NewService, app2.NewController)
 

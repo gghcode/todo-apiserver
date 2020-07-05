@@ -2,26 +2,25 @@ package user
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/domain/entity"
-	"github.com/gghcode/apas-todo-apiserver/domain/usecase/security"
 )
 
 type userService struct {
-	userRepo Repository
-	passport security.Passport
+	userRepo          Repository
+	passwordEncryptor PasswordEncryptor
 }
 
 // NewService return user service
-func NewService(userRepo Repository, passport security.Passport) UseCase {
+func NewService(userRepo Repository, passwordEncryptor PasswordEncryptor) UseCase {
 	return &userService{
-		userRepo: userRepo,
-		passport: passport,
+		userRepo:          userRepo,
+		passwordEncryptor: passwordEncryptor,
 	}
 }
 
 func (srv *userService) CreateUser(req CreateUserRequest) (UserResponse, error) {
 	var res UserResponse
 
-	hashPassword, err := srv.passport.HashPassword(req.Password)
+	hashPassword, err := srv.passwordEncryptor.HashPassword(req.Password)
 	if err != nil {
 		return res, err
 	}
