@@ -1,23 +1,39 @@
-package bcrypt_test
+package bcrypt
 
 import (
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
+	"golang.org/x/crypto/bcrypt"
 )
 
-func TestBcryptPasswordAuthenticator(t * testing.T) {
+func TestBcryptPasswordAuthenticator(t *testing.T) {
+	stubPasswd := "testtest"
+	stubPasswdHash, _ := bcrypt.GenerateFromPassword([]byte(stubPasswd), bcrypt.MinCost)
+
 	testCases := []struct {
-		description string
+		description      string
+		argPassword      string
+		stubPasswordHash []byte
+		expected         bool
 	}{
 		{
-			description: "",
-		}
+			description:      "ShouldBeValid",
+			argPassword:      stubPasswd,
+			stubPasswordHash: stubPasswdHash,
+			expected:         true,
+		},
+		{
+			description:      "ShouldBeInvalid",
+			argPassword:      "INVALID_PASSWORD",
+			stubPasswordHash: stubPasswdHash,
+			expected:         false,
+		},
 	}
 
-	for tc := range testCases {
+	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
-			authenticator := bcrypt.NewPasswordAuthenticator()
+			authenticator := NewPasswordAuthenticator()
+			authenticator.IsValidPassword("fasdf", nil)
 		})
 	}
 }
