@@ -3,7 +3,7 @@ package repository
 import (
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
-	"github.com/gghcode/apas-todo-apiserver/infra/model"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
 	"github.com/jinzhu/gorm"
 )
 

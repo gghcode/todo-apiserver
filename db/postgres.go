@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/infra/model"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 

@@ -7,8 +7,8 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
-	"github.com/gghcode/apas-todo-apiserver/infra/model"
-	"github.com/gghcode/apas-todo-apiserver/infra/repository"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/stretchr/testify/suite"
 )
