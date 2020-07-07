@@ -14,10 +14,10 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
-	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repo"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infra/redis"
-	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
+	repo2 "github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	app2 "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -55,12 +55,12 @@ func InitializeRouter() (*http.Server, func(), error) {
 	}
 	redisConnection, cleanup2 := redis.NewConnection(configuration)
 	controller := app2.NewController(useCase, connection, redisConnection)
-	todoRepository := repository.NewGormTodoRepository(connection)
-	todoUseCase := todo.NewTodoService(todoRepository)
+	repository := repo.NewTodoRepository(connection)
+	todoUseCase := todo.NewTodoService(repository)
 	todoController := todo2.NewController(todoUseCase)
 	passwordAuthenticator := bcrypt.NewPasswordAuthenticator()
-	tokenRepository := repo.NewRedisTokenRepository(redisConnection)
-	userRepository := repository.NewUserRepository(connection)
+	tokenRepository := repo2.NewRedisTokenRepository(redisConnection)
+	userRepository := repo.NewUserRepository(connection)
 	userDataSource := provideDataSource(userRepository)
 	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(configuration)
 	refreshTokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(configuration)
@@ -111,13 +111,13 @@ var dbSet = wire.NewSet(gorm.NewPostgresConnection)
 
 var redisSet = wire.NewSet(redis.NewConnection)
 
-var todoSet = wire.NewSet(repository.NewGormTodoRepository, todo.NewTodoService, todo2.NewController)
+var todoSet = wire.NewSet(repo.NewTodoRepository, todo.NewTodoService, todo2.NewController)
 
 var bcryptSet = wire.NewSet(bcrypt.NewPasswordAuthenticator, bcrypt.NewPasswordEncryptor)
 
-var authSet = wire.NewSet(repo.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
+var authSet = wire.NewSet(repo2.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
 
-var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, provideDataSource, user2.NewController)
+var userSet = wire.NewSet(repo.NewUserRepository, user.NewService, provideDataSource, user2.NewController)
 
 var appSet = wire.NewSet(afero.NewOsFs, file.NewAferoFileReader, app.NewService, app2.NewController)
 

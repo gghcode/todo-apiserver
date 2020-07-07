@@ -1,4 +1,4 @@
-package repository
+package repo
 
 import (
 	"time"
@@ -11,18 +11,18 @@ import (
 	pg "github.com/lib/pq"
 )
 
-type repository struct {
+type userRepo struct {
 	dbConn myGorm.Connection
 }
 
 // NewUserRepository godoc
 func NewUserRepository(dbConn myGorm.Connection) user.Repository {
-	return &repository{
+	return &userRepo{
 		dbConn: dbConn,
 	}
 }
 
-func (repo *repository) CreateUser(usr entity.User) (entity.User, error) {
+func (repo *userRepo) CreateUser(usr entity.User) (entity.User, error) {
 	newUser := model.FromUserEntity(usr)
 	newUser.CreatedAt = time.Now().Unix()
 
@@ -39,7 +39,7 @@ func (repo *repository) CreateUser(usr entity.User) (entity.User, error) {
 	return model.ToUserEntity(newUser), nil
 }
 
-func (repo *repository) UserByID(userID int64) (entity.User, error) {
+func (repo *userRepo) UserByID(userID int64) (entity.User, error) {
 	var u model.User
 
 	err := repo.dbConn.DB().
@@ -56,7 +56,7 @@ func (repo *repository) UserByID(userID int64) (entity.User, error) {
 	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) UserByUserName(username string) (entity.User, error) {
+func (repo *userRepo) UserByUserName(username string) (entity.User, error) {
 	var u model.User
 
 	err := repo.dbConn.DB().
@@ -78,7 +78,7 @@ func (repo *repository) UserByUserName(username string) (entity.User, error) {
 	// return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) UpdateUserByID(usr entity.User) (entity.User, error) {
+func (repo *userRepo) UpdateUserByID(usr entity.User) (entity.User, error) {
 	u, err := repo.userByID(usr.ID)
 	if err != nil {
 		return entity.User{}, err
@@ -96,7 +96,7 @@ func (repo *repository) UpdateUserByID(usr entity.User) (entity.User, error) {
 	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) RemoveUserByID(userID int64) (entity.User, error) {
+func (repo *userRepo) RemoveUserByID(userID int64) (entity.User, error) {
 	u, err := repo.userByID(userID)
 	if err != nil {
 		return entity.User{}, err
@@ -113,7 +113,7 @@ func (repo *repository) RemoveUserByID(userID int64) (entity.User, error) {
 	return model.ToUserEntity(u), nil
 }
 
-func (repo *repository) userByID(userID int64) (model.User, error) {
+func (repo *userRepo) userByID(userID int64) (model.User, error) {
 	var u model.User
 
 	err := repo.dbConn.DB().

@@ -13,7 +13,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
-	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
+	gormRepo "github.com/gghcode/apas-todo-apiserver/infra/gorm/repo"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/infra/redis"
 	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
@@ -71,7 +71,7 @@ var redisSet = wire.NewSet(
 )
 
 var todoSet = wire.NewSet(
-	repository.NewGormTodoRepository,
+	gormRepo.NewTodoRepository,
 	todo.NewTodoService,
 	webTodo.NewController,
 )
@@ -90,7 +90,7 @@ var authSet = wire.NewSet(
 )
 
 var userSet = wire.NewSet(
-	repository.NewUserRepository,
+	gormRepo.NewUserRepository,
 	user.NewService,
 	provideDataSource,
 	webUser.NewController,

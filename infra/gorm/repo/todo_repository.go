@@ -1,4 +1,4 @@
-package repository
+package repo
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
@@ -8,18 +8,18 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type gormTodoRepository struct {
+type todoRepo struct {
 	dbConn myGorm.Connection
 }
 
-// NewGormTodoRepository return new todo repository
-func NewGormTodoRepository(dbConn myGorm.Connection) todo.Repository {
-	return &gormTodoRepository{
+// NewTodoRepository return new todo repository
+func NewTodoRepository(dbConn myGorm.Connection) todo.Repository {
+	return &todoRepo{
 		dbConn: dbConn,
 	}
 }
 
-func (r *gormTodoRepository) AddTodo(t todo.Todo) (todo.Todo, error) {
+func (r *todoRepo) AddTodo(t todo.Todo) (todo.Todo, error) {
 	newTodo := model.FromTodoEntity(t)
 
 	err := r.dbConn.DB().
@@ -32,7 +32,7 @@ func (r *gormTodoRepository) AddTodo(t todo.Todo) (todo.Todo, error) {
 
 	return model.ToTodoEntity(newTodo), nil
 }
-func (r *gormTodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error) {
+func (r *todoRepo) AllTodosByUserID(userID int64) ([]todo.Todo, error) {
 	var t []model.Todo
 
 	err := r.dbConn.DB().
@@ -47,7 +47,7 @@ func (r *gormTodoRepository) AllTodosByUserID(userID int64) ([]todo.Todo, error)
 	return model.ToTodoEntityArray(t), nil
 }
 
-func (r *gormTodoRepository) TodoByTodoID(todoID string) (todo.Todo, error) {
+func (r *todoRepo) TodoByTodoID(todoID string) (todo.Todo, error) {
 	var t model.Todo
 
 	err := r.dbConn.DB().
@@ -63,7 +63,7 @@ func (r *gormTodoRepository) TodoByTodoID(todoID string) (todo.Todo, error) {
 	return model.ToTodoEntity(t), nil
 }
 
-func (r *gormTodoRepository) UpdateTodo(todoID string, data map[string]interface{}) (todo.Todo, error) {
+func (r *todoRepo) UpdateTodo(todoID string, data map[string]interface{}) (todo.Todo, error) {
 	t, err := r.TodoByTodoID(todoID)
 	if err != nil {
 		return t, err
@@ -74,7 +74,7 @@ func (r *gormTodoRepository) UpdateTodo(todoID string, data map[string]interface
 	return t, nil
 }
 
-func (r *gormTodoRepository) RemoveTodo(todoID string) error {
+func (r *todoRepo) RemoveTodo(todoID string) error {
 	t, err := r.TodoByTodoID(todoID)
 	if err != nil {
 		return err

@@ -1,4 +1,4 @@
-package repository_test
+package repo_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
-	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	uuid "github.com/satori/go.uuid"
 	"github.com/stretchr/testify/suite"
@@ -37,7 +37,7 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 
 	testutil.SetupDBSandbox(suite.T(), dbConn.DB())
 
-	suite.repo = repository.NewGormTodoRepository(dbConn)
+	suite.repo = repo.NewTodoRepository(dbConn)
 	suite.testTodos = []model.Todo{
 		{ID: uuid.NewV4(), Title: "test title 1", Contents: "test contents 2", AssignorID: 4},
 		{ID: uuid.NewV4(), Title: "test title 2", Contents: "test contents 3", AssignorID: 4},

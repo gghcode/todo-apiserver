@@ -1,4 +1,4 @@
-package repository_test
+package repo_test
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
-	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repo"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/stretchr/testify/suite"
 )
@@ -37,7 +37,7 @@ func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
 
 	testutil.SetupDBSandbox(suite.T(), dbConn.DB())
 
-	suite.repo = repository.NewUserRepository(dbConn)
+	suite.repo = repo.NewUserRepository(dbConn)
 	suite.testUsers = []model.User{
 		{UserName: "fakeUser1", PasswordHash: []byte("password")},
 		{UserName: "fakeUser2", PasswordHash: []byte("password")},
