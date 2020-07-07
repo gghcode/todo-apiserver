@@ -1,24 +1,16 @@
-package db
+package redis
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
 	"github.com/go-redis/redis"
 )
 
-// RedisConnection godoc
-type RedisConnection interface {
-	Healthy() bool
-	Client() *redis.Client
-
-	Close() error
-}
-
 type redisConn struct {
 	client *redis.Client
 }
 
-// NewRedisConn return new connection of redis
-func NewRedisConn(cfg config.Configuration) (RedisConnection, func()) {
+// NewConnection return new connection of redis
+func NewConnection(cfg config.Configuration) (Connection, func()) {
 	conn := redisConn{
 		client: redis.NewClient(&redis.Options{
 			Addr:     cfg.RedisAddr,

@@ -1,20 +1,20 @@
-package repository_test
+package repo_test
 
 import (
 	"testing"
 	"time"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
-	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
 	"github.com/stretchr/testify/suite"
 )
 
 type RepositoryIntegration struct {
 	suite.Suite
 
-	redisConn db.RedisConnection
+	redisConn redis.Connection
 	tokenRepo auth.TokenRepository
 
 	cleanup func()
@@ -32,8 +32,8 @@ func (suite *RepositoryIntegration) SetupTest() {
 	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
-	suite.redisConn, suite.cleanup = db.NewRedisConn(cfg)
-	suite.tokenRepo = repository.NewRedisTokenRepository(suite.redisConn)
+	suite.redisConn, suite.cleanup = redis.NewConnection(cfg)
+	suite.tokenRepo = repo.NewRedisTokenRepository(suite.redisConn)
 }
 
 func (suite *RepositoryIntegration) TearDownTest() {

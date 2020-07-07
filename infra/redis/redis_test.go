@@ -1,10 +1,10 @@
-package db_test
+package redis_test
 
 import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,7 +23,7 @@ func TestRedisConnIntegration(t *testing.T) {
 	expectedHealthyAfterClose := false
 	expectedPong := "ping: PONG"
 
-	redisConn, cleanup := db.NewRedisConn(cfg)
+	redisConn, cleanup := redis.NewConnection(cfg)
 
 	actualHealthy := redisConn.Healthy()
 	assert.Equal(t, expectedHealthy, actualHealthy)

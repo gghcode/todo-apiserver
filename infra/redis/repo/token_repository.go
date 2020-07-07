@@ -1,12 +1,12 @@
-package repository
+package repo
 
 import (
 	"errors"
 	"strconv"
 	"time"
 
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
+	myRedis "github.com/gghcode/apas-todo-apiserver/infra/redis"
 	"github.com/go-redis/redis"
 )
 
@@ -16,11 +16,11 @@ var (
 )
 
 type redisTokenRepository struct {
-	redisConn db.RedisConnection
+	redisConn myRedis.Connection
 }
 
 // NewRedisTokenRepository godoc
-func NewRedisTokenRepository(redisConn db.RedisConnection) auth.TokenRepository {
+func NewRedisTokenRepository(redisConn myRedis.Connection) auth.TokenRepository {
 	return &redisTokenRepository{
 		redisConn: redisConn,
 	}

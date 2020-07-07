@@ -7,7 +7,6 @@ package main
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
@@ -17,6 +16,8 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	app2 "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -52,13 +53,13 @@ func InitializeRouter() (*http.Server, func(), error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	redisConnection, cleanup2 := db.NewRedisConn(configuration)
+	redisConnection, cleanup2 := redis.NewConnection(configuration)
 	controller := app2.NewController(useCase, connection, redisConnection)
 	todoRepository := repository.NewGormTodoRepository(connection)
 	todoUseCase := todo.NewTodoService(todoRepository)
 	todoController := todo2.NewController(todoUseCase)
 	passwordAuthenticator := bcrypt.NewPasswordAuthenticator()
-	tokenRepository := repository.NewRedisTokenRepository(redisConnection)
+	tokenRepository := repo.NewRedisTokenRepository(redisConnection)
 	userRepository := repository.NewUserRepository(connection)
 	userDataSource := provideDataSource(userRepository)
 	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(configuration)
@@ -108,13 +109,13 @@ var configSet = wire.NewSet(config.FromEnvs)
 
 var dbSet = wire.NewSet(gorm.NewPostgresConn)
 
-var redisSet = wire.NewSet(db.NewRedisConn)
+var redisSet = wire.NewSet(redis.NewConnection)
 
 var todoSet = wire.NewSet(repository.NewGormTodoRepository, todo.NewTodoService, todo2.NewController)
 
 var bcryptSet = wire.NewSet(bcrypt.NewPasswordAuthenticator, bcrypt.NewPasswordEncryptor)
 
-var authSet = wire.NewSet(repository.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
+var authSet = wire.NewSet(repo.NewRedisTokenRepository, jwt.NewJwtAccessTokenGeneratorFunc, jwt.NewJwtRefreshTokenGeneratorFunc, auth.NewService, auth2.NewController)
 
 var userSet = wire.NewSet(repository.NewUserRepository, user.NewService, provideDataSource, user2.NewController)
 

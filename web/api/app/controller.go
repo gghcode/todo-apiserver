@@ -3,9 +3,9 @@ package app
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,14 +13,14 @@ import (
 type Controller struct {
 	appService   app.UseCase
 	postgresConn gorm.Connection
-	redisConn    db.RedisConnection
+	redisConn    redis.Connection
 }
 
 // NewController return new app controller
 func NewController(
 	appService app.UseCase,
 	postgresConn gorm.Connection,
-	redisConn db.RedisConnection,
+	redisConn redis.Connection,
 ) *Controller {
 	return &Controller{
 		appService:   appService,

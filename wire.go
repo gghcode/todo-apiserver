@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
@@ -16,6 +15,8 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -66,7 +67,7 @@ var dbSet = wire.NewSet(
 )
 
 var redisSet = wire.NewSet(
-	db.NewRedisConn,
+	redis.NewConnection,
 )
 
 var todoSet = wire.NewSet(
@@ -81,7 +82,7 @@ var bcryptSet = wire.NewSet(
 )
 
 var authSet = wire.NewSet(
-	repository.NewRedisTokenRepository,
+	repo.NewRedisTokenRepository,
 	jwt.NewJwtAccessTokenGeneratorFunc,
 	jwt.NewJwtRefreshTokenGeneratorFunc,
 	auth.NewService,
