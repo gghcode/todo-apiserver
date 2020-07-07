@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gghcode/apas-todo-apiserver/web/api"

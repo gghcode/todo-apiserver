@@ -1,7 +1,7 @@
 package fake
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 
 	"github.com/stretchr/testify/mock"
 )

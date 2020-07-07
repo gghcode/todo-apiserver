@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/gghcode/apas-todo-apiserver/domain/auth"
+import "github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 
 type (
 	tokenResponseDTO struct {

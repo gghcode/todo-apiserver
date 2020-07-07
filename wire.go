@@ -6,15 +6,17 @@ import (
 	"net/http"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
-	"github.com/gghcode/apas-todo-apiserver/domain/app"
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/file"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/jwt"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/repository"
-	"github.com/gghcode/apas-todo-apiserver/infrastructure/security"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
+	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
+	"github.com/gghcode/apas-todo-apiserver/infra/file"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
+	gormRepo "github.com/gghcode/apas-todo-apiserver/infra/gorm/repo"
+	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis/repo"
 	"github.com/gghcode/apas-todo-apiserver/web"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	webApp "github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -52,30 +54,35 @@ func provideMiddlewares(
 	}
 }
 
+func provideDataSource(userRepo user.Repository) auth.UserDataSource {
+	return userRepo
+}
+
 var configSet = wire.NewSet(
 	config.FromEnvs,
 )
 
 var dbSet = wire.NewSet(
-	db.NewPostgresConn,
+	gorm.NewPostgresConnection,
 )
 
 var redisSet = wire.NewSet(
-	db.NewRedisConn,
+	redis.NewConnection,
 )
 
 var todoSet = wire.NewSet(
-	repository.NewGormTodoRepository,
+	gormRepo.NewTodoRepository,
 	todo.NewTodoService,
 	webTodo.NewController,
 )
 
-var securitySet = wire.NewSet(
-	security.NewBcryptPassport,
+var bcryptSet = wire.NewSet(
+	bcrypt.NewPasswordAuthenticator,
+	bcrypt.NewPasswordEncryptor,
 )
 
 var authSet = wire.NewSet(
-	repository.NewRedisTokenRepository,
+	repo.NewRedisTokenRepository,
 	jwt.NewJwtAccessTokenGeneratorFunc,
 	jwt.NewJwtRefreshTokenGeneratorFunc,
 	auth.NewService,
@@ -83,8 +90,9 @@ var authSet = wire.NewSet(
 )
 
 var userSet = wire.NewSet(
-	repository.NewUserRepository,
+	gormRepo.NewUserRepository,
 	user.NewService,
+	provideDataSource,
 	webUser.NewController,
 )
 
@@ -109,7 +117,7 @@ func InitializeRouter() (*http.Server, func(), error) {
 		configSet,
 		dbSet,
 		redisSet,
-		securitySet,
+		bcryptSet,
 		todoSet,
 		authSet,
 		userSet,

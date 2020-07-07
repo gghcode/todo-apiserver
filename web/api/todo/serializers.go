@@ -1,6 +1,6 @@
 package todo
 
-import "github.com/gghcode/apas-todo-apiserver/domain/todo"
+import "github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 
 type (
 	todoResponseDTO struct {

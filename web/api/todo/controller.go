@@ -3,7 +3,7 @@ package todo
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/todo"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
 	"github.com/gin-gonic/gin"
@@ -11,11 +11,11 @@ import (
 
 // Controller is todo controller
 type Controller struct {
-	todoService todo.UsecaseInteractor
+	todoService todo.UseCase
 }
 
 // NewController return todo controller
-func NewController(todoService todo.UsecaseInteractor) *Controller {
+func NewController(todoService todo.UseCase) *Controller {
 	return &Controller{
 		todoService: todoService,
 	}

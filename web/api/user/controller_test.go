@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gghcode/apas-todo-apiserver/web/api"

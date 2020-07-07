@@ -3,7 +3,7 @@ package user
 import (
 	"time"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 )
 
 type (

@@ -3,7 +3,7 @@ package auth
 import (
 	"net/http"
 
-	"github.com/gghcode/apas-todo-apiserver/domain/auth"
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/auth"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 
 	"github.com/gin-gonic/gin"
@@ -11,11 +11,11 @@ import (
 
 // Controller godoc
 type Controller struct {
-	service auth.UsecaseInteractor
+	service auth.UseCase
 }
 
 // NewController return new auth controller instance.
-func NewController(service auth.UsecaseInteractor) *Controller {
+func NewController(service auth.UseCase) *Controller {
 	return &Controller{
 		service: service,
 	}

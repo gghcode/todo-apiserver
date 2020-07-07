@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
+	"github.com/gghcode/apas-todo-apiserver/infra/redis"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil/fake"
 	"github.com/gghcode/apas-todo-apiserver/web/api/app"
@@ -17,8 +18,8 @@ type ControllerIntegrationTestSuite struct {
 	suite.Suite
 
 	fakeAppService *fake.AppService
-	postgresConn   db.GormConnection
-	redisConn      db.RedisConnection
+	postgresConn   gorm.Connection
+	redisConn      redis.Connection
 	cleanup        func()
 
 	router *gin.Engine
@@ -41,8 +42,8 @@ func (suite *ControllerIntegrationTestSuite) SetupTest() {
 	suite.router = gin.New()
 	suite.fakeAppService = fake.NewAppService()
 
-	postgresConn, postgresCleanup, err := db.NewPostgresConn(cfg)
-	redisConn, redisCleanup := db.NewRedisConn(cfg)
+	postgresConn, postgresCleanup, err := gorm.NewPostgresConnection(cfg)
+	redisConn, redisCleanup := redis.NewConnection(cfg)
 
 	suite.NoError(err)
 

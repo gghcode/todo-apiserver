@@ -1,21 +1,22 @@
 package user
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/domain/user"
+	"net/http"
+
+	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/web/api"
 	"github.com/gghcode/apas-todo-apiserver/web/middleware"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Controller is user controller
 type Controller struct {
-	userService user.UsecaseInteractor
+	userService user.UseCase
 }
 
 // NewController return user controller
-func NewController(userService user.UsecaseInteractor) *Controller {
+func NewController(userService user.UseCase) *Controller {
 	return &Controller{
 		userService: userService,
 	}
