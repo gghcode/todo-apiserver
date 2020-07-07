@@ -1,6 +1,7 @@
 package user_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -115,12 +116,13 @@ func TestUserService_GetUserByUserID(t *testing.T) {
 
 func TestUserService_CreateUser(t *testing.T) {
 	testCases := []struct {
-		description      string
-		argCreateUserReq user.CreateUserRequest
-		stubUser         entity.User
-		stubErr          error
-		expectedRes      user.UserResponse
-		expectedErr      error
+		description         string
+		argCreateUserReq    user.CreateUserRequest
+		stubHashPasswordErr error
+		stubUser            entity.User
+		stubCreateUserErr   error
+		expectedRes         user.UserResponse
+		expectedErr         error
 	}{
 		{
 			description: "ShouldCreateUser",
@@ -136,6 +138,24 @@ func TestUserService_CreateUser(t *testing.T) {
 			},
 			expectedErr: nil,
 		},
+		{
+			description: "ShouldReturnErrWhenReturnErrOnHashPassword",
+			argCreateUserReq: user.CreateUserRequest{
+				UserName: "test",
+				Password: "",
+			},
+			stubHashPasswordErr: errors.New("Hash Conflict"),
+			expectedErr:         errors.New("Hash Conflict"),
+		},
+		{
+			description: "ShouldReturnErrWhenReturnErrOnCreateUser",
+			argCreateUserReq: user.CreateUserRequest{
+				UserName: "test",
+				Password: "testtest",
+			},
+			stubCreateUserErr: errors.New("Already exists user"),
+			expectedErr:       errors.New("Already exists user"),
+		},
 	}
 
 	for _, tc := range testCases {
@@ -143,12 +163,12 @@ func TestUserService_CreateUser(t *testing.T) {
 			fakePassport := fake.NewPassport()
 			fakePassport.
 				On("HashPassword", tc.argCreateUserReq.Password).
-				Return([]byte{}, nil)
+				Return([]byte{}, tc.stubHashPasswordErr)
 
 			fakeUserRepo := fake.NewUserRepository()
 			fakeUserRepo.
 				On("CreateUser", mock.Anything).
-				Return(tc.stubUser, tc.stubErr)
+				Return(tc.stubUser, tc.stubCreateUserErr)
 
 			srv := user.NewService(fakeUserRepo, fakePassport)
 
