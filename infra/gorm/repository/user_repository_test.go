@@ -17,8 +17,6 @@ type userRepositoryIntegrationTestSuite struct {
 	suite.Suite
 
 	repo      user.Repository
-	dbCleanup func()
-
 	testUsers []model.User
 }
 
@@ -37,7 +35,8 @@ func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
 	dbConn, _, err := gorm.NewPostgresConnection(cfg)
 	suite.NoError(err)
 
-	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())
+	testutil.SetupDBSandbox(suite.T(), dbConn.DB())
+
 	suite.repo = repository.NewUserRepository(dbConn)
 	suite.testUsers = []model.User{
 		{UserName: "fakeUser1", PasswordHash: []byte("password")},
@@ -47,10 +46,6 @@ func (suite *userRepositoryIntegrationTestSuite) SetupTest() {
 	for i := range suite.testUsers {
 		suite.NoError(dbConn.DB().Create(&suite.testUsers[i]).Error)
 	}
-}
-
-func (suite *userRepositoryIntegrationTestSuite) TearDownTest() {
-	suite.dbCleanup()
 }
 
 func (suite *userRepositoryIntegrationTestSuite) TestCreateUser() {
@@ -126,12 +121,7 @@ func (suite *userRepositoryIntegrationTestSuite) TestUserByUserName() {
 		{
 			description: "ShouldGetUser",
 			argUserName: suite.testUsers[0].UserName,
-			expected: entity.User{
-				ID:           suite.testUsers[0].ID,
-				UserName:     suite.testUsers[0].UserName,
-				PasswordHash: suite.testUsers[0].PasswordHash,
-			},
-			// expected:    model.ToUserEntity(suite.testUsers[0]),
+			expected:    model.ToUserEntity(suite.testUsers[0]),
 			expectedErr: nil,
 		},
 		{

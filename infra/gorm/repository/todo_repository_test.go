@@ -17,8 +17,6 @@ type todoRepositoryIntegrationTestSuite struct {
 	suite.Suite
 
 	repo      todo.Repository
-	dbCleanup func()
-
 	testTodos []model.Todo
 }
 
@@ -37,7 +35,8 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 	dbConn, _, err := gorm.NewPostgresConnection(cfg)
 	suite.NoError(err)
 
-	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())
+	testutil.SetupDBSandbox(suite.T(), dbConn.DB())
+
 	suite.repo = repository.NewGormTodoRepository(dbConn)
 	suite.testTodos = []model.Todo{
 		{ID: uuid.NewV4(), Title: "test title 1", Contents: "test contents 2", AssignorID: 4},
@@ -53,10 +52,6 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 				Error,
 		)
 	}
-}
-
-func (suite *todoRepositoryIntegrationTestSuite) TearDownTest() {
-	suite.dbCleanup()
 }
 
 func (suite *todoRepositoryIntegrationTestSuite) TestAddTodo() {

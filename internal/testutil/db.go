@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"database/sql"
+	"testing"
 
 	"github.com/jinzhu/gorm"
 )
@@ -13,8 +14,8 @@ type DbEntity struct {
 	Key       interface{}
 }
 
-// DbCleanupFunc godoc
-func DbCleanupFunc(db *gorm.DB) func() {
+// SetupDBSandbox godoc
+func SetupDBSandbox(t *testing.T, db *gorm.DB) {
 	const hookName = "dbCleanup"
 
 	entries := []DbEntity{}
@@ -29,7 +30,7 @@ func DbCleanupFunc(db *gorm.DB) func() {
 			})
 		})
 
-	return func() {
+	t.Cleanup(func() {
 		defer db.Close()
 		defer db.Callback().Create().Remove(hookName)
 
@@ -46,5 +47,5 @@ func DbCleanupFunc(db *gorm.DB) func() {
 		if !inTransaction {
 			tx.Commit()
 		}
-	}
+	})
 }
