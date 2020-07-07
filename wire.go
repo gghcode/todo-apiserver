@@ -63,7 +63,7 @@ var configSet = wire.NewSet(
 )
 
 var dbSet = wire.NewSet(
-	gorm.NewPostgresConn,
+	gorm.NewPostgresConnection,
 )
 
 var redisSet = wire.NewSet(

@@ -14,8 +14,8 @@ type PostgresConn struct {
 	db *gorm.DB
 }
 
-// NewPostgresConn godoc
-func NewPostgresConn(cfg config.Configuration) (Connection, func(), error) {
+// NewPostgresConnection godoc
+func NewPostgresConnection(cfg config.Configuration) (Connection, func(), error) {
 	gormDB, err := gorm.Open("postgres",
 		"host="+cfg.PostgresHost+
 			" port="+cfg.PostgresPort+

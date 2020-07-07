@@ -34,7 +34,7 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
-	dbConn, _, err := gorm.NewPostgresConn(cfg)
+	dbConn, _, err := gorm.NewPostgresConnection(cfg)
 	suite.NoError(err)
 
 	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())

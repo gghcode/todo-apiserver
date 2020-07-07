@@ -49,7 +49,7 @@ func InitializeRouter() (*http.Server, func(), error) {
 	fs := afero.NewOsFs()
 	fileReader := file.NewAferoFileReader(fs)
 	useCase := app.NewService(fileReader)
-	connection, cleanup, err := gorm.NewPostgresConn(configuration)
+	connection, cleanup, err := gorm.NewPostgresConnection(configuration)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -107,7 +107,7 @@ func provideDataSource(userRepo user.Repository) auth.UserDataSource {
 
 var configSet = wire.NewSet(config.FromEnvs)
 
-var dbSet = wire.NewSet(gorm.NewPostgresConn)
+var dbSet = wire.NewSet(gorm.NewPostgresConnection)
 
 var redisSet = wire.NewSet(redis.NewConnection)
 

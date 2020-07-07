@@ -42,7 +42,7 @@ func (suite *ControllerIntegrationTestSuite) SetupTest() {
 	suite.router = gin.New()
 	suite.fakeAppService = fake.NewAppService()
 
-	postgresConn, postgresCleanup, err := gorm.NewPostgresConn(cfg)
+	postgresConn, postgresCleanup, err := gorm.NewPostgresConnection(cfg)
 	redisConn, redisCleanup := redis.NewConnection(cfg)
 
 	suite.NoError(err)

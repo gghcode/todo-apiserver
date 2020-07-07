@@ -21,7 +21,7 @@ func TestPostgresConnIntegration(t *testing.T) {
 	expectedHealthy := true
 	expectedHealthyAfterClose := false
 
-	postgresConn, cleanup, err := gorm.NewPostgresConn(cfg)
+	postgresConn, cleanup, err := gorm.NewPostgresConnection(cfg)
 	if err != nil {
 		t.Error(err)
 	}
