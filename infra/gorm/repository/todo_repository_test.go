@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/internal/testutil"
@@ -34,7 +34,7 @@ func (suite *todoRepositoryIntegrationTestSuite) SetupTest() {
 	cfg, err := config.FromEnvs()
 	suite.NoError(err)
 
-	dbConn, _, err := db.NewPostgresConn(cfg)
+	dbConn, _, err := gorm.NewPostgresConn(cfg)
 	suite.NoError(err)
 
 	suite.dbCleanup = testutil.DbCleanupFunc(dbConn.DB())

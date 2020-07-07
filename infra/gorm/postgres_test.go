@@ -1,10 +1,10 @@
-package db_test
+package gorm_test
 
 import (
 	"testing"
 
 	"github.com/gghcode/apas-todo-apiserver/config"
-	"github.com/gghcode/apas-todo-apiserver/db"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,7 @@ func TestPostgresConnIntegration(t *testing.T) {
 	expectedHealthy := true
 	expectedHealthyAfterClose := false
 
-	postgresConn, cleanup, err := db.NewPostgresConn(cfg)
+	postgresConn, cleanup, err := gorm.NewPostgresConn(cfg)
 	if err != nil {
 		t.Error(err)
 	}

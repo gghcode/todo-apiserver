@@ -1,4 +1,4 @@
-package db
+package gorm
 
 import (
 	"github.com/gghcode/apas-todo-apiserver/config"
@@ -15,7 +15,7 @@ type PostgresConn struct {
 }
 
 // NewPostgresConn godoc
-func NewPostgresConn(cfg config.Configuration) (GormConnection, func(), error) {
+func NewPostgresConn(cfg config.Configuration) (Connection, func(), error) {
 	gormDB, err := gorm.Open("postgres",
 		"host="+cfg.PostgresHost+
 			" port="+cfg.PostgresPort+

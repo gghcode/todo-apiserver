@@ -14,6 +14,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/web"
@@ -47,18 +48,18 @@ func InitializeRouter() (*http.Server, func(), error) {
 	fs := afero.NewOsFs()
 	fileReader := file.NewAferoFileReader(fs)
 	useCase := app.NewService(fileReader)
-	gormConnection, cleanup, err := db.NewPostgresConn(configuration)
+	connection, cleanup, err := gorm.NewPostgresConn(configuration)
 	if err != nil {
 		return nil, nil, err
 	}
 	redisConnection, cleanup2 := db.NewRedisConn(configuration)
-	controller := app2.NewController(useCase, gormConnection, redisConnection)
-	todoRepository := repository.NewGormTodoRepository(gormConnection)
+	controller := app2.NewController(useCase, connection, redisConnection)
+	todoRepository := repository.NewGormTodoRepository(connection)
 	todoUseCase := todo.NewTodoService(todoRepository)
 	todoController := todo2.NewController(todoUseCase)
 	passwordAuthenticator := bcrypt.NewPasswordAuthenticator()
 	tokenRepository := repository.NewRedisTokenRepository(redisConnection)
-	userRepository := repository.NewUserRepository(gormConnection)
+	userRepository := repository.NewUserRepository(connection)
 	userDataSource := provideDataSource(userRepository)
 	accessTokenGeneratorFunc := jwt.NewJwtAccessTokenGeneratorFunc(configuration)
 	refreshTokenGeneratorFunc := jwt.NewJwtRefreshTokenGeneratorFunc(configuration)
@@ -105,7 +106,7 @@ func provideDataSource(userRepo user.Repository) auth.UserDataSource {
 
 var configSet = wire.NewSet(config.FromEnvs)
 
-var dbSet = wire.NewSet(db.NewPostgresConn)
+var dbSet = wire.NewSet(gorm.NewPostgresConn)
 
 var redisSet = wire.NewSet(db.NewRedisConn)
 

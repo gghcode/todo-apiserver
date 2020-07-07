@@ -13,6 +13,7 @@ import (
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
 	"github.com/gghcode/apas-todo-apiserver/infra/bcrypt"
 	"github.com/gghcode/apas-todo-apiserver/infra/file"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/repository"
 	"github.com/gghcode/apas-todo-apiserver/infra/jwt"
 	"github.com/gghcode/apas-todo-apiserver/web"
@@ -61,7 +62,7 @@ var configSet = wire.NewSet(
 )
 
 var dbSet = wire.NewSet(
-	db.NewPostgresConn,
+	gorm.NewPostgresConn,
 )
 
 var redisSet = wire.NewSet(

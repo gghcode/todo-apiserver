@@ -1,18 +1,19 @@
 package repository
 
 import (
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/todo"
+	myGorm "github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
+
 	"github.com/jinzhu/gorm"
 )
 
 type gormTodoRepository struct {
-	dbConn db.GormConnection
+	dbConn myGorm.Connection
 }
 
 // NewGormTodoRepository return new todo repository
-func NewGormTodoRepository(dbConn db.GormConnection) todo.Repository {
+func NewGormTodoRepository(dbConn myGorm.Connection) todo.Repository {
 	return &gormTodoRepository{
 		dbConn: dbConn,
 	}

@@ -1,11 +1,11 @@
-package db
+package gorm
 
 import (
 	"github.com/jinzhu/gorm"
 )
 
-// GormConnection connection
-type GormConnection interface {
+// Connection is gorm connection
+type Connection interface {
 	Healthy() bool
 	DB() *gorm.DB
 

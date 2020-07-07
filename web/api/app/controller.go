@@ -5,20 +5,21 @@ import (
 
 	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/app"
+	"github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gin-gonic/gin"
 )
 
 // Controller is app controller
 type Controller struct {
 	appService   app.UseCase
-	postgresConn db.GormConnection
+	postgresConn gorm.Connection
 	redisConn    db.RedisConnection
 }
 
 // NewController return new app controller
 func NewController(
 	appService app.UseCase,
-	postgresConn db.GormConnection,
+	postgresConn gorm.Connection,
 	redisConn db.RedisConnection,
 ) *Controller {
 	return &Controller{

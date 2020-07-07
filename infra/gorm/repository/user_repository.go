@@ -3,20 +3,20 @@ package repository
 import (
 	"time"
 
-	"github.com/gghcode/apas-todo-apiserver/db"
 	"github.com/gghcode/apas-todo-apiserver/domain/entity"
 	"github.com/gghcode/apas-todo-apiserver/domain/usecase/user"
+	myGorm "github.com/gghcode/apas-todo-apiserver/infra/gorm"
 	"github.com/gghcode/apas-todo-apiserver/infra/gorm/model"
 	"github.com/jinzhu/gorm"
 	pg "github.com/lib/pq"
 )
 
 type repository struct {
-	dbConn db.GormConnection
+	dbConn myGorm.Connection
 }
 
 // NewUserRepository godoc
-func NewUserRepository(dbConn db.GormConnection) user.Repository {
+func NewUserRepository(dbConn myGorm.Connection) user.Repository {
 	return &repository{
 		dbConn: dbConn,
 	}
