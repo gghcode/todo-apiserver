@@ -9,7 +9,7 @@ require (
 	github.com/go-redis/redis v6.15.8+incompatible
 	github.com/google/wire v0.4.0
 	github.com/jinzhu/gorm v1.9.14
-	github.com/lib/pq v1.7.0
+	github.com/lib/pq v1.8.0
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
