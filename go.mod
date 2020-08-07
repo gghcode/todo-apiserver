@@ -19,10 +19,9 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.7
-	github.com/vrischmann/envconfig v1.2.0
+	github.com/vrischmann/envconfig v1.3.0
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
 	golang.org/x/tools v0.0.0-20191114200427-caa0b0f7d508 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
 
 go 1.14
