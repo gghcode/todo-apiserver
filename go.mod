@@ -17,7 +17,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/afero v1.3.5
 	github.com/stretchr/testify v1.6.1
-	github.com/swaggo/gin-swagger v1.2.0
+	github.com/swaggo/gin-swagger v1.3.0
 	github.com/swaggo/swag v1.6.7
 	github.com/vrischmann/envconfig v1.3.0
 	golang.org/x/crypto v0.0.0-20200311171314-f7b00557c8c4
