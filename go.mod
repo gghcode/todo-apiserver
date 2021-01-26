@@ -7,7 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ozzo/ozzo-validation/v3 v3.8.1
 	github.com/go-redis/redis v6.15.9+incompatible
-	github.com/google/wire v0.4.0
+	github.com/google/wire v0.5.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lib/pq v1.8.0
 	github.com/mailru/easyjson v0.7.0 // indirect
